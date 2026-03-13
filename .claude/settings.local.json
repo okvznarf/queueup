@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash($env:Path += \";C:\\\\Program Files\\\\PostgreSQL\\\\18\\\\bin\")",
+      "Bash(psql -U postgres -d queueup -c \"SELECT id, name, email, role FROM \"\"User\"\";\")",
+      "Bash(rm -rf \"c:/Users/zovko/queueup/src/app/fran\")",
+      "Bash(rm -rf \"c:/Users/zovko/queueup/src/app/api/superadmin\")"
+    ]
+  }
+}

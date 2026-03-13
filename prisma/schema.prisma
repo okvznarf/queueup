@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum BusinessType {
+  BARBER
+  RESTAURANT
+  MECHANIC
+  SALON
+  DENTIST
+  SPA
+  FITNESS
+  VETERINARY
+  OTHER
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+model Shop {
+  id           String       @id @default(cuid())
+  name         String
+  slug         String       @unique
+  businessType BusinessType
+  description  String?
+  phone        String?
+  email        String?
+  website      String?
+  address      String?
+  city         String?
+  state        String?
+  zipCode      String?
+  country      String       @default("US")
+  logoUrl      String?
+  primaryColor String       @default("#C8A45A")
+  darkMode     Boolean      @default(true)
+  timezone     String       @default("America/New_York")
+  currency     String       @default("USD")
+  requirePayment Boolean    @default(false)
+  allowWalkIns   Boolean    @default(true)
+  showStaffPicker  Boolean  @default(true)
+  showPartySize    Boolean  @default(false)
+  showVehicleInfo  Boolean  @default(false)
+  staffLabel    String      @default("Staff")
+  serviceLabel  String      @default("Service")
+  bookingLabel  String      @default("Appointment")
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  owner        User?        @relation("ShopOwner", fields: [ownerId], references: [id])
+  ownerId      String?
+  staff        Staff[]
+  services     Service[]
+  appointments Appointment[]
+  workingHours WorkingHours[]
+  customers    Customer[]
+  @@index([slug])
+  @@index([businessType])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String
+  role          String    @default("owner")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  ownedShops    Shop[]    @relation("ShopOwner")
+}
+
+model Staff {
+  id          String   @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  role        String?
+  bio         String?
+  avatarUrl   String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  shopId      String
+  appointments Appointment[]
+  workingHours StaffWorkingHours[]
+  @@index([shopId])
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  duration    Int
+  price       Float
+  icon        String?
+  category    String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  shopId      String
+  appointments Appointment[]
+  @@index([shopId])
+}
+
+model Customer {
+  id            String   @id @default(cuid())
+  name          String
+  email         String?
+  phone         String
+  notes         String?
+  passwordHash  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  shop          Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  shopId        String
+  appointments  Appointment[]
+  @@unique([phone, shopId])
+  @@unique([email, shopId])
+  @@index([shopId])
+}
+
+model Appointment {
+  id          String        @id @default(cuid())
+  date        DateTime
+  startTime   String
+  endTime     String
+  status      BookingStatus @default(PENDING)
+  partySize   Int?
+  tableNumber String?
+  vehicleInfo String?
+  licensePlate String?
+  notes       String?
+  totalPrice  Float?
+  paidAt      DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  shop        Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  shopId      String
+  service     Service       @relation(fields: [serviceId], references: [id])
+  serviceId   String
+  staff       Staff?        @relation(fields: [staffId], references: [id])
+  staffId     String?
+  customer    Customer      @relation(fields: [customerId], references: [id])
+  customerId  String
+  @@index([shopId, date])
+  @@index([staffId, date])
+  @@index([status])
+}
+
+model WorkingHours {
+  id        String    @id @default(cuid())
+  day       DayOfWeek
+  openTime  String
+  closeTime String
+  isClosed  Boolean   @default(false)
+  shop      Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  shopId    String
+  @@unique([shopId, day])
+}
+
+model StaffWorkingHours {
+  id        String    @id @default(cuid())
+  day       DayOfWeek
+  startTime String
+  endTime   String
+  isOff     Boolean   @default(false)
+  staff     Staff     @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  staffId   String
+  @@unique([staffId, day])
+}
