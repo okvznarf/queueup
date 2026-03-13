@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
         staffName: appointment.staff?.name,
         date: appointment.date,
         startTime: appointment.startTime,
-        totalPrice: appointment.totalPrice,
+        totalPrice: appointment.totalPrice ?? 0,
       });
     }
 
