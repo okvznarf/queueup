@@ -20,6 +20,7 @@ type Shop = any;
 export default function BookingClient({ shop }: { shop: Shop }) {
   const [step, setStep] = useState(0);
   const [selService, setSelService] = useState<string | null>(null);
+  const [selDuration, setSelDuration] = useState<number | null>(null);
   const [selStaff, setSelStaff] = useState<string | null>(null);
   const [selDate, setSelDate] = useState<Date | null>(null);
   const [selSlot, setSelSlot] = useState<any>(null);
@@ -41,7 +42,7 @@ export default function BookingClient({ shop }: { shop: Shop }) {
   useEffect(() => {
     if (selDate && selService) {
       setSlotsLoading(true);
-      const duration = service?.duration || 30;
+      const duration = selDuration || service?.duration || 30;
       let url = "/api/availability?shopId=" + shop.id + "&date=" + selDate.toISOString().split("T")[0] + "&duration=" + duration;
       if (selStaff) url += "&staffId=" + selStaff;
       fetch(url).then(r => r.json()).then(data => {
@@ -52,7 +53,11 @@ export default function BookingClient({ shop }: { shop: Shop }) {
   }, [selDate, selStaff, selService]);
 
   const steps: { id: string; label: string }[] = [];
-  steps.push({ id: "service", label: shop.serviceLabel || "Service" });
+  if (shop.showPartySize) {
+    steps.push({ id: "duration", label: "Duration" });
+  } else {
+    steps.push({ id: "service", label: shop.serviceLabel || "Service" });
+  }
   if (shop.showStaffPicker && shop.staff.length > 0) steps.push({ id: "staff", label: shop.staffLabel || "Staff" });
   if (shop.showPartySize) steps.push({ id: "party", label: "Party Size" });
   if (shop.showVehicleInfo) steps.push({ id: "vehicle", label: "Vehicle" });
@@ -64,6 +69,7 @@ export default function BookingClient({ shop }: { shop: Shop }) {
 
   const canNext = () => {
     if (!currentStep) return false;
+    if (currentStep.id === "duration") return selDuration !== null;
     if (currentStep.id === "service") return selService !== null;
     if (currentStep.id === "staff") return selStaff !== null;
     if (currentStep.id === "party") return partySize > 0;
@@ -108,7 +114,7 @@ export default function BookingClient({ shop }: { shop: Shop }) {
   };
 
   const reset = () => {
-    setStep(0); setSelService(null); setSelStaff(null); setSelDate(null); setSelSlot(null);
+    setStep(0); setSelService(null); setSelDuration(null); setSelStaff(null); setSelDate(null); setSelSlot(null);
     setPartySize(2); setVehicleInfo(""); setForm({ name: "", phone: "", email: "", notes: "", password: "" });
     setConfirmed(false); setCreateAccount(false); setError("");
   };
@@ -172,6 +178,28 @@ export default function BookingClient({ shop }: { shop: Shop }) {
           </div>
         ))}
       </div>
+
+      {currentStep?.id === "duration" && (
+        <div>
+          <h2 style={{ fontSize: 17, fontWeight: 600, marginBottom: 14, color: s.text }}>How long is your stay?</h2>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            {[
+              { label: "45 min", value: 45 },
+              { label: "1 hour", value: 60 },
+              { label: "1.5 hours", value: 90 },
+              { label: "2 hours", value: 120 },
+              { label: "3 hours", value: 180 },
+            ].map((opt) => (
+              <button key={opt.value} onClick={() => {
+                setSelDuration(opt.value);
+                if (shop.services.length > 0) setSelService(shop.services[0].id);
+              }} style={{ background: selDuration === opt.value ? accent + "18" : s.card, border: "2px solid " + (selDuration === opt.value ? accent : s.border), borderRadius: 12, padding: "14px 24px", fontSize: 15, fontWeight: 600, cursor: "pointer", color: selDuration === opt.value ? accent : s.text }}>
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {currentStep?.id === "service" && (
         <div>
@@ -285,8 +313,8 @@ export default function BookingClient({ shop }: { shop: Shop }) {
         <div>
           <h2 style={{ fontSize: 17, fontWeight: 600, marginBottom: 14, color: s.text }}>Review and Confirm</h2>
           <div style={{ background: s.card, border: "1px solid " + s.border, borderRadius: 12, padding: 18 }}>
-            <Row label={shop.serviceLabel} value={service?.name + (service?.price ? " - $" + service.price : "")} s={s} />
-            <Row label="Duration" value={service?.duration + " min"} s={s} />
+            {!shop.showPartySize && <Row label={shop.serviceLabel} value={service?.name + (service?.price ? " - $" + service.price : "")} s={s} />}
+            <Row label="Duration" value={(selDuration || service?.duration) + " min"} s={s} />
             {staffMember && <Row label={shop.staffLabel} value={staffMember.name} s={s} />}
             {shop.showPartySize && <Row label="Party Size" value={partySize + " guests"} s={s} />}
             {shop.showVehicleInfo && <Row label="Vehicle" value={vehicleInfo} s={s} />}
