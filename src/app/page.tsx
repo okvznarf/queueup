@@ -22,8 +22,6 @@ export default function Home() {
 
         <div style={{ marginTop: 48, display: "flex", gap: 16, justifyContent: "center" }}>
           <a href="/admin/login" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>Business Login</a>
-          <span style={{ color: "#333" }}>·</span>
-          <a href="/fran/login" style={{ fontSize: 13, color: "#333", textDecoration: "none" }}>Admin</a>
         </div>
       </div>
     </div>
