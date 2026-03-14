@@ -3,7 +3,7 @@ export default function Home() {
     <div style={{ fontFamily: "system-ui, sans-serif", background: "#0a0a0a", minHeight: "100vh", color: "#e8e4dd", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div style={{ textAlign: "center", maxWidth: 480 }}>
         <div style={{ fontWeight: 900, fontSize: 36, letterSpacing: 6, color: "#C8A45A", marginBottom: 8 }}>QUEUEUP</div>
-        <p style={{ color: "#555", fontSize: 15, marginBottom: 48 }}>Appointment booking for modern businesses</p>
+        <p style={{ fontSize: 15, marginBottom: 48, background: "linear-gradient(90deg, #C8A45A, #e8c97a, #C8A45A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontWeight: 500, letterSpacing: 1 }}>Appointment booking for modern businesses</p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <a href="/booking/sharp-and-co" style={cardStyle("#C8A45A")}>
@@ -21,7 +21,7 @@ export default function Home() {
         </div>
 
         <div style={{ marginTop: 48, display: "flex", gap: 16, justifyContent: "center" }}>
-          <a href="/admin/login" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>Business Login</a>
+          <a href="/admin/login" style={{ fontSize: 13, color: "#C8A45A", textDecoration: "none", border: "1px solid #C8A45A40", borderRadius: 8, padding: "8px 20px", fontWeight: 600, letterSpacing: 1 }}>Business Login</a>
         </div>
       </div>
     </div>
