@@ -78,8 +78,8 @@ export default function HomePage() {
     if (lb && ls) lb.onclick = () => ls.classList.toggle('open');
 
     document.querySelectorAll('.lo').forEach(btn => {
-      (btn as HTMLElement).onclick = function(this: HTMLElement) {
-        sl(this.getAttribute('data-l') || 'en');
+      (btn as HTMLElement).onclick = function() {
+        sl((btn as HTMLElement).getAttribute('data-l') || 'en');
         ls?.classList.remove('open');
       };
     });
