@@ -92,8 +92,12 @@ export default function CustomerDashboard() {
       <div style={{ background: t.header, borderBottom: `1px solid ${t.headerBorder}`, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: dark ? "none" : "0 1px 6px rgba(0,0,0,0.05)" }}>
         <Image src="/logo.png" alt="QueueUp" width={110} height={36} style={{ objectFit: "contain", filter: dark ? "brightness(0) invert(1)" : "none" }} />
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <button onClick={toggleTheme} title={dark ? "Switch to light mode" : "Switch to dark mode"} style={{ background: "transparent", border: "none", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>
-            {dark ? "☀️" : "🌙"}
+          <button onClick={toggleTheme} title={dark ? "Switch to light mode" : "Switch to dark mode"} style={{ background: "transparent", border: "none", cursor: "pointer", padding: 4, lineHeight: 1, color: dark ? "#e8e4dd" : "#555" }}>
+            {dark ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            )}
           </button>
           <button onClick={handleLogout} style={{ background: "transparent", border: `1px solid ${t.cardBorder}`, borderRadius: 8, padding: "7px 16px", color: t.muted, fontSize: 13, cursor: "pointer" }}>Logout</button>
         </div>
@@ -106,7 +110,7 @@ export default function CustomerDashboard() {
           <p style={{ color: t.muted, textAlign: "center", paddingTop: 40 }}>Loading your appointments...</p>
         ) : appointments.length === 0 ? (
           <div style={{ textAlign: "center", paddingTop: 60 }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>📅</div>
+            <div style={{ fontSize: 48, marginBottom: 16, color: t.muted }}>—</div>
             <h2 style={{ fontSize: 20, fontWeight: 600, margin: "0 0 8px" }}>No Appointments Yet</h2>
             <p style={{ color: t.muted, fontSize: 14 }}>Book your first appointment to see it here.</p>
           </div>
