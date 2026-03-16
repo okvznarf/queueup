@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING: "#f59e0b",
@@ -92,7 +91,7 @@ export default function CustomerDashboard() {
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", background: t.bg, minHeight: "100vh", color: t.text }}>
       <div style={{ background: t.header, borderBottom: `1px solid ${t.headerBorder}`, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: dark ? "none" : "0 1px 6px rgba(0,0,0,0.05)" }}>
-        <div style={{ height: 36, display: "flex", alignItems: "center" }}><Image src={dark ? "/logo-dark.png" : "/logo.png"} alt="QueueUp" width={110} height={36} style={{ objectFit: "contain", maxHeight: 36 }} /></div>
+        <img src={dark ? "/logo-dark.png" : "/logo.png"} alt="QueueUp" style={{ height: 36, width: "auto", display: "block" }} />
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <button onClick={toggleTheme} title={dark ? "Switch to light mode" : "Switch to dark mode"} style={{ background: "transparent", border: "none", cursor: "pointer", padding: 4, lineHeight: 1, color: dark ? "#e8e4dd" : "#555" }}>
             {dark ? (
