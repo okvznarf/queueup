@@ -90,7 +90,7 @@ export default function CustomerDashboard() {
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", background: t.bg, minHeight: "100vh", color: t.text }}>
       <div style={{ background: t.header, borderBottom: `1px solid ${t.headerBorder}`, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: dark ? "none" : "0 1px 6px rgba(0,0,0,0.05)" }}>
-        <Image src="/logo.png" alt="QueueUp" width={110} height={36} style={{ objectFit: "contain", filter: "none" }} />
+        <Image src={dark ? "/logo-dark.png" : "/logo.png"} alt="QueueUp" width={110} height={36} style={{ objectFit: "contain", filter: "none" }} />
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <button onClick={toggleTheme} title={dark ? "Switch to light mode" : "Switch to dark mode"} style={{ background: "transparent", border: "none", cursor: "pointer", padding: 4, lineHeight: 1, color: dark ? "#e8e4dd" : "#555" }}>
             {dark ? (
