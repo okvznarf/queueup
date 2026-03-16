@@ -101,7 +101,7 @@ function CustomerLoginForm() {
         <ThemeToggle dark={dark} onToggle={toggleTheme} />
 
         <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <img src={dark ? "/logo-dark.png" : "/logo.png"} alt="QueueUp" style={{ height: 72, width: "auto", display: "block", margin: "0 auto" }} />
+          <img src={dark ? "/logo-dark.png" : "/logo.png"} alt="QueueUp" style={{ height: 96, width: "auto", display: "block", margin: "0 auto" }} />
           {shopName && <div style={{ marginTop: 10, fontSize: 13, color: "#656D3F", fontWeight: 600 }}>{shopName}</div>}
           <h1 style={{ fontSize: 20, fontWeight: 600, margin: "10px 0 4px", color: t.text }}>{isRegister ? "Create Account" : "Customer Login"}</h1>
           <p style={{ color: t.label, fontSize: 13 }}>{isRegister ? "Sign up to manage your bookings" : "Sign in to view your appointments"}</p>
