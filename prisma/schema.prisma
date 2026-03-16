@@ -127,17 +127,20 @@ model Service {
 }
 
 model Customer {
-  id            String   @id @default(cuid())
-  name          String
-  email         String?
-  phone         String
-  notes         String?
-  passwordHash  String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  shop          Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  shopId        String
-  appointments  Appointment[]
+  id               String    @id @default(cuid())
+  name             String
+  email            String?
+  phone            String?
+  notes            String?
+  passwordHash     String?
+  googleId         String?   @unique
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  shop             Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  shopId           String
+  appointments     Appointment[]
   @@unique([phone, shopId])
   @@unique([email, shopId])
   @@index([shopId])

@@ -1,4 +1,35 @@
+import nodemailer from "nodemailer";
 import sgMail from "@sendgrid/mail";
+
+function createTransporter() {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+}
+
+export async function sendPasswordResetEmail(to: string, resetLink: string, shopName: string) {
+  if (!process.env.SMTP_HOST) return;
+  const transporter = createTransporter();
+  await transporter.sendMail({
+    from: `"QueueUp" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+    to,
+    subject: "Reset your password",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #f9f9f9;">
+        <h2 style="color: #111;">Reset your password</h2>
+        <p style="color: #555;">Hi, you requested a password reset for your ${shopName} account on QueueUp.</p>
+        <a href="${resetLink}" style="display: inline-block; margin: 24px 0; background: #C8A45A; color: #111; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 700;">Reset Password</a>
+        <p style="color: #888; font-size: 13px;">This link expires in 1 hour. If you didn't request this, ignore this email.</p>
+      </div>
+    `,
+  });
+}
 
 if (process.env.SENDGRID_API_KEY) {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);

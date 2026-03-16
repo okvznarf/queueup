@@ -1163,6 +1163,11 @@ export type StaffWorkingHoursFindManyArgs<ExtArgs extends runtime.Types.Extensio
    * Skip the first `n` StaffWorkingHours.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of StaffWorkingHours.
+   */
   distinct?: Prisma.StaffWorkingHoursScalarFieldEnum | Prisma.StaffWorkingHoursScalarFieldEnum[]
 }
 

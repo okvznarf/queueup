@@ -168,6 +168,9 @@ export const CustomerScalarFieldEnum = {
   phone: 'phone',
   notes: 'notes',
   passwordHash: 'passwordHash',
+  googleId: 'googleId',
+  resetToken: 'resetToken',
+  resetTokenExpiry: 'resetTokenExpiry',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   shopId: 'shopId'
