@@ -21,7 +21,7 @@ function formatDate(dateStr: string) {
 }
 
 export default function CustomerDashboard() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState<boolean | null>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
@@ -30,8 +30,10 @@ export default function CustomerDashboard() {
 
   useEffect(() => {
     const saved = localStorage.getItem("customer-theme");
-    if (saved === "dark") setDark(true);
+    setDark(saved === "dark");
   }, []);
+
+  if (dark === null) return null;
 
   const toggleTheme = () => {
     const next = !dark;

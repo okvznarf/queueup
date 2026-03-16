@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 function ForgotPasswordForm() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState<boolean | null>(null);
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -15,11 +15,13 @@ function ForgotPasswordForm() {
 
   useEffect(() => {
     const saved = localStorage.getItem("customer-theme");
-    if (saved === "dark") setDark(true);
+    setDark(saved === "dark");
     if (shopSlug) {
       fetch("/api/shops?slug=" + shopSlug).then((r) => r.json()).then((d) => { if (d.id) setShopId(d.id); });
     }
   }, [shopSlug]);
+
+  if (dark === null) return null;
 
   const toggleTheme = () => {
     const next = !dark;

@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 
 function ResetPasswordForm() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState<boolean | null>(null);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [done, setDone] = useState(false);
@@ -17,8 +17,10 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     const saved = localStorage.getItem("customer-theme");
-    if (saved === "dark") setDark(true);
+    setDark(saved === "dark");
   }, []);
+
+  if (dark === null) return null;
 
   const toggleTheme = () => {
     const next = !dark;

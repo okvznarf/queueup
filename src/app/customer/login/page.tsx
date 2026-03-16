@@ -16,7 +16,7 @@ function ThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => void }
 }
 
 function CustomerLoginForm() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState<boolean | null>(null);
   const [isRegister, setIsRegister] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -33,7 +33,7 @@ function CustomerLoginForm() {
 
   useEffect(() => {
     const saved = localStorage.getItem("customer-theme");
-    if (saved === "dark") setDark(true);
+    setDark(saved === "dark");
   }, []);
 
   useEffect(() => {
@@ -47,6 +47,8 @@ function CustomerLoginForm() {
     if (urlError === "no_email") setError("No email returned from Google.");
     if (urlError === "no_shop") setError("Shop not found.");
   }, [shopSlug, urlError]);
+
+  if (dark === null) return null;
 
   const toggleTheme = () => {
     const next = !dark;
