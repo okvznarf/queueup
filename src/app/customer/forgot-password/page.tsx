@@ -59,7 +59,7 @@ function ForgotPasswordForm() {
         </button>
 
         <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <Image src="/logo.png" alt="QueueUp" width={140} height={48} style={{ objectFit: "contain", filter: dark ? "brightness(0) invert(1)" : "none" }} />
+          <div style={{ display: "inline-block", background: "#fff", borderRadius: 8, padding: "6px 12px" }}><Image src="/logo.png" alt="QueueUp" width={140} height={48} style={{ objectFit: "contain", display: "block" }} /></div>
           <h1 style={{ fontSize: 20, fontWeight: 600, margin: "12px 0 4px", color: t.text }}>Forgot Password</h1>
           <p style={{ color: t.label, fontSize: 13 }}>Enter your email to receive a reset link</p>
         </div>
