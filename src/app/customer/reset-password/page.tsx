@@ -68,7 +68,7 @@ function ResetPasswordForm() {
         </button>
 
         <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <img src={dark ? "/logo-dark.png" : "/logo.png"} alt="QueueUp" style={{ height: 80, width: "auto", display: "block", margin: "0 auto" }} />
+          <img src={dark ? "/logo-dark.png" : "/logo.png"} alt="QueueUp" style={{ height: 100, width: "auto", display: "block", margin: "0 auto" }} />
           <h1 style={{ fontSize: 20, fontWeight: 600, margin: "12px 0 4px", color: t.text }}>Set New Password</h1>
           <p style={{ color: t.label, fontSize: 13 }}>Choose a new password for your account</p>
         </div>
