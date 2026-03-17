@@ -97,7 +97,7 @@ function CustomerLoginForm() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", background: t.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: t.text }}>
-      <div style={{ position: "relative", background: t.card, border: `1px solid ${t.border}`, borderRadius: 16, padding: 36, width: 380, boxShadow: dark ? "none" : "0 4px 24px rgba(0,0,0,0.07)" }}>
+      <div style={{ position: "relative", background: t.card, border: `1px solid ${t.border}`, borderRadius: 16, padding: 36, width: 380, minHeight: 600, boxShadow: dark ? "none" : "0 4px 24px rgba(0,0,0,0.07)" }}>
         <ThemeToggle dark={dark} onToggle={toggleTheme} />
 
         <div style={{ textAlign: "center", marginBottom: 28 }}>
