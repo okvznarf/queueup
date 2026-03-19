@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (appointment.customer.email) {
-      sendBookingConfirmation({
+      await sendBookingConfirmation({
         customerName: appointment.customer.name,
         customerEmail: appointment.customer.email,
         shopName: appointment.shop.name,
