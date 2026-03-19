@@ -32,14 +32,6 @@ export default function CustomerDashboard() {
     setDark(saved === "dark");
   }, []);
 
-  if (dark === null) return null;
-
-  const toggleTheme = () => {
-    const next = !dark;
-    setDark(next);
-    localStorage.setItem("customer-theme", next ? "dark" : "light");
-  };
-
   const fetchAppointments = async () => {
     setLoading(true);
     try {
@@ -51,6 +43,14 @@ export default function CustomerDashboard() {
   };
 
   useEffect(() => { fetchAppointments(); }, []);
+
+  if (dark === null) return null;
+
+  const toggleTheme = () => {
+    const next = !dark;
+    setDark(next);
+    localStorage.setItem("customer-theme", next ? "dark" : "light");
+  };
 
   const cancelAppointment = async (id: string) => {
     setCancellingId(id);
