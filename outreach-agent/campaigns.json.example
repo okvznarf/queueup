@@ -1,0 +1,25 @@
+{
+  "campaigns": [
+    {
+      "id": "campaign-001",
+      "category": "barber",
+      "cities": ["Zagreb", "Split", "Rijeka"],
+      "maxLeads": 20,
+      "delayBetweenEmails": 3000
+    },
+    {
+      "id": "campaign-002",
+      "category": "spa",
+      "cities": ["Zagreb", "Osijek"],
+      "maxLeads": 10,
+      "delayBetweenEmails": 5000
+    },
+    {
+      "id": "campaign-003",
+      "category": "fitness",
+      "cities": ["Zagreb"],
+      "maxLeads": 15,
+      "delayBetweenEmails": 3000
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "name": "queueup-outreach-agent",
+  "version": "1.0.0",
+  "description": "B2B outreach agent for QueueUp — discovers Croatian SMEs and sends personalized emails",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/agent.ts",
+    "dev": "tsx src/agent.ts",
+    "test:serper": "tsx src/agent.ts --test serper",
+    "test:sheets": "tsx src/agent.ts --test sheets",
+    "test:sendgrid": "tsx src/agent.ts --test sendgrid",
+    "test:claude": "tsx src/agent.ts --test claude",
+    "test:pipeline": "tsx src/agent.ts --dry-run --category barber --cities Zagreb"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@sendgrid/mail": "^8.1.0",
+    "cheerio": "^1.0.0",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.0",
+    "googleapis": "^144.0.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
+  }
+}
