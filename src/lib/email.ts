@@ -1,11 +1,21 @@
 import sgMail from "@sendgrid/mail";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 const FROM = { email: "info@queueup.me", name: "QueueUp" };
 
+function getSgMail() {
+  const key = process.env.SENDGRID_API_KEY;
+  if (!key) {
+    console.error("SENDGRID_API_KEY is not set");
+    return null;
+  }
+  sgMail.setApiKey(key);
+  return sgMail;
+}
+
 export async function sendPasswordResetEmail(to: string, resetLink: string, shopName: string) {
-  if (!process.env.SENDGRID_API_KEY) return;
-  await sgMail.send({
+  const mail = getSgMail();
+  if (!mail) return;
+  await mail.send({
     to,
     from: FROM,
     subject: "Reset your password",
@@ -37,7 +47,8 @@ export async function sendAppointmentReminder({
   date: Date;
   startTime: string;
 }) {
-  if (!process.env.SENDGRID_API_KEY) return;
+  const mail = getSgMail();
+  if (!mail) return;
 
   const formattedDate = new Date(date).toLocaleDateString("en-US", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
@@ -48,7 +59,7 @@ export async function sendAppointmentReminder({
   const displayHour = hours % 12 || 12;
   const formattedTime = `${displayHour}:${minutes.toString().padStart(2, "0")} ${period}`;
 
-  await sgMail.send({
+  await mail.send({
     to: customerEmail,
     from: FROM,
     subject: `Reminder: Your appointment tomorrow at ${formattedTime}`,
@@ -88,7 +99,8 @@ export async function sendBookingConfirmation({
   startTime: string;
   totalPrice: number;
 }) {
-  if (!process.env.SENDGRID_API_KEY) return;
+  const mail = getSgMail();
+  if (!mail) return;
 
   const formattedDate = new Date(date).toLocaleDateString("en-US", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
@@ -100,7 +112,7 @@ export async function sendBookingConfirmation({
   const formattedTime = `${displayHour}:${minutes.toString().padStart(2, "0")} ${period}`;
 
   try {
-    await sgMail.send({
+    await mail.send({
       to: customerEmail,
       from: FROM,
       subject: `Booking Confirmed — ${shopName}`,
