@@ -1,13 +1,13 @@
-import { Resend } from "resend";
+import sgMail from "@sendgrid/mail";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = "QueueUp <info@queueup.me>";
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+const FROM = { email: "info@queueup.me", name: "QueueUp" };
 
 export async function sendPasswordResetEmail(to: string, resetLink: string, shopName: string) {
-  if (!process.env.RESEND_API_KEY) return;
-  await resend.emails.send({
-    from: FROM,
+  if (!process.env.SENDGRID_API_KEY) return;
+  await sgMail.send({
     to,
+    from: FROM,
     subject: "Reset your password",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #f9f9f9;">
@@ -37,7 +37,7 @@ export async function sendAppointmentReminder({
   date: Date;
   startTime: string;
 }) {
-  if (!process.env.RESEND_API_KEY) return;
+  if (!process.env.SENDGRID_API_KEY) return;
 
   const formattedDate = new Date(date).toLocaleDateString("en-US", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
@@ -48,9 +48,9 @@ export async function sendAppointmentReminder({
   const displayHour = hours % 12 || 12;
   const formattedTime = `${displayHour}:${minutes.toString().padStart(2, "0")} ${period}`;
 
-  await resend.emails.send({
-    from: FROM,
+  await sgMail.send({
     to: customerEmail,
+    from: FROM,
     subject: `Reminder: Your appointment tomorrow at ${formattedTime}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #f9f9f9;">
@@ -88,7 +88,7 @@ export async function sendBookingConfirmation({
   startTime: string;
   totalPrice: number;
 }) {
-  if (!process.env.RESEND_API_KEY) return;
+  if (!process.env.SENDGRID_API_KEY) return;
 
   const formattedDate = new Date(date).toLocaleDateString("en-US", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
@@ -100,9 +100,9 @@ export async function sendBookingConfirmation({
   const formattedTime = `${displayHour}:${minutes.toString().padStart(2, "0")} ${period}`;
 
   try {
-    await resend.emails.send({
-      from: FROM,
+    await sgMail.send({
       to: customerEmail,
+      from: FROM,
       subject: `Booking Confirmed — ${shopName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 32px; background: #f9f9f9;">
