@@ -1,22 +1,12 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-function createTransporter() {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-}
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM = "QueueUp <info@queueup.me>";
 
 export async function sendPasswordResetEmail(to: string, resetLink: string, shopName: string) {
-  if (!process.env.SMTP_HOST) return;
-  const transporter = createTransporter();
-  await transporter.sendMail({
-    from: `"QueueUp" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+  if (!process.env.RESEND_API_KEY) return;
+  await resend.emails.send({
+    from: FROM,
     to,
     subject: "Reset your password",
     html: `
@@ -47,13 +37,10 @@ export async function sendAppointmentReminder({
   date: Date;
   startTime: string;
 }) {
-  if (!process.env.SMTP_HOST) return;
+  if (!process.env.RESEND_API_KEY) return;
 
   const formattedDate = new Date(date).toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+    weekday: "long", year: "numeric", month: "long", day: "numeric",
   });
 
   const [hours, minutes] = startTime.split(":").map(Number);
@@ -61,9 +48,8 @@ export async function sendAppointmentReminder({
   const displayHour = hours % 12 || 12;
   const formattedTime = `${displayHour}:${minutes.toString().padStart(2, "0")} ${period}`;
 
-  const transporter = createTransporter();
-  await transporter.sendMail({
-    from: `"${shopName}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+  await resend.emails.send({
+    from: FROM,
     to: customerEmail,
     subject: `Reminder: Your appointment tomorrow at ${formattedTime}`,
     html: `
@@ -102,13 +88,10 @@ export async function sendBookingConfirmation({
   startTime: string;
   totalPrice: number;
 }) {
-  if (!process.env.SMTP_HOST) return;
+  if (!process.env.RESEND_API_KEY) return;
 
   const formattedDate = new Date(date).toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+    weekday: "long", year: "numeric", month: "long", day: "numeric",
   });
 
   const [hours, minutes] = startTime.split(":").map(Number);
@@ -116,10 +99,9 @@ export async function sendBookingConfirmation({
   const displayHour = hours % 12 || 12;
   const formattedTime = `${displayHour}:${minutes.toString().padStart(2, "0")} ${period}`;
 
-  const transporter = createTransporter();
   try {
-    await transporter.sendMail({
-      from: `"${shopName}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+    await resend.emails.send({
+      from: FROM,
       to: customerEmail,
       subject: `Booking Confirmed — ${shopName}`,
       html: `
