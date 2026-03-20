@@ -102,35 +102,41 @@ export async function sendBookingConfirmation({
   const mail = getSgMail();
   if (!mail) return;
 
-  const formattedDate = new Date(date).toLocaleDateString("en-US", {
+  const formattedDate = new Date(date).toLocaleDateString("hr-HR", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
   });
 
   const [hours, minutes] = startTime.split(":").map(Number);
-  const period = hours >= 12 ? "PM" : "AM";
-  const displayHour = hours % 12 || 12;
-  const formattedTime = `${displayHour}:${minutes.toString().padStart(2, "0")} ${period}`;
+  const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+
+  const text = `Pozdrav ${customerName},
+
+Vaša rezervacija je uspješno potvrđena.
+
+---
+
+VAŠ TERMIN
+Datum:    ${formattedDate}
+Vrijeme:  ${formattedTime}
+Usluga:   ${serviceName}${staffName ? `\nOsoblje:  ${staffName}` : ""}${totalPrice > 0 ? `\nCijena:   ${totalPrice.toFixed(2)} €` : ""}
+
+---
+
+MJESTO
+${shopName}
+
+---
+
+Otkazivanje: Ako trebate otkazati ili promijeniti termin, kontaktirajte ${shopName} direktno.
+
+© ${new Date().getFullYear()} ${shopName}`;
 
   try {
     await mail.send({
       to: customerEmail,
       from: FROM,
-      subject: `Booking Confirmed — ${shopName}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 32px; background: #f9f9f9;">
-          <h2 style="color: #111; margin-bottom: 4px;">Booking Confirmed</h2>
-          <p style="color: #555; margin-top: 0;">Hi ${customerName}, your appointment is booked.</p>
-          <div style="background: #fff; border-radius: 8px; padding: 24px; margin: 24px 0; border: 1px solid #e0e0e0;">
-            <p style="margin: 0 0 12px;"><strong>Shop:</strong> ${shopName}</p>
-            <p style="margin: 0 0 12px;"><strong>Service:</strong> ${serviceName}</p>
-            ${staffName ? `<p style="margin: 0 0 12px;"><strong>With:</strong> ${staffName}</p>` : ""}
-            <p style="margin: 0 0 12px;"><strong>Date:</strong> ${formattedDate}</p>
-            <p style="margin: 0 0 12px;"><strong>Time:</strong> ${formattedTime}</p>
-            <p style="margin: 0;"><strong>Price:</strong> €${totalPrice.toFixed(2)}</p>
-          </div>
-          <p style="color: #888; font-size: 13px;">If you need to cancel or reschedule, please contact ${shopName} directly.</p>
-        </div>
-      `,
+      subject: `Potvrda termina — ${shopName}`,
+      text,
     });
   } catch (error) {
     console.error("Failed to send confirmation email:", error);
