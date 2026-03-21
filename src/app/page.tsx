@@ -51,7 +51,16 @@ const css = `
 .lp-root .step h3{font-family:var(--fd);font-size:1.55rem;font-weight:400;color:#FFF;line-height:1.2}
 .lp-root .step p{color:rgba(236,236,236,0.82);font-size:1.02rem;line-height:1.75;max-width:300px}
 .lp-root .stag{display:inline-block;margin-top:18px;font-family:var(--fm);font-size:0.78rem;font-weight:500;color:var(--accent);letter-spacing:0.08em;padding:6px 16px;border:1px solid rgba(132,147,74,0.45);border-radius:100px}
+.lp-root .pricing{padding:120px 48px;border-top:1px solid var(--border)}.lp-root .pricing .sh{text-align:center;margin-bottom:56px}.lp-root .pricing .sh .sd{margin:12px auto 0}
+.lp-root .pg{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;max-width:900px;margin:0 auto}
+.lp-root .pc{background:var(--bg-dark);color:var(--bg);border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:20px}
+.lp-root .pm{display:flex;align-items:baseline;gap:6px}.lp-root .pm h3{font-family:var(--fd);font-size:3.6rem;color:#fff;line-height:1}.lp-root .pm span{font-size:1rem;color:rgba(236,236,236,0.6)}
+.lp-root .pe{font-size:0.95rem;color:rgba(236,236,236,0.7);padding:10px 16px;background:rgba(255,255,255,0.06);border-radius:8px}
+.lp-root .pfl{list-style:none;display:flex;flex-direction:column;gap:10px}.lp-root .pfl li{font-size:0.95rem;color:rgba(236,236,236,0.8);padding-left:20px;position:relative}.lp-root .pfl li::before{content:'✓';position:absolute;left:0;color:var(--accent)}
+.lp-root .roi{display:flex;flex-direction:column;gap:20px;justify-content:center}
+.lp-root .rs{padding:28px;border:1px solid var(--border);border-radius:12px;background:var(--bg-card)}.lp-root .rs h3{font-family:var(--fd);font-size:2.4rem;color:var(--bg-dark)}.lp-root .rs p{color:var(--text-muted);font-size:0.82rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;margin-top:4px}
 .lp-root .cta{padding:140px 48px;text-align:center;border-top:1px solid var(--border)}.lp-root .cta h2{font-family:var(--fd);font-size:clamp(2.2rem,5vw,3.8rem);letter-spacing:-0.03em;max-width:600px;margin:0 auto 16px}.lp-root .cta h2 em{font-style:italic;color:var(--accent-dark)}.lp-root .cta p{color:var(--text-mid);font-size:1.05rem;max-width:440px;margin:0 auto 36px;line-height:1.7}
+@media(max-width:900px){.lp-root .pg{grid-template-columns:1fr}}
 .lp-root footer{padding:48px 48px 36px;border-top:1px solid var(--border)}.lp-root .fti{max-width:1040px;margin:0 auto;display:flex;justify-content:space-between;align-items:start;gap:40px}.lp-root .ftb p{color:var(--text-muted);font-size:0.85rem;margin-top:8px;max-width:240px;line-height:1.6}
 .lp-root .ftc h4{font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);margin-bottom:14px}.lp-root .ftc a{display:block;color:var(--text-muted);text-decoration:none;font-size:0.9rem;margin-bottom:10px;transition:color 0.2s}.lp-root .ftc a:hover{color:var(--text)}
 .lp-root .ftm{max-width:1040px;margin:36px auto 0;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text-muted)}
@@ -129,6 +138,7 @@ export default function HomePage() {
               <a href="#industries"><span className="en">Industries</span><span className="hr">Industrije</span><span className="sl">Industrije</span></a>
               <a href="#features"><span className="en">Features</span><span className="hr">Značajke</span><span className="sl">Funkcije</span></a>
               <a href="#how"><span className="en">How It Works</span><span className="hr">Kako radi</span><span className="sl">Kako deluje</span></a>
+              <a href="#pricing"><span className="en">Pricing</span><span className="hr">Cijene</span><span className="sl">Cene</span></a>
               <a href="#contact" className="bs"><span className="en">Get Started</span><span className="hr">Započnite</span><span className="sl">Začnite</span></a>
             </div>
             <div className="ls" id="ls">
@@ -150,15 +160,15 @@ export default function HomePage() {
           <h1 className="en">Stop losing clients<br/>to <em>no-shows</em></h1>
           <h1 className="hr">Prestanite gubiti klijente<br/>zbog <em>nedolazaka</em></h1>
           <h1 className="sl">Nehajte izgubljati stranke<br/>zaradi <em>nedohodov</em></h1>
-          <p className="hs"><span className="en">QueueUp is the booking platform that lets any appointment-based business fill their calendar automatically.</span><span className="hr">QueueUp je platforma za rezervacije koja omogućuje svakom poslovanju temeljenom na terminima da automatski popuni svoj kalendar.</span><span className="sl">QueueUp je platforma za naročanje, ki vsakemu podjetju omogoča samodejno polnjenje koledarja.</span></p>
+          <p className="hs"><span className="en">Businesses lose 15–30% of appointments to no-shows. QueueUp cuts that by up to 70% with automated reminders — and pays for itself in under 2 months.</span><span className="hr">Biznisi gube 15–30% termina zbog nedolazaka. QueueUp to smanjuje do 70% automatskim podsjetnicima — i isplati se za manje od 2 mjeseca.</span><span className="sl">Podjetja izgubijo 15–30% terminov zaradi nedohodov. QueueUp to zmanjša do 70% s samodejnimi opomniki — in se povrne v manj kot 2 mesecih.</span></p>
           <div className="ha">
             <a href="#contact" className="bp ib"><span className="en">Get In Touch</span><span className="hr">Kontaktirajte nas</span><span className="sl">Kontaktirajte nas</span></a>
             <a href="#how" className="bg ib"><span className="en">See How It Works</span><span className="hr">Kako funkcionira</span><span className="sl">Kako deluje</span></a>
           </div>
           <div className="hm">
-            <div className="metric"><h3>12k+</h3><p><span className="en">Appointments booked</span><span className="hr">Rezerviranih termina</span><span className="sl">Naročenih terminov</span></p></div>
-            <div className="metric"><h3>94%</h3><p><span className="en">Show-up rate</span><span className="hr">Stopa dolazaka</span><span className="sl">Stopnja prihodov</span></p></div>
-            <div className="metric"><h3>3 min</h3><p><span className="en">Setup time</span><span className="hr">Vrijeme postavljanja</span><span className="sl">Čas nastavitve</span></p></div>
+            <div className="metric"><h3>-70%</h3><p><span className="en">Fewer no-shows</span><span className="hr">Manje nedolazaka</span><span className="sl">Manj nedohodov</span></p></div>
+            <div className="metric"><h3>+27%</h3><p><span className="en">Revenue growth</span><span className="hr">Rast prihoda</span><span className="sl">Rast prihodov</span></p></div>
+            <div className="metric"><h3>&lt;2 mj.</h3><p><span className="en">ROI payback</span><span className="hr">Povrat investicije</span><span className="sl">Povrat investicije</span></p></div>
           </div>
         </section>
 
@@ -220,10 +230,40 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="pricing" id="pricing">
+          <div className="container">
+            <div className="sh rv">
+              <p className="sl2"><span className="en">Pricing</span><span className="hr">Cijene</span><span className="sl">Cene</span></p>
+              <h2 className="st"><span className="en">Simple, transparent pricing</span><span className="hr">Jednostavne, transparentne cijene</span><span className="sl">Preproste, pregledne cene</span></h2>
+              <p className="sd"><span className="en">No hidden fees. No contracts. Cancel anytime.</span><span className="hr">Bez skrivenih troškova. Bez ugovora. Otkažite bilo kada.</span><span className="sl">Brez skritih stroškov. Brez pogodb. Kadarkoli odpovejte.</span></p>
+            </div>
+            <div className="pg rv">
+              <div className="pc">
+                <div className="pm"><h3>25€</h3><span><span className="en">/month</span><span className="hr">/mj.</span><span className="sl">/mes.</span></span></div>
+                <div className="pe"><span className="en">+ 5€ per employee</span><span className="hr">+ 5€ po zaposleniku</span><span className="sl">+ 5€ na zaposlenega</span></div>
+                <ul className="pfl">
+                  <li><span className="en">Online booking 24/7</span><span className="hr">Online rezervacije 24/7</span><span className="sl">Spletno naročanje 24/7</span></li>
+                  <li><span className="en">Automated email reminders</span><span className="hr">Automatski podsjetnici</span><span className="sl">Samodejni opomniki</span></li>
+                  <li><span className="en">Admin dashboard</span><span className="hr">Admin nadzorna ploča</span><span className="sl">Skrbniška nadzorna plošča</span></li>
+                  <li><span className="en">Customer accounts</span><span className="hr">Korisnički računi</span><span className="sl">Računi strank</span></li>
+                  <li><span className="en">30-day free trial</span><span className="hr">30 dana besplatno</span><span className="sl">30 dni brezplačno</span></li>
+                </ul>
+                <a href="#contact" className="bp ib"><span className="en">Start Free Trial</span><span className="hr">Počnite besplatno</span><span className="sl">Začnite brezplačno</span></a>
+              </div>
+              <div className="roi">
+                <div className="rs"><h3>-70%</h3><p><span className="en">Fewer no-shows</span><span className="hr">Manje nedolazaka</span><span className="sl">Manj nedohodov</span></p></div>
+                <div className="rs"><h3>+27%</h3><p><span className="en">Revenue growth</span><span className="hr">Rast prihoda</span><span className="sl">Rast prihodov</span></p></div>
+                <div className="rs"><h3>+30%</h3><p><span className="en">More bookings</span><span className="hr">Više rezervacija</span><span className="sl">Več rezervacij</span></p></div>
+                <div className="rs"><h3>90%</h3><p><span className="en">Stay 12+ months</span><span className="hr">Ostaju 12+ mj.</span><span className="sl">Ostanejo 12+ mes.</span></p></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="cta" id="contact">
           <div className="rv">
             <h2><span className="en">Your next client is searching <em>right now</em></span><span className="hr">Vaš sljedeći klijent traži <em>upravo sada</em></span><span className="sl">Vaša naslednja stranka išče <em>ravno zdaj</em></span></h2>
-            <p><span className="en">Get in touch to set up QueueUp for your business. One-time setup, ongoing support.</span><span className="hr">Javite nam se i postavite QueueUp za vaš posao. Jednokratna postava, trajna podrška.</span><span className="sl">Javite se nam in nastavite QueueUp za vaše podjetje. Enkratna nastavitev, stalna podpora.</span></p>
+            <p><span className="en">Start your 30-day free trial today. No credit card required. First no-show report in 7 days.</span><span className="hr">Započnite besplatnu 30-dnevnu probu danas. Bez kreditne kartice. Prvi izvještaj o nedolascima za 7 dana.</span><span className="sl">Začnite 30-dnevno brezplačno preskusno obdobje danes. Brez kreditne kartice. Prvo poročilo v 7 dneh.</span></p>
             <a href="#" className="bp ib" id="cb"><span className="en">Get In Touch</span><span className="hr">Kontaktirajte nas</span><span className="sl">Kontaktirajte nas</span></a>
           </div>
         </section>
