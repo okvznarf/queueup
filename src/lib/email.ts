@@ -50,33 +50,40 @@ export async function sendAppointmentReminder({
   const mail = getSgMail();
   if (!mail) return;
 
-  const formattedDate = new Date(date).toLocaleDateString("en-US", {
+  const formattedDate = new Date(date).toLocaleDateString("hr-HR", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
   });
 
   const [hours, minutes] = startTime.split(":").map(Number);
-  const period = hours >= 12 ? "PM" : "AM";
-  const displayHour = hours % 12 || 12;
-  const formattedTime = `${displayHour}:${minutes.toString().padStart(2, "0")} ${period}`;
+  const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+
+  const text = `Pozdrav ${customerName},
+
+Podsjećamo vas da imate termin sutra.
+
+---
+
+VAŠ TERMIN
+Datum:    ${formattedDate}
+Vrijeme:  ${formattedTime}
+Usluga:   ${serviceName}${staffName ? `\nOsoblje:  ${staffName}` : ""}
+
+---
+
+MJESTO
+${shopName}
+
+---
+
+Otkazivanje: Ako trebate otkazati ili promijeniti termin, kontaktirajte ${shopName} što prije.
+
+© ${new Date().getFullYear()} ${shopName}`;
 
   await mail.send({
     to: customerEmail,
     from: FROM,
-    subject: `Reminder: Your appointment tomorrow at ${formattedTime}`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #f9f9f9;">
-        <h2 style="color: #111; margin-bottom: 4px;">Appointment Reminder</h2>
-        <p style="color: #555; margin-top: 0;">Hi ${customerName}, just a reminder that you have an appointment tomorrow.</p>
-        <div style="background: #fff; border-radius: 8px; padding: 20px; margin: 20px 0; border: 1px solid #e0e0e0;">
-          <p style="margin: 0 0 10px;"><strong>Shop:</strong> ${shopName}</p>
-          <p style="margin: 0 0 10px;"><strong>Service:</strong> ${serviceName}</p>
-          ${staffName ? `<p style="margin: 0 0 10px;"><strong>With:</strong> ${staffName}</p>` : ""}
-          <p style="margin: 0 0 10px;"><strong>Date:</strong> ${formattedDate}</p>
-          <p style="margin: 0;"><strong>Time:</strong> ${formattedTime}</p>
-        </div>
-        <p style="color: #888; font-size: 13px;">Need to cancel? Contact ${shopName} as soon as possible.</p>
-      </div>
-    `,
+    subject: `Podsjetnik za termin — ${shopName}`,
+    text,
   });
 }
 
