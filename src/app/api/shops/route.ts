@@ -26,13 +26,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Shop not found" }, { status: 404 });
     }
 
-    // Check subscription status
-    const now = new Date();
-    const inTrial = shop.trialEndsAt && now < shop.trialEndsAt;
-    const hasPaid = shop.paidUntil && now < shop.paidUntil;
-    if (!shop.subscriptionActive || (!inTrial && !hasPaid)) {
-      return NextResponse.json({ error: "This business is currently unavailable" }, { status: 403 });
-    }
+    // TODO: Re-enable subscription check when billing is live
+    // const now = new Date();
+    // const inTrial = shop.trialEndsAt && now < shop.trialEndsAt;
+    // const hasPaid = shop.paidUntil && now < shop.paidUntil;
+    // if (!shop.subscriptionActive || (!inTrial && !hasPaid)) {
+    //   return NextResponse.json({ error: "This business is currently unavailable" }, { status: 403 });
+    // }
 
     return NextResponse.json(shop);
   } catch (error) {
