@@ -1,7 +1,14 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { rateLimit } from "@/lib/security";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!rateLimit("shops:" + ip, 60, 60000)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const slug = request.nextUrl.searchParams.get("slug");
   if (!slug) {
     return NextResponse.json({ error: "Shop slug is required" }, { status: 400 });
@@ -18,6 +25,15 @@ export async function GET(request: NextRequest) {
     if (!shop) {
       return NextResponse.json({ error: "Shop not found" }, { status: 404 });
     }
+
+    // Check subscription status
+    const now = new Date();
+    const inTrial = shop.trialEndsAt && now < shop.trialEndsAt;
+    const hasPaid = shop.paidUntil && now < shop.paidUntil;
+    if (!shop.subscriptionActive || (!inTrial && !hasPaid)) {
+      return NextResponse.json({ error: "This business is currently unavailable" }, { status: 403 });
+    }
+
     return NextResponse.json(shop);
   } catch (error) {
     console.error("Error fetching shop:", error);
@@ -26,6 +42,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (auth.error) return auth.error;
   try {
     const body = await request.json();
     const { name, businessType, email, phone } = body;
@@ -39,6 +57,7 @@ export async function POST(request: NextRequest) {
       FITNESS: { staff: "Trainer", service: "Session", booking: "Booking" },
     };
     const l = labels[businessType] || { staff: "Staff", service: "Service", booking: "Appointment" };
+    const trialEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30-day trial
     const shop = await prisma.shop.create({
       data: {
         name, slug, businessType, email, phone,
@@ -46,6 +65,10 @@ export async function POST(request: NextRequest) {
         showStaffPicker: businessType !== "RESTAURANT",
         showPartySize: businessType === "RESTAURANT",
         showVehicleInfo: businessType === "MECHANIC",
+        trialEndsAt,
+        subscriptionActive: true,
+        employeeCount: 1,
+        monthlyPrice: 30, // 25 base + 5 for 1 employee
       },
     });
     return NextResponse.json(shop, { status: 201 });

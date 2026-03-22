@@ -2,6 +2,10 @@ import sgMail from "@sendgrid/mail";
 
 const FROM = { email: "info@queueup.me", name: "QueueUp" };
 
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 function getSgMail() {
   const key = process.env.SENDGRID_API_KEY;
   if (!key) {
@@ -10,6 +14,56 @@ function getSgMail() {
   }
   sgMail.setApiKey(key);
   return sgMail;
+}
+
+export async function sendWelcomeEmail({
+  customerName,
+  customerEmail,
+  shopName,
+  loginUrl,
+}: {
+  customerName: string;
+  customerEmail: string;
+  shopName: string;
+  loginUrl: string;
+}) {
+  const mail = getSgMail();
+  if (!mail) return;
+
+  const text = `Pozdrav ${customerName},
+
+Dobrodošli na QueueUp! Vaš račun za ${shopName} je uspješno kreiran.
+
+---
+
+VAŠ RAČUN
+Email:    ${customerEmail}
+
+---
+
+Sada možete:
+- Rezervirati termine online
+- Pratiti svoje nadolazeće termine
+- Upravljati svojim rezervacijama
+
+Prijavite se ovdje: ${loginUrl}
+
+---
+
+Ako niste kreirali ovaj račun, možete ignorirati ovaj email.
+
+© ${new Date().getFullYear()} ${shopName}`;
+
+  try {
+    await mail.send({
+      to: customerEmail,
+      from: FROM,
+      subject: `Dobrodošli na ${shopName}!`,
+      text,
+    });
+  } catch (error) {
+    console.error("Failed to send welcome email:", error);
+  }
 }
 
 export async function sendPasswordResetEmail(to: string, resetLink: string, shopName: string) {
@@ -22,8 +76,8 @@ export async function sendPasswordResetEmail(to: string, resetLink: string, shop
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #f9f9f9;">
         <h2 style="color: #111;">Reset your password</h2>
-        <p style="color: #555;">Hi, you requested a password reset for your ${shopName} account on QueueUp.</p>
-        <a href="${resetLink}" style="display: inline-block; margin: 24px 0; background: #84934A; color: #fff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 700;">Reset Password</a>
+        <p style="color: #555;">Hi, you requested a password reset for your ${escapeHtml(shopName)} account on QueueUp.</p>
+        <a href="${encodeURI(resetLink)}" style="display: inline-block; margin: 24px 0; background: #84934A; color: #fff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 700;">Reset Password</a>
         <p style="color: #888; font-size: 13px;">This link expires in 1 hour. If you didn't request this, ignore this email.</p>
       </div>
     `,
