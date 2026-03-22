@@ -1,6 +1,4 @@
-'use client';
-
-import { useEffect } from 'react';
+import LandingInteractivity from './LandingInteractivity';
 
 const css = `
 :root{--bg:#ECECEC;--bg-card:#E2E2E0;--bg-dark:#492828;--text:#1A0E0E;--text-mid:#3D2A2A;--text-muted:#6B5858;--accent:#84934A;--accent-dark:#656D3F;--border:rgba(73,40,40,0.1);--border-dark:rgba(255,255,255,0.08);--fd:'Instrument Serif',Georgia,serif;--fb:'Outfit',sans-serif;--fm:'JetBrains Mono',monospace}
@@ -10,7 +8,7 @@ const css = `
 .lp-root.lang-hr .en{display:none}.lp-root.lang-hr .hr{display:inline}.lp-root.lang-hr p.hr,.lp-root.lang-hr h1.hr,.lp-root.lang-hr h2.hr,.lp-root.lang-hr h3.hr,.lp-root.lang-hr div.hr,.lp-root.lang-hr span.hr,.lp-root.lang-hr a.hr{display:block}.lp-root.lang-hr a.hr.ib{display:inline-block}
 .lp-root.lang-sl .en{display:none}.lp-root.lang-sl .sl{display:inline}.lp-root.lang-sl p.sl,.lp-root.lang-sl h1.sl,.lp-root.lang-sl h2.sl,.lp-root.lang-sl h3.sl,.lp-root.lang-sl div.sl,.lp-root.lang-sl span.sl,.lp-root.lang-sl a.sl{display:block}.lp-root.lang-sl a.sl.ib{display:inline-block}
 .lp-root nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 48px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(24px);background:rgba(236,236,236,0.9);border-bottom:1px solid rgba(73,40,40,0.12)}
-.lp-root .logo{font-family:var(--fd);font-size:1.8rem;color:var(--text);text-decoration:none;letter-spacing:-0.02em}.lp-root .logo b{color:var(--accent-dark)}
+.lp-root .logo{text-decoration:none;display:flex;align-items:center}.lp-root .logo img{height:150px;width:auto;margin:-40px 0}
 .lp-root .nr{display:flex;gap:28px;align-items:center}
 .lp-root .nl{display:flex;gap:32px;align-items:center}
 .lp-root .nl a{color:var(--text-mid);text-decoration:none;font-size:0.95rem;font-weight:500;transition:color 0.2s}.lp-root .nl a:hover{color:var(--text)}
@@ -18,7 +16,7 @@ const css = `
 .lp-root .ls{position:relative}.lp-root .lb{display:flex;align-items:center;gap:6px;background:0;border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-family:var(--fb);font-size:0.85rem;font-weight:500;color:var(--text-mid);cursor:pointer}.lp-root .lb svg{width:14px;height:14px;opacity:0.5;transition:transform 0.2s}.lp-root .ls.open .lb svg{transform:rotate(180deg)}
 .lp-root .ld{position:absolute;top:calc(100% + 6px);right:0;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:6px;min-width:140px;box-shadow:0 8px 24px rgba(0,0,0,0.08);opacity:0;visibility:hidden;transform:translateY(-4px);transition:all 0.2s}.lp-root .ls.open .ld{opacity:1;visibility:visible;transform:translateY(0)}
 .lp-root .lo{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;font-size:0.88rem;font-weight:500;color:var(--text-mid);cursor:pointer;border:0;background:0;width:100%;font-family:var(--fb);text-align:left}.lp-root .lo:hover{background:var(--bg-card)}.lp-root .lo.ac{color:var(--accent-dark);font-weight:600}
-.lp-root .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:160px 24px 100px}
+.lp-root .hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 24px 80px}
 .lp-root .hl{font-family:var(--fm);font-size:0.78rem;font-weight:500;color:var(--accent-dark);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:28px;padding:7px 18px;border:1px solid rgba(101,109,63,0.25);border-radius:100px;animation:fu 0.6s ease both}
 .lp-root .hero h1{font-family:var(--fd);font-size:clamp(3.4rem,8.5vw,7.5rem);line-height:0.95;letter-spacing:-0.04em;max-width:850px;animation:fu 0.6s ease 0.08s both}
 .lp-root .hero h1 em{font-style:italic;color:var(--bg-dark);position:relative}.lp-root .hero h1 em::after{content:'';position:absolute;bottom:2px;left:0;right:0;height:4px;background:var(--accent);border-radius:2px;opacity:0.6}
@@ -70,69 +68,14 @@ const css = `
 `;
 
 export default function HomePage() {
-  useEffect(() => {
-    const root = document.getElementById('lp-root');
-    if (!root) return;
-
-    function sl(l: string) {
-      if (!root) return;
-      root.className = 'lp-root' + (l === 'en' ? '' : ' lang-' + l);
-      try { localStorage.setItem('ql', l); } catch(e) {}
-    }
-
-    const lb = document.getElementById('lb');
-    const ls = document.getElementById('ls');
-    const cb = document.getElementById('cb');
-
-    if (lb && ls) lb.onclick = () => ls.classList.toggle('open');
-
-    document.querySelectorAll('.lo').forEach(btn => {
-      (btn as HTMLElement).onclick = function() {
-        sl((btn as HTMLElement).getAttribute('data-l') || 'en');
-        ls?.classList.remove('open');
-      };
-    });
-
-    const handleDocClick = (e: MouseEvent) => {
-      if (ls && !ls.contains(e.target as Node)) ls.classList.remove('open');
-    };
-    document.addEventListener('click', handleDocClick);
-
-    if (cb) {
-      cb.onclick = (e) => {
-        e.preventDefault();
-        window.location.href = 'mailto:hello@queueup.me';
-      };
-    }
-
-    try {
-      const s = localStorage.getItem('ql');
-      if (s) sl(s);
-      else {
-        const b = (navigator.language || '').slice(0, 2);
-        if (b === 'hr' || b === 'sl') sl(b);
-      }
-    } catch(e) {}
-
-    const rv = document.querySelectorAll('.rv');
-    const ob = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('v'); });
-    }, { threshold: 0.1 });
-    rv.forEach(el => ob.observe(el));
-
-    return () => {
-      document.removeEventListener('click', handleDocClick);
-      ob.disconnect();
-    };
-  }, []);
-
   return (
     <>
       <style dangerouslySetInnerHTML={{__html: css}} />
+      <LandingInteractivity />
       <div className="lp-root" id="lp-root">
 
         <nav>
-          <a href="#" className="logo">queue<b>up</b></a>
+          <a href="#" className="logo"><img src="/logo.png" alt="QueueUp" /></a>
           <div className="nr">
             <div className="nl">
               <a href="#industries"><span className="en">Industries</span><span className="hr">Industrije</span><span className="sl">Industrije</span></a>
@@ -270,10 +213,10 @@ export default function HomePage() {
 
         <footer>
           <div className="fti">
-            <div className="ftb"><a href="#" className="logo">queue<b>up</b></a><p><span className="en">Smart appointment booking for every business. Built in Croatia.</span><span className="hr">Pametne rezervacije termina za svaki posao. Napravljeno u Hrvatskoj.</span><span className="sl">Pametno naročanje terminov za vsako podjetje. Narejeno na Hrvaškem.</span></p></div>
+            <div className="ftb"><a href="#" className="logo"><img src="/logo.png" alt="QueueUp" /></a><p><span className="en">Smart appointment booking for every business. Built in Croatia.</span><span className="hr">Pametne rezervacije termina za svaki posao. Napravljeno u Hrvatskoj.</span><span className="sl">Pametno naročanje terminov za vsako podjetje. Narejeno na Hrvaškem.</span></p></div>
             <div className="ftc"><h4><span className="en">Product</span><span className="hr">Proizvod</span><span className="sl">Izdelek</span></h4><a href="#features"><span className="en">Features</span><span className="hr">Značajke</span><span className="sl">Funkcije</span></a><a href="#industries"><span className="en">Industries</span><span className="hr">Industrije</span><span className="sl">Industrije</span></a><a href="#how"><span className="en">How It Works</span><span className="hr">Kako radi</span><span className="sl">Kako deluje</span></a></div>
             <div className="ftc"><h4><span className="en">Company</span><span className="hr">Tvrtka</span><span className="sl">Podjetje</span></h4><a href="#"><span className="en">About</span><span className="hr">O nama</span><span className="sl">O nas</span></a><a href="#contact"><span className="en">Contact</span><span className="hr">Kontakt</span><span className="sl">Kontakt</span></a></div>
-            <div className="ftc"><h4><span className="en">Legal</span><span className="hr">Pravno</span><span className="sl">Pravno</span></h4><a href="#"><span className="en">Privacy</span><span className="hr">Privatnost</span><span className="sl">Zasebnost</span></a><a href="#"><span className="en">Terms</span><span className="hr">Uvjeti</span><span className="sl">Pogoji</span></a></div>
+            <div className="ftc"><h4><span className="en">Legal</span><span className="hr">Pravno</span><span className="sl">Pravno</span></h4><a href="/privacy"><span className="en">Privacy Policy</span><span className="hr">Privatnost</span><span className="sl">Zasebnost</span></a><a href="/cookies"><span className="en">Cookie Policy</span><span className="hr">Kolačići</span><span className="sl">Piškotki</span></a><a href="/impressum">Impressum</a></div>
           </div>
           <div className="ftm"><span>© 2026 queueup. <span className="en">All rights reserved.</span><span className="hr">Sva prava pridržana.</span><span className="sl">Vse pravice pridržane.</span></span><span>Zagreb, Croatia</span></div>
         </footer>

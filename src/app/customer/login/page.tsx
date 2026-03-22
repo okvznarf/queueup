@@ -97,12 +97,12 @@ function CustomerLoginForm() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", background: t.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: t.text }}>
-      <div style={{ position: "relative", background: t.card, border: `1px solid ${t.border}`, borderRadius: 16, padding: 36, width: 380, minHeight: 600, boxShadow: dark ? "none" : "0 4px 24px rgba(0,0,0,0.07)" }}>
+      <div style={{ position: "relative", background: t.card, border: `1px solid ${t.border}`, borderRadius: 16, padding: "24px 28px", width: 360, boxShadow: dark ? "none" : "0 4px 24px rgba(0,0,0,0.07)" }}>
         <ThemeToggle dark={dark} onToggle={toggleTheme} />
 
         <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <img src={dark ? "/logo-dark.png" : "/logo.png"} alt="QueueUp" style={{ height: 120, width: "auto", display: "block", margin: "0 auto" }} />
-          {shopName && <div style={{ marginTop: 10, fontSize: 13, color: "#656D3F", fontWeight: 600 }}>{shopName}</div>}
+          <img src={dark ? "/logo-dark.png" : "/logo.png"} alt="QueueUp" style={{ height: 300, width: "auto", display: "block", margin: "0 auto" }} />
+          {shopName && <div style={{ marginTop: 10, fontSize: 18, color: "#656D3F", fontWeight: 700 }}>{shopName}</div>}
           <h1 style={{ fontSize: 20, fontWeight: 600, margin: "10px 0 4px", color: t.text }}>{isRegister ? "Create Account" : "Customer Login"}</h1>
           <p style={{ color: t.label, fontSize: 13 }}>{isRegister ? "Sign up to manage your bookings" : "Sign in to view your appointments"}</p>
         </div>

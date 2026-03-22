@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { hashPassword, createToken } from "@/lib/auth";
 import { sanitize, isValidEmail, isValidPhone, rateLimit } from "@/lib/security";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") || "unknown";
@@ -42,6 +43,16 @@ export async function POST(request: NextRequest) {
     } else {
       customer = await prisma.customer.create({ data: { name, email, phone, passwordHash, shopId } });
     }
+
+    const shop = await prisma.shop.findUnique({ where: { id: shopId }, select: { name: true, slug: true } });
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+
+    sendWelcomeEmail({
+      customerName: name,
+      customerEmail: email,
+      shopName: shop?.name || "QueueUp",
+      loginUrl: `${baseUrl}/customer/login?shop=${shop?.slug || ""}`,
+    }).catch(() => {});
 
     const token = createToken({ userId: customer.id, email: customer.email || "", role: "customer" });
 

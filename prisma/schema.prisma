@@ -65,6 +65,12 @@ model Shop {
   staffLabel    String      @default("Staff")
   serviceLabel  String      @default("Service")
   bookingLabel  String      @default("Appointment")
+  // Subscription
+  subscriptionActive Boolean  @default(true)
+  trialEndsAt       DateTime?
+  employeeCount     Int       @default(1)
+  paidUntil         DateTime?
+  monthlyPrice      Float     @default(30)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   owner        User?        @relation("ShopOwner", fields: [ownerId], references: [id])
@@ -79,14 +85,18 @@ model Shop {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  passwordHash  String
-  role          String    @default("owner")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  ownedShops    Shop[]    @relation("ShopOwner")
+  id               String    @id @default(cuid())
+  email            String    @unique
+  name             String?
+  passwordHash     String
+  role             String    @default("owner")
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  totpSecret       String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  ownedShops       Shop[]    @relation("ShopOwner")
+  @@index([resetToken])
 }
 
 model Staff {
@@ -144,6 +154,8 @@ model Customer {
   @@unique([phone, shopId])
   @@unique([email, shopId])
   @@index([shopId])
+  @@index([email])
+  @@index([resetToken])
 }
 
 model Appointment {
@@ -172,6 +184,8 @@ model Appointment {
   @@index([shopId, date])
   @@index([staffId, date])
   @@index([status])
+  @@index([customerId])
+  @@index([shopId, status, date])
 }
 
 model WorkingHours {

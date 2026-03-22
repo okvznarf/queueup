@@ -127,6 +127,26 @@ export default function BookingClient({ shop }: { shop: Shop }) {
   const containerStyle: React.CSSProperties = { fontFamily: "system-ui, -apple-system, sans-serif", background: s.bg, minHeight: "100vh", maxWidth: 640, margin: "0 auto", padding: "28px 20px 100px", color: s.text };
   const inputStyle: React.CSSProperties = { background: s.card, border: "1.5px solid " + s.border, borderRadius: 10, padding: "11px 14px", fontSize: 14, color: s.text, width: "100%", boxSizing: "border-box" as const, outline: "none" };
 
+  const handleAddToCalendar = () => {
+    if (!selDate || !selSlot || !service) return;
+    const [h, m] = selSlot.startTime.split(":").map(Number);
+    const start = new Date(selDate);
+    start.setHours(h, m, 0, 0);
+    const end = new Date(start);
+    end.setMinutes(end.getMinutes() + (service.duration || 60));
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const fmt = (d: Date) => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+    const title = encodeURIComponent(`${service.name} — ${shop.name}`);
+    const details = encodeURIComponent([
+      service.name,
+      staffMember ? `${shop.staffLabel}: ${staffMember.name}` : "",
+      service.price ? `Price: $${service.price}` : "",
+    ].filter(Boolean).join("\n"));
+    const location = encodeURIComponent(shop.address || shop.name);
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(start)}/${fmt(end)}&details=${details}&location=${location}`;
+    window.open(url, "_blank");
+  };
+
   if (confirmed) {
     return (
       <div style={containerStyle}>
@@ -147,7 +167,8 @@ export default function BookingClient({ shop }: { shop: Shop }) {
           </div>
           <p style={{ color: s.dim, fontSize: 13, fontStyle: "italic" }}>Confirmation sent to {form.email}</p>
           {createAccount && <p style={{ color: "#22c55e", fontSize: 13, marginTop: 8 }}>Account created! Manage bookings at <a href="/customer/dashboard" style={{ color: accent }}>My Bookings</a></p>}
-          <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 16 }}>
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 16, flexWrap: "wrap" }}>
+            <button onClick={handleAddToCalendar} style={{ background: "transparent", color: accent, border: "1px solid " + accent + "40", borderRadius: 10, padding: "12px 28px", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add to Calendar</button>
             <button onClick={reset} style={{ background: accent, color: s.bg, border: "none", borderRadius: 10, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Book Another</button>
             <a href="/customer/dashboard" style={{ background: "transparent", color: accent, border: "1px solid " + accent + "40", borderRadius: 10, padding: "12px 28px", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>My Bookings</a>
           </div>

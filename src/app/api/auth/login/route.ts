@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email },
-      include: { ownedShops: { select: { slug: true }, take: 1 } },
+      select: { id: true, email: true, name: true, passwordHash: true, role: true },
     });
     if (!user) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
@@ -32,9 +32,12 @@ export async function POST(request: NextRequest) {
     }
 
     const token = createToken({ userId: user.id, email: user.email, role: user.role });
-    const shopSlug = user.ownedShops[0]?.slug ?? null;
 
-    const response = NextResponse.json({ user: { id: user.id, email: user.email, name: user.name }, shopSlug });
+    // Get shop slug separately to avoid Prisma adapter relation issues
+    const ownedShop = await prisma.shop.findFirst({ where: { ownerId: user.id }, select: { slug: true } });
+    const shopSlug = ownedShop?.slug ?? null;
+
+    const response = NextResponse.json({ user: { id: user.id, email: user.email, name: user.name }, role: user.role, shopSlug });
     response.cookies.set("auth_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

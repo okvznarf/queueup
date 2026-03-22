@@ -1,3 +1,5 @@
+import { Redis } from "@upstash/redis";
+
 // Input sanitization - strips HTML tags and limits length
 export function sanitize(input: string, maxLength: number = 500): string {
   if (!input) return "";
@@ -23,10 +25,23 @@ export function isValidPhone(phone: string): boolean {
   return cleaned.length >= 7 && cleaned.length <= 20 && /^[+]?[0-9]+$/.test(cleaned);
 }
 
-// Simple in-memory rate limiter
+// --- Rate Limiting ---
+
+// Upstash Redis client (lazy-initialized)
+let redis: Redis | null = null;
+function getRedis(): Redis | null {
+  if (redis) return redis;
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+  redis = new Redis({ url, token });
+  return redis;
+}
+
+// In-memory fallback (used when Redis is not configured)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
-export function rateLimit(key: string, maxRequests: number = 10, windowMs: number = 60000): boolean {
+function rateLimitMemory(key: string, maxRequests: number, windowMs: number): boolean {
   const now = Date.now();
   const entry = rateLimitMap.get(key);
 
@@ -41,6 +56,28 @@ export function rateLimit(key: string, maxRequests: number = 10, windowMs: numbe
 
   entry.count++;
   return true;
+}
+
+export async function rateLimitRedis(key: string, maxRequests: number, windowMs: number): Promise<boolean> {
+  const r = getRedis();
+  if (!r) return rateLimitMemory(key, maxRequests, windowMs);
+
+  try {
+    const rlKey = `rl:${key}`;
+    const count = await r.incr(rlKey);
+    if (count === 1) {
+      await r.pexpire(rlKey, windowMs);
+    }
+    return count <= maxRequests;
+  } catch {
+    // Fall back to in-memory if Redis fails
+    return rateLimitMemory(key, maxRequests, windowMs);
+  }
+}
+
+// Synchronous rate limiter (backward-compatible, uses in-memory only)
+export function rateLimit(key: string, maxRequests: number = 10, windowMs: number = 60000): boolean {
+  return rateLimitMemory(key, maxRequests, windowMs);
 }
 
 // Validate required fields exist and are non-empty strings

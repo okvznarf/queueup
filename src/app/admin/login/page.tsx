@@ -11,7 +11,8 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/admin/sharp-and-co/appointments";
+  const rawRedirect = searchParams.get("redirect") || "/admin/sharp-and-co/appointments";
+  const redirect = rawRedirect.startsWith("/admin/") ? rawRedirect : "/admin/sharp-and-co/appointments";
 
   const handleSubmit = async () => {
     setError("");
@@ -66,10 +67,18 @@ function LoginForm() {
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" style={{ background: "#1a1a1a", border: "1.5px solid #ffffff15", borderRadius: 10, padding: "11px 14px", fontSize: 14, color: "#e8e4dd", width: "100%", boxSizing: "border-box" as any, outline: "none" }} />
         </div>
 
-        <div style={{ marginBottom: 20 }}>
+        <div style={{ marginBottom: 8 }}>
           <label style={{ fontSize: 13, color: "#888", display: "block", marginBottom: 6 }}>Password</label>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 characters" onKeyDown={(e) => e.key === "Enter" && handleSubmit()} style={{ background: "#1a1a1a", border: "1.5px solid #ffffff15", borderRadius: 10, padding: "11px 14px", fontSize: 14, color: "#e8e4dd", width: "100%", boxSizing: "border-box" as any, outline: "none" }} />
         </div>
+
+        {!isRegister && (
+          <div style={{ textAlign: "right", marginBottom: 16 }}>
+            <a href="/admin/forgot-password" style={{ color: "#666", fontSize: 12, textDecoration: "none" }}>Forgot password?</a>
+          </div>
+        )}
+
+        {isRegister && <div style={{ marginBottom: 20 }} />}
 
         <button onClick={handleSubmit} disabled={loading} style={{ background: accent, color: "#111", border: "none", borderRadius: 10, padding: "12px 0", fontSize: 15, fontWeight: 700, cursor: "pointer", width: "100%", opacity: loading ? 0.6 : 1 }}>{loading ? "Please wait..." : isRegister ? "Create Account" : "Sign In"}</button>
 

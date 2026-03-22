@@ -6,40 +6,30 @@ import { rateLimit } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") || "unknown";
-  if (!rateLimit("cust-forgot:" + ip, 5, 3600000)) {
+  if (!rateLimit("admin-forgot:" + ip, 5, 3600000)) {
     return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
   }
 
-  const { email, shopId } = await req.json();
+  const { email } = await req.json();
   if (!email) return NextResponse.json({ error: "Email is required" }, { status: 400 });
 
-  // Find customer — by shopId if provided, otherwise find first match
-  const customer = shopId
-    ? await prisma.customer.findFirst({ where: { email, shopId } })
-    : await prisma.customer.findFirst({ where: { email } });
+  const user = await prisma.user.findUnique({ where: { email } });
 
   // Always return success to prevent email enumeration
-  if (!customer || !customer.email) {
-    return NextResponse.json({ ok: true });
-  }
+  if (!user) return NextResponse.json({ ok: true });
 
   const token = randomBytes(32).toString("hex");
   const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-  await prisma.customer.update({
-    where: { id: customer.id },
+  await prisma.user.update({
+    where: { id: user.id },
     data: { resetToken: token, resetTokenExpiry: expiry },
   });
 
-  const shop = await prisma.shop.findUnique({ where: { id: customer.shopId } });
   const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-  const resetLink = `${baseUrl}/customer/reset-password?token=${token}&shop=${shop?.slug ?? ""}`;
+  const resetLink = `${baseUrl}/admin/reset-password?token=${token}`;
 
-  try {
-    await sendPasswordResetEmail(customer.email, resetLink, shop?.name ?? "QueueUp");
-  } catch (error) {
-    console.error("Failed to send reset email:", error);
-  }
+  await sendPasswordResetEmail(user.email, resetLink, "QueueUp Admin");
 
   return NextResponse.json({ ok: true });
 }

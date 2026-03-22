@@ -9,12 +9,13 @@ export function middleware(request: NextRequest) {
   response.headers.set("X-XSS-Protection", "1; mode=block");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  response.headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com; frame-src https://accounts.google.com;");
 
   if (request.nextUrl.pathname.startsWith("/api/")) {
     const origin = request.headers.get("origin") || "";
     const allowedOrigins = ["http://localhost:3000", process.env.NEXTAUTH_URL || ""].filter(Boolean);
-    if (allowedOrigins.includes(origin) || process.env.NODE_ENV === "development") {
-      response.headers.set("Access-Control-Allow-Origin", origin || "*");
+    if (origin && (allowedOrigins.includes(origin) || process.env.NODE_ENV === "development")) {
+      response.headers.set("Access-Control-Allow-Origin", origin);
     }
     response.headers.set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
     response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");

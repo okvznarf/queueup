@@ -1,7 +1,14 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { rateLimit } from "@/lib/security";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!rateLimit("staff:" + ip, 60, 60000)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const shopId = request.nextUrl.searchParams.get("shopId");
   if (!shopId) {
     return NextResponse.json({ error: "shopId is required" }, { status: 400 });
@@ -25,6 +32,8 @@ export async function POST(request: NextRequest) {
     if (!shopId || !name) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
+    const auth = await requireAdmin(request, shopId);
+    if (auth.error) return auth.error;
     const staff = await prisma.staff.create({
       data: { shopId, name, email, phone, role, bio },
     });

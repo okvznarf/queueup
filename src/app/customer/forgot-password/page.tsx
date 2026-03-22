@@ -32,12 +32,14 @@ function ForgotPasswordForm() {
     setError("");
     setLoading(true);
     try {
-      await fetch("/api/auth/forgot-password", {
+      const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, shopId }),
+        body: JSON.stringify({ email, shopId: shopId || undefined }),
       });
-      setSent(true);
+      const data = await res.json();
+      if (!res.ok) setError(data.error);
+      else setSent(true);
     } catch {
       setError("Connection error. Please try again.");
     }

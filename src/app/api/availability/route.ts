@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAvailableSlots } from "@/lib/availability";
+import { rateLimit } from "@/lib/security";
 
 export async function GET(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!rateLimit("avail:" + ip, 60, 60000)) {
+    return NextResponse.json({ error: "Too many requests. Please slow down." }, { status: 429 });
+  }
+
   const shopId = request.nextUrl.searchParams.get("shopId");
   const date = request.nextUrl.searchParams.get("date");
   const staffId = request.nextUrl.searchParams.get("staffId");
