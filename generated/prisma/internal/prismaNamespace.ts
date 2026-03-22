@@ -1069,6 +1069,11 @@ export const ShopScalarFieldEnum = {
   staffLabel: 'staffLabel',
   serviceLabel: 'serviceLabel',
   bookingLabel: 'bookingLabel',
+  subscriptionActive: 'subscriptionActive',
+  trialEndsAt: 'trialEndsAt',
+  employeeCount: 'employeeCount',
+  paidUntil: 'paidUntil',
+  monthlyPrice: 'monthlyPrice',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   ownerId: 'ownerId'
@@ -1083,6 +1088,9 @@ export const UserScalarFieldEnum = {
   name: 'name',
   passwordHash: 'passwordHash',
   role: 'role',
+  resetToken: 'resetToken',
+  resetTokenExpiry: 'resetTokenExpiry',
+  totpSecret: 'totpSecret',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

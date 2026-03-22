@@ -537,10 +537,6 @@ export type CustomerUncheckedUpdateManyWithoutShopNestedInput = {
   deleteMany?: Prisma.CustomerScalarWhereInput | Prisma.CustomerScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type CustomerCreateNestedOneWithoutAppointmentsInput = {
   create?: Prisma.XOR<Prisma.CustomerCreateWithoutAppointmentsInput, Prisma.CustomerUncheckedCreateWithoutAppointmentsInput>
   connectOrCreate?: Prisma.CustomerCreateOrConnectWithoutAppointmentsInput

@@ -581,14 +581,6 @@ export type StaffUncheckedUpdateManyWithoutShopNestedInput = {
   deleteMany?: Prisma.StaffScalarWhereInput | Prisma.StaffScalarWhereInput[]
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type StaffCreateNestedOneWithoutAppointmentsInput = {
   create?: Prisma.XOR<Prisma.StaffCreateWithoutAppointmentsInput, Prisma.StaffUncheckedCreateWithoutAppointmentsInput>
   connectOrCreate?: Prisma.StaffCreateOrConnectWithoutAppointmentsInput

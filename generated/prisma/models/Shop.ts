@@ -20,8 +20,20 @@ export type ShopModel = runtime.Types.Result.DefaultSelection<Prisma.$ShopPayloa
 
 export type AggregateShop = {
   _count: ShopCountAggregateOutputType | null
+  _avg: ShopAvgAggregateOutputType | null
+  _sum: ShopSumAggregateOutputType | null
   _min: ShopMinAggregateOutputType | null
   _max: ShopMaxAggregateOutputType | null
+}
+
+export type ShopAvgAggregateOutputType = {
+  employeeCount: number | null
+  monthlyPrice: number | null
+}
+
+export type ShopSumAggregateOutputType = {
+  employeeCount: number | null
+  monthlyPrice: number | null
 }
 
 export type ShopMinAggregateOutputType = {
@@ -51,6 +63,11 @@ export type ShopMinAggregateOutputType = {
   staffLabel: string | null
   serviceLabel: string | null
   bookingLabel: string | null
+  subscriptionActive: boolean | null
+  trialEndsAt: Date | null
+  employeeCount: number | null
+  paidUntil: Date | null
+  monthlyPrice: number | null
   createdAt: Date | null
   updatedAt: Date | null
   ownerId: string | null
@@ -83,6 +100,11 @@ export type ShopMaxAggregateOutputType = {
   staffLabel: string | null
   serviceLabel: string | null
   bookingLabel: string | null
+  subscriptionActive: boolean | null
+  trialEndsAt: Date | null
+  employeeCount: number | null
+  paidUntil: Date | null
+  monthlyPrice: number | null
   createdAt: Date | null
   updatedAt: Date | null
   ownerId: string | null
@@ -115,12 +137,27 @@ export type ShopCountAggregateOutputType = {
   staffLabel: number
   serviceLabel: number
   bookingLabel: number
+  subscriptionActive: number
+  trialEndsAt: number
+  employeeCount: number
+  paidUntil: number
+  monthlyPrice: number
   createdAt: number
   updatedAt: number
   ownerId: number
   _all: number
 }
 
+
+export type ShopAvgAggregateInputType = {
+  employeeCount?: true
+  monthlyPrice?: true
+}
+
+export type ShopSumAggregateInputType = {
+  employeeCount?: true
+  monthlyPrice?: true
+}
 
 export type ShopMinAggregateInputType = {
   id?: true
@@ -149,6 +186,11 @@ export type ShopMinAggregateInputType = {
   staffLabel?: true
   serviceLabel?: true
   bookingLabel?: true
+  subscriptionActive?: true
+  trialEndsAt?: true
+  employeeCount?: true
+  paidUntil?: true
+  monthlyPrice?: true
   createdAt?: true
   updatedAt?: true
   ownerId?: true
@@ -181,6 +223,11 @@ export type ShopMaxAggregateInputType = {
   staffLabel?: true
   serviceLabel?: true
   bookingLabel?: true
+  subscriptionActive?: true
+  trialEndsAt?: true
+  employeeCount?: true
+  paidUntil?: true
+  monthlyPrice?: true
   createdAt?: true
   updatedAt?: true
   ownerId?: true
@@ -213,6 +260,11 @@ export type ShopCountAggregateInputType = {
   staffLabel?: true
   serviceLabel?: true
   bookingLabel?: true
+  subscriptionActive?: true
+  trialEndsAt?: true
+  employeeCount?: true
+  paidUntil?: true
+  monthlyPrice?: true
   createdAt?: true
   updatedAt?: true
   ownerId?: true
@@ -257,6 +309,18 @@ export type ShopAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ShopAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ShopSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ShopMinAggregateInputType
@@ -287,6 +351,8 @@ export type ShopGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: ShopCountAggregateInputType | true
+  _avg?: ShopAvgAggregateInputType
+  _sum?: ShopSumAggregateInputType
   _min?: ShopMinAggregateInputType
   _max?: ShopMaxAggregateInputType
 }
@@ -318,10 +384,17 @@ export type ShopGroupByOutputType = {
   staffLabel: string
   serviceLabel: string
   bookingLabel: string
+  subscriptionActive: boolean
+  trialEndsAt: Date | null
+  employeeCount: number
+  paidUntil: Date | null
+  monthlyPrice: number
   createdAt: Date
   updatedAt: Date
   ownerId: string | null
   _count: ShopCountAggregateOutputType | null
+  _avg: ShopAvgAggregateOutputType | null
+  _sum: ShopSumAggregateOutputType | null
   _min: ShopMinAggregateOutputType | null
   _max: ShopMaxAggregateOutputType | null
 }
@@ -371,6 +444,11 @@ export type ShopWhereInput = {
   staffLabel?: Prisma.StringFilter<"Shop"> | string
   serviceLabel?: Prisma.StringFilter<"Shop"> | string
   bookingLabel?: Prisma.StringFilter<"Shop"> | string
+  subscriptionActive?: Prisma.BoolFilter<"Shop"> | boolean
+  trialEndsAt?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
+  employeeCount?: Prisma.IntFilter<"Shop"> | number
+  paidUntil?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
+  monthlyPrice?: Prisma.FloatFilter<"Shop"> | number
   createdAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   ownerId?: Prisma.StringNullableFilter<"Shop"> | string | null
@@ -409,6 +487,11 @@ export type ShopOrderByWithRelationInput = {
   staffLabel?: Prisma.SortOrder
   serviceLabel?: Prisma.SortOrder
   bookingLabel?: Prisma.SortOrder
+  subscriptionActive?: Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  employeeCount?: Prisma.SortOrder
+  paidUntil?: Prisma.SortOrderInput | Prisma.SortOrder
+  monthlyPrice?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -450,6 +533,11 @@ export type ShopWhereUniqueInput = Prisma.AtLeast<{
   staffLabel?: Prisma.StringFilter<"Shop"> | string
   serviceLabel?: Prisma.StringFilter<"Shop"> | string
   bookingLabel?: Prisma.StringFilter<"Shop"> | string
+  subscriptionActive?: Prisma.BoolFilter<"Shop"> | boolean
+  trialEndsAt?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
+  employeeCount?: Prisma.IntFilter<"Shop"> | number
+  paidUntil?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
+  monthlyPrice?: Prisma.FloatFilter<"Shop"> | number
   createdAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   ownerId?: Prisma.StringNullableFilter<"Shop"> | string | null
@@ -488,12 +576,19 @@ export type ShopOrderByWithAggregationInput = {
   staffLabel?: Prisma.SortOrder
   serviceLabel?: Prisma.SortOrder
   bookingLabel?: Prisma.SortOrder
+  subscriptionActive?: Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  employeeCount?: Prisma.SortOrder
+  paidUntil?: Prisma.SortOrderInput | Prisma.SortOrder
+  monthlyPrice?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ShopCountOrderByAggregateInput
+  _avg?: Prisma.ShopAvgOrderByAggregateInput
   _max?: Prisma.ShopMaxOrderByAggregateInput
   _min?: Prisma.ShopMinOrderByAggregateInput
+  _sum?: Prisma.ShopSumOrderByAggregateInput
 }
 
 export type ShopScalarWhereWithAggregatesInput = {
@@ -526,6 +621,11 @@ export type ShopScalarWhereWithAggregatesInput = {
   staffLabel?: Prisma.StringWithAggregatesFilter<"Shop"> | string
   serviceLabel?: Prisma.StringWithAggregatesFilter<"Shop"> | string
   bookingLabel?: Prisma.StringWithAggregatesFilter<"Shop"> | string
+  subscriptionActive?: Prisma.BoolWithAggregatesFilter<"Shop"> | boolean
+  trialEndsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Shop"> | Date | string | null
+  employeeCount?: Prisma.IntWithAggregatesFilter<"Shop"> | number
+  paidUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"Shop"> | Date | string | null
+  monthlyPrice?: Prisma.FloatWithAggregatesFilter<"Shop"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Shop"> | Date | string
   ownerId?: Prisma.StringNullableWithAggregatesFilter<"Shop"> | string | null
@@ -558,6 +658,11 @@ export type ShopCreateInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedShopsInput
@@ -595,6 +700,11 @@ export type ShopUncheckedCreateInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -632,6 +742,11 @@ export type ShopUpdateInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedShopsNestedInput
@@ -669,6 +784,11 @@ export type ShopUncheckedUpdateInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -706,6 +826,11 @@ export type ShopCreateManyInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -738,6 +863,11 @@ export type ShopUpdateManyMutationInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -769,6 +899,11 @@ export type ShopUncheckedUpdateManyInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -801,9 +936,19 @@ export type ShopCountOrderByAggregateInput = {
   staffLabel?: Prisma.SortOrder
   serviceLabel?: Prisma.SortOrder
   bookingLabel?: Prisma.SortOrder
+  subscriptionActive?: Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrder
+  employeeCount?: Prisma.SortOrder
+  paidUntil?: Prisma.SortOrder
+  monthlyPrice?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+}
+
+export type ShopAvgOrderByAggregateInput = {
+  employeeCount?: Prisma.SortOrder
+  monthlyPrice?: Prisma.SortOrder
 }
 
 export type ShopMaxOrderByAggregateInput = {
@@ -833,6 +978,11 @@ export type ShopMaxOrderByAggregateInput = {
   staffLabel?: Prisma.SortOrder
   serviceLabel?: Prisma.SortOrder
   bookingLabel?: Prisma.SortOrder
+  subscriptionActive?: Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrder
+  employeeCount?: Prisma.SortOrder
+  paidUntil?: Prisma.SortOrder
+  monthlyPrice?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
@@ -865,9 +1015,19 @@ export type ShopMinOrderByAggregateInput = {
   staffLabel?: Prisma.SortOrder
   serviceLabel?: Prisma.SortOrder
   bookingLabel?: Prisma.SortOrder
+  subscriptionActive?: Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrder
+  employeeCount?: Prisma.SortOrder
+  paidUntil?: Prisma.SortOrder
+  monthlyPrice?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+}
+
+export type ShopSumOrderByAggregateInput = {
+  employeeCount?: Prisma.SortOrder
+  monthlyPrice?: Prisma.SortOrder
 }
 
 export type ShopListRelationFilter = {
@@ -899,6 +1059,26 @@ export type NullableStringFieldUpdateOperationsInput = {
 
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type FloatFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -1044,6 +1224,11 @@ export type ShopCreateWithoutOwnerInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   staff?: Prisma.StaffCreateNestedManyWithoutShopInput
@@ -1080,6 +1265,11 @@ export type ShopUncheckedCreateWithoutOwnerInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   staff?: Prisma.StaffUncheckedCreateNestedManyWithoutShopInput
@@ -1145,6 +1335,11 @@ export type ShopScalarWhereInput = {
   staffLabel?: Prisma.StringFilter<"Shop"> | string
   serviceLabel?: Prisma.StringFilter<"Shop"> | string
   bookingLabel?: Prisma.StringFilter<"Shop"> | string
+  subscriptionActive?: Prisma.BoolFilter<"Shop"> | boolean
+  trialEndsAt?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
+  employeeCount?: Prisma.IntFilter<"Shop"> | number
+  paidUntil?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
+  monthlyPrice?: Prisma.FloatFilter<"Shop"> | number
   createdAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   ownerId?: Prisma.StringNullableFilter<"Shop"> | string | null
@@ -1177,6 +1372,11 @@ export type ShopCreateWithoutStaffInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedShopsInput
@@ -1213,6 +1413,11 @@ export type ShopUncheckedCreateWithoutStaffInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1265,6 +1470,11 @@ export type ShopUpdateWithoutStaffInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedShopsNestedInput
@@ -1301,6 +1511,11 @@ export type ShopUncheckedUpdateWithoutStaffInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1337,6 +1552,11 @@ export type ShopCreateWithoutServicesInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedShopsInput
@@ -1373,6 +1593,11 @@ export type ShopUncheckedCreateWithoutServicesInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1425,6 +1650,11 @@ export type ShopUpdateWithoutServicesInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedShopsNestedInput
@@ -1461,6 +1691,11 @@ export type ShopUncheckedUpdateWithoutServicesInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1497,6 +1732,11 @@ export type ShopCreateWithoutCustomersInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedShopsInput
@@ -1533,6 +1773,11 @@ export type ShopUncheckedCreateWithoutCustomersInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1585,6 +1830,11 @@ export type ShopUpdateWithoutCustomersInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedShopsNestedInput
@@ -1621,6 +1871,11 @@ export type ShopUncheckedUpdateWithoutCustomersInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1657,6 +1912,11 @@ export type ShopCreateWithoutAppointmentsInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedShopsInput
@@ -1693,6 +1953,11 @@ export type ShopUncheckedCreateWithoutAppointmentsInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1745,6 +2010,11 @@ export type ShopUpdateWithoutAppointmentsInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedShopsNestedInput
@@ -1781,6 +2051,11 @@ export type ShopUncheckedUpdateWithoutAppointmentsInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1817,6 +2092,11 @@ export type ShopCreateWithoutWorkingHoursInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedShopsInput
@@ -1853,6 +2133,11 @@ export type ShopUncheckedCreateWithoutWorkingHoursInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1905,6 +2190,11 @@ export type ShopUpdateWithoutWorkingHoursInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedShopsNestedInput
@@ -1941,6 +2231,11 @@ export type ShopUncheckedUpdateWithoutWorkingHoursInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1977,6 +2272,11 @@ export type ShopCreateManyOwnerInput = {
   staffLabel?: string
   serviceLabel?: string
   bookingLabel?: string
+  subscriptionActive?: boolean
+  trialEndsAt?: Date | string | null
+  employeeCount?: number
+  paidUntil?: Date | string | null
+  monthlyPrice?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -2008,6 +2308,11 @@ export type ShopUpdateWithoutOwnerInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   staff?: Prisma.StaffUpdateManyWithoutShopNestedInput
@@ -2044,6 +2349,11 @@ export type ShopUncheckedUpdateWithoutOwnerInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   staff?: Prisma.StaffUncheckedUpdateManyWithoutShopNestedInput
@@ -2080,6 +2390,11 @@ export type ShopUncheckedUpdateManyWithoutOwnerInput = {
   staffLabel?: Prisma.StringFieldUpdateOperationsInput | string
   serviceLabel?: Prisma.StringFieldUpdateOperationsInput | string
   bookingLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -2178,6 +2493,11 @@ export type ShopSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   staffLabel?: boolean
   serviceLabel?: boolean
   bookingLabel?: boolean
+  subscriptionActive?: boolean
+  trialEndsAt?: boolean
+  employeeCount?: boolean
+  paidUntil?: boolean
+  monthlyPrice?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
@@ -2217,6 +2537,11 @@ export type ShopSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   staffLabel?: boolean
   serviceLabel?: boolean
   bookingLabel?: boolean
+  subscriptionActive?: boolean
+  trialEndsAt?: boolean
+  employeeCount?: boolean
+  paidUntil?: boolean
+  monthlyPrice?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
@@ -2250,6 +2575,11 @@ export type ShopSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   staffLabel?: boolean
   serviceLabel?: boolean
   bookingLabel?: boolean
+  subscriptionActive?: boolean
+  trialEndsAt?: boolean
+  employeeCount?: boolean
+  paidUntil?: boolean
+  monthlyPrice?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
@@ -2283,12 +2613,17 @@ export type ShopSelectScalar = {
   staffLabel?: boolean
   serviceLabel?: boolean
   bookingLabel?: boolean
+  subscriptionActive?: boolean
+  trialEndsAt?: boolean
+  employeeCount?: boolean
+  paidUntil?: boolean
+  monthlyPrice?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
 }
 
-export type ShopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "businessType" | "description" | "phone" | "email" | "website" | "address" | "city" | "state" | "zipCode" | "country" | "logoUrl" | "primaryColor" | "darkMode" | "timezone" | "currency" | "requirePayment" | "allowWalkIns" | "showStaffPicker" | "showPartySize" | "showVehicleInfo" | "staffLabel" | "serviceLabel" | "bookingLabel" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["shop"]>
+export type ShopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "businessType" | "description" | "phone" | "email" | "website" | "address" | "city" | "state" | "zipCode" | "country" | "logoUrl" | "primaryColor" | "darkMode" | "timezone" | "currency" | "requirePayment" | "allowWalkIns" | "showStaffPicker" | "showPartySize" | "showVehicleInfo" | "staffLabel" | "serviceLabel" | "bookingLabel" | "subscriptionActive" | "trialEndsAt" | "employeeCount" | "paidUntil" | "monthlyPrice" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["shop"]>
 export type ShopInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.Shop$ownerArgs<ExtArgs>
   staff?: boolean | Prisma.Shop$staffArgs<ExtArgs>
@@ -2342,6 +2677,11 @@ export type $ShopPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     staffLabel: string
     serviceLabel: string
     bookingLabel: string
+    subscriptionActive: boolean
+    trialEndsAt: Date | null
+    employeeCount: number
+    paidUntil: Date | null
+    monthlyPrice: number
     createdAt: Date
     updatedAt: Date
     ownerId: string | null
@@ -2800,6 +3140,11 @@ export interface ShopFieldRefs {
   readonly staffLabel: Prisma.FieldRef<"Shop", 'String'>
   readonly serviceLabel: Prisma.FieldRef<"Shop", 'String'>
   readonly bookingLabel: Prisma.FieldRef<"Shop", 'String'>
+  readonly subscriptionActive: Prisma.FieldRef<"Shop", 'Boolean'>
+  readonly trialEndsAt: Prisma.FieldRef<"Shop", 'DateTime'>
+  readonly employeeCount: Prisma.FieldRef<"Shop", 'Int'>
+  readonly paidUntil: Prisma.FieldRef<"Shop", 'DateTime'>
+  readonly monthlyPrice: Prisma.FieldRef<"Shop", 'Float'>
   readonly createdAt: Prisma.FieldRef<"Shop", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Shop", 'DateTime'>
   readonly ownerId: Prisma.FieldRef<"Shop", 'String'>
