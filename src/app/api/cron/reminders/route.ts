@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { sendAppointmentReminder } from "@/lib/email";
 import { rateLimit } from "@/lib/security";
+import { logger } from "@/lib/logger";
 
 // Given a UTC datetime and a timezone string (e.g. "Europe/Zagreb"),
 // returns the local hour as a zero-padded string like "14"
@@ -104,7 +105,7 @@ export async function GET(req: NextRequest) {
         });
         return true;
       } catch (err) {
-        console.error(`Failed reminder for appointment ${appt.id}:`, err);
+        logger.error("Failed to send reminder", "cron:reminders", err);
         return false;
       }
     });

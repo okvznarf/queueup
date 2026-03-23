@@ -22,26 +22,39 @@ export async function GET(request: NextRequest) {
   const user = requireSuperadmin(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const shops = await prisma.shop.findMany({
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      email: true,
-      phone: true,
-      businessType: true,
-      subscriptionActive: true,
-      trialEndsAt: true,
-      employeeCount: true,
-      paidUntil: true,
-      monthlyPrice: true,
-      createdAt: true,
-      _count: { select: { appointments: true, customers: true, staff: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  // Offset pagination: ?page=1&limit=50
+  const page = Math.max(Number(request.nextUrl.searchParams.get("page")) || 1, 1);
+  const limit = Math.min(Number(request.nextUrl.searchParams.get("limit")) || 50, 100);
+  const skip = (page - 1) * limit;
 
-  return NextResponse.json(shops);
+  const [shops, total] = await Promise.all([
+    prisma.shop.findMany({
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        email: true,
+        phone: true,
+        businessType: true,
+        subscriptionActive: true,
+        trialEndsAt: true,
+        employeeCount: true,
+        paidUntil: true,
+        monthlyPrice: true,
+        createdAt: true,
+        _count: { select: { appointments: true, customers: true, staff: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      skip,
+    }),
+    prisma.shop.count(),
+  ]);
+
+  return NextResponse.json({
+    data: shops,
+    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+  });
 }
 
 // PATCH - update subscription for a shop

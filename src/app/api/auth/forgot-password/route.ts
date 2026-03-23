@@ -3,6 +3,7 @@ import { randomBytes } from "crypto";
 import prisma from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/security";
+import { logger } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") || "unknown";
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
   try {
     await sendPasswordResetEmail(customer.email, resetLink, shop?.name ?? "QueueUp");
   } catch (error) {
-    console.error("Failed to send reset email:", error);
+    logger.error("Failed to send reset email", "api:auth", error);
   }
 
   return NextResponse.json({ ok: true });

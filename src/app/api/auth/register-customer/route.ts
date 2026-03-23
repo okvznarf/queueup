@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { hashPassword, createToken } from "@/lib/auth";
 import { sanitize, isValidEmail, isValidPhone, rateLimit } from "@/lib/security";
 import { sendWelcomeEmail } from "@/lib/email";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") || "unknown";
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
     });
     return response;
   } catch (error) {
-    console.error("Customer register error:", error);
+    logger.error("Customer registration failed", "api:auth", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

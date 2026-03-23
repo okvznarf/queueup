@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyPassword, createToken } from "@/lib/auth";
 import { sanitize, rateLimit } from "@/lib/security";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") || "unknown";
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("Login error:", error);
+    logger.error("Login failed", "api:auth", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

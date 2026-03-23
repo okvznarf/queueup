@@ -46,3 +46,8 @@ next-env.d.ts
 
 .vercel
 .env*.local
+
+# outreach agent secrets & logs
+outreach-agent/.env
+outreach-agent/logs/
+outreach-agent/leads.csv

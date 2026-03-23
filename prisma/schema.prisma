@@ -82,6 +82,7 @@ model Shop {
   customers    Customer[]
   @@index([slug])
   @@index([businessType])
+  @@index([ownerId])
 }
 
 model User {

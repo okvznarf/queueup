@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import { rateLimit } from "@/lib/security";
+import { logger } from "@/lib/logger";
+import { broadcastToShop } from "@/app/api/events/route";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -39,14 +41,29 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       }
     }
 
+    // Admins can only modify appointments in their own shop
+    if (auth.user.role !== "customer" && auth.user.role !== "superadmin") {
+      const shop = await prisma.shop.findUnique({ where: { id: existing.shopId }, select: { ownerId: true } });
+      if (!shop || shop.ownerId !== auth.user.userId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+    }
+
     const appointment = await prisma.appointment.update({
       where: { id },
       data: { status },
       include: { service: true, staff: true, customer: true },
     });
+
+    // Broadcast status change to all connected clients for this shop
+    broadcastToShop(existing.shopId, "appointment:updated", {
+      id: appointment.id, status: appointment.status,
+      customer: appointment.customer.name,
+    });
+
     return NextResponse.json(appointment);
   } catch (error) {
-    console.error("Error updating appointment:", error);
+    logger.error("Failed to update appointment", "api:appointments", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAvailableSlots } from "@/lib/availability";
 import { rateLimit } from "@/lib/security";
+import { logger } from "@/lib/logger";
+import { cacheGet, cacheSet } from "@/lib/cache";
+
+const CACHE_TTL = 60_000; // 1 minute — short enough that new bookings appear quickly
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") || "unknown";
@@ -17,6 +21,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "shopId and date required" }, { status: 400 });
   }
 
+  const cacheKey = `avail:${shopId}:${date}:${staffId || "any"}:${duration || 30}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return NextResponse.json(cached);
+
   try {
     const slots = await getAvailableSlots(
       shopId,
@@ -24,9 +32,10 @@ export async function GET(request: NextRequest) {
       staffId || null,
       duration ? parseInt(duration) : 30
     );
+    cacheSet(cacheKey, slots, CACHE_TTL);
     return NextResponse.json(slots);
   } catch (error) {
-    console.error("Error:", error);
+    logger.error("Failed to fetch availability", "api:availability", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@
 import prisma from "@/lib/prisma";
 import { rateLimit } from "@/lib/security";
 import { requireAdmin } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") || "unknown";
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(services);
   } catch (error) {
-    console.error("Error fetching services:", error);
+    logger.error("Failed to fetch services", "api:services", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(service, { status: 201 });
   } catch (error) {
-    console.error("Error creating service:", error);
+    logger.error("Failed to create service", "api:services", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

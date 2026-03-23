@@ -1,0 +1,57 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next.js: Debug Server",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/next",
+      "runtimeArgs": ["dev"],
+      "env": { "NODE_OPTIONS": "--inspect" },
+      "console": "integratedTerminal",
+      "serverReadyAction": {
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      },
+      "skipFiles": ["<node_internals>/**", "node_modules/**"]
+    },
+    {
+      "name": "Next.js: Debug Client (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/src",
+      "sourceMapPathOverrides": {
+        "webpack://_N_E/*": "${webRoot}/*"
+      }
+    },
+    {
+      "name": "Debug Current API Route",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/next",
+      "runtimeArgs": ["dev"],
+      "env": { "NODE_OPTIONS": "--inspect-brk" },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Outreach Agent: Debug",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["tsx", "${workspaceFolder}/outreach-agent/src/agent.ts", "--dry-run", "--category", "barber", "--cities", "Zagreb"],
+      "cwd": "${workspaceFolder}/outreach-agent",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/outreach-agent/.env",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Next.js: Full Stack Debug",
+      "configurations": ["Next.js: Debug Server", "Next.js: Debug Client (Chrome)"]
+    }
+  ]
+}

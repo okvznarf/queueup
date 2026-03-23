@@ -1,81 +1,90 @@
-import { google } from "googleapis";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import type { Lead } from "../types/index.js";
 import { logger } from "../lib/logger.js";
-import fs from "fs";
 
-const SHEET_NAME = "Leads";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const CSV_PATH = path.join(__dirname, "../../leads.csv");
+
 const HEADERS = [
   "Business Name", "Category", "City", "Website", "Email",
   "Search Date", "Message Status", "Date Sent", "First Contact Message",
   "Reply Status", "Reply Date", "Reply Content", "Campaign ID", "Notes",
 ];
 
-function getAuth() {
-  const credsPath = process.env.GOOGLE_SHEETS_CREDENTIALS!;
-  const creds = JSON.parse(fs.readFileSync(credsPath, "utf-8"));
-  return new google.auth.GoogleAuth({
-    credentials: creds,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-  });
+function escapeCsv(value: string): string {
+  if (value.includes(",") || value.includes('"') || value.includes("\n")) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
 }
 
-async function getSheets() {
-  const auth = await getAuth().getClient();
-  return google.sheets({ version: "v4", auth: auth as any });
+function parseCsvLine(line: string): string[] {
+  const fields: string[] = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (inQuotes) {
+      if (char === '"' && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else if (char === '"') {
+        inQuotes = false;
+      } else {
+        current += char;
+      }
+    } else {
+      if (char === '"') {
+        inQuotes = true;
+      } else if (char === ",") {
+        fields.push(current);
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+  }
+  fields.push(current);
+  return fields;
 }
 
 export async function ensureSheetExists(): Promise<void> {
-  const sheets = await getSheets();
-  const spreadsheetId = process.env.SPREADSHEET_ID!;
-
-  const meta = await sheets.spreadsheets.get({ spreadsheetId });
-  const exists = meta.data.sheets?.some((s) => s.properties?.title === SHEET_NAME);
-
-  if (!exists) {
-    await sheets.spreadsheets.batchUpdate({
-      spreadsheetId,
-      requestBody: {
-        requests: [{ addSheet: { properties: { title: SHEET_NAME } } }],
-      },
-    });
-    // Write headers
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: `${SHEET_NAME}!A1`,
-      valueInputOption: "RAW",
-      requestBody: { values: [HEADERS] },
-    });
-    logger.info("Created Leads sheet with headers");
+  if (!fs.existsSync(CSV_PATH)) {
+    fs.writeFileSync(CSV_PATH, HEADERS.join(",") + "\n", "utf-8");
+    logger.info(`Created leads.csv at ${CSV_PATH}`);
   }
 }
 
 export async function getAllLeads(): Promise<Lead[]> {
-  const sheets = await getSheets();
-  const spreadsheetId = process.env.SPREADSHEET_ID!;
+  if (!fs.existsSync(CSV_PATH)) return [];
 
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range: `${SHEET_NAME}!A2:N`,
+  const content = fs.readFileSync(CSV_PATH, "utf-8").trim();
+  const lines = content.split("\n");
+  if (lines.length <= 1) return []; // only headers
+
+  return lines.slice(1).map((line, index) => {
+    const row = parseCsvLine(line);
+    return {
+      businessName: row[0] ?? "",
+      category: (row[1] ?? "other") as Lead["category"],
+      city: row[2] ?? "",
+      website: row[3] ?? "",
+      email: row[4] ?? "",
+      searchDate: row[5] ?? "",
+      messageStatus: (row[6] ?? "Not Sent") as Lead["messageStatus"],
+      dateSent: row[7] ?? "",
+      firstContactMessage: row[8] ?? "",
+      replyStatus: (row[9] ?? "No Reply") as Lead["replyStatus"],
+      replyDate: row[10] ?? "",
+      replyContent: row[11] ?? "",
+      campaignId: row[12] ?? "",
+      notes: row[13] ?? "",
+      sheetRow: index + 2, // 1-based, skip header
+    };
   });
-
-  const rows = res.data.values ?? [];
-  return rows.map((row, index) => ({
-    businessName: row[0] ?? "",
-    category: (row[1] ?? "other") as Lead["category"],
-    city: row[2] ?? "",
-    website: row[3] ?? "",
-    email: row[4] ?? "",
-    searchDate: row[5] ?? "",
-    messageStatus: (row[6] ?? "Not Sent") as Lead["messageStatus"],
-    dateSent: row[7] ?? "",
-    firstContactMessage: row[8] ?? "",
-    replyStatus: (row[9] ?? "No Reply") as Lead["replyStatus"],
-    replyDate: row[10] ?? "",
-    replyContent: row[11] ?? "",
-    campaignId: row[12] ?? "",
-    notes: row[13] ?? "",
-    sheetRow: index + 2,
-  }));
 }
 
 export async function isDuplicate(businessName: string, city: string): Promise<boolean> {
@@ -88,8 +97,7 @@ export async function isDuplicate(businessName: string, city: string): Promise<b
 }
 
 export async function appendLead(lead: Lead): Promise<void> {
-  const sheets = await getSheets();
-  const spreadsheetId = process.env.SPREADSHEET_ID!;
+  await ensureSheetExists();
 
   const row = [
     lead.businessName, lead.category, lead.city, lead.website, lead.email,
@@ -97,15 +105,9 @@ export async function appendLead(lead: Lead): Promise<void> {
     lead.firstContactMessage ?? "", lead.replyStatus,
     lead.replyDate ?? "", lead.replyContent ?? "",
     lead.campaignId ?? "", lead.notes ?? "",
-  ];
+  ].map(escapeCsv);
 
-  await sheets.spreadsheets.values.append({
-    spreadsheetId,
-    range: `${SHEET_NAME}!A:N`,
-    valueInputOption: "RAW",
-    requestBody: { values: [row] },
-  });
-
+  fs.appendFileSync(CSV_PATH, row.join(",") + "\n", "utf-8");
   logger.info(`Appended lead: ${lead.businessName} (${lead.city})`);
 }
 
@@ -113,16 +115,13 @@ export async function updateLeadStatus(
   rowNumber: number,
   updates: Partial<Pick<Lead, "messageStatus" | "dateSent" | "firstContactMessage" | "replyStatus" | "replyDate" | "replyContent">>,
 ): Promise<void> {
-  const sheets = await getSheets();
-  const spreadsheetId = process.env.SPREADSHEET_ID!;
+  const content = fs.readFileSync(CSV_PATH, "utf-8").trim();
+  const lines = content.split("\n");
 
-  // Read current row first
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range: `${SHEET_NAME}!A${rowNumber}:N${rowNumber}`,
-  });
+  const lineIndex = rowNumber - 1; // rowNumber is 1-based (header = 1)
+  if (lineIndex < 1 || lineIndex >= lines.length) return;
 
-  const row: string[] = (res.data.values?.[0] ?? new Array(14).fill("")) as string[];
+  const row = parseCsvLine(lines[lineIndex]);
 
   if (updates.messageStatus !== undefined) row[6] = updates.messageStatus;
   if (updates.dateSent !== undefined) row[7] = updates.dateSent;
@@ -131,12 +130,8 @@ export async function updateLeadStatus(
   if (updates.replyDate !== undefined) row[10] = updates.replyDate;
   if (updates.replyContent !== undefined) row[11] = updates.replyContent;
 
-  await sheets.spreadsheets.values.update({
-    spreadsheetId,
-    range: `${SHEET_NAME}!A${rowNumber}:N${rowNumber}`,
-    valueInputOption: "RAW",
-    requestBody: { values: [row] },
-  });
+  lines[lineIndex] = row.map(escapeCsv).join(",");
+  fs.writeFileSync(CSV_PATH, lines.join("\n") + "\n", "utf-8");
 
   logger.info(`Updated row ${rowNumber}: ${JSON.stringify(updates)}`);
 }

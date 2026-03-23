@@ -1,19 +1,78 @@
 import sgMail from "@sendgrid/mail";
+import { withRetry, isTransientError, circuits, CircuitOpenError } from "./resilience";
+import { logger } from "./logger";
+
+// ─── Email Provider Interface (Dependency Injection) ────────────────────────
+// To swap providers: implement this interface and call setEmailProvider()
+// Supported: SendGrid (default), Resend, Mailgun, or any SMTP
+
+export interface EmailMessage {
+  to: string;
+  subject: string;
+  text?: string;
+  html?: string;
+}
+
+export interface EmailProvider {
+  send(msg: EmailMessage): Promise<void>;
+}
+
+// ─── SendGrid Provider (default) ────────────────────────────────────────────
+
+class SendGridProvider implements EmailProvider {
+  private initialized = false;
+
+  private init() {
+    if (this.initialized) return true;
+    const key = process.env.SENDGRID_API_KEY;
+    if (!key) {
+      logger.error("SENDGRID_API_KEY is not set", "email:config");
+      return false;
+    }
+    sgMail.setApiKey(key);
+    this.initialized = true;
+    return true;
+  }
+
+  async send(msg: EmailMessage): Promise<void> {
+    if (!this.init()) return;
+    await sgMail.send({ ...msg, from: FROM } as sgMail.MailDataRequired);
+  }
+}
+
+// ─── Provider Registry ──────────────────────────────────────────────────────
 
 const FROM = { email: "info@queueup.me", name: "QueueUp" };
+let provider: EmailProvider = new SendGridProvider();
+
+// Call this to swap email provider (e.g. in tests or migration)
+export function setEmailProvider(p: EmailProvider) {
+  provider = p;
+}
+
+// Resilient send: retry transient failures + circuit breaker
+async function sendMail(msg: EmailMessage): Promise<void> {
+  try {
+    await circuits.sendgrid.call(() =>
+      withRetry(() => provider.send(msg), {
+        maxRetries: 3,
+        baseDelayMs: 1000,
+        retryOn: isTransientError,
+      })
+    );
+  } catch (err) {
+    if (err instanceof CircuitOpenError) {
+      logger.warn(`SendGrid circuit open — skipping email to ${msg.to}`, "email:sendgrid");
+      return;
+    }
+    throw err;
+  }
+}
+
+// ─── Email Functions (unchanged API — nothing else needs to change) ─────────
 
 function escapeHtml(text: string): string {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-
-function getSgMail() {
-  const key = process.env.SENDGRID_API_KEY;
-  if (!key) {
-    console.error("SENDGRID_API_KEY is not set");
-    return null;
-  }
-  sgMail.setApiKey(key);
-  return sgMail;
 }
 
 export async function sendWelcomeEmail({
@@ -27,9 +86,6 @@ export async function sendWelcomeEmail({
   shopName: string;
   loginUrl: string;
 }) {
-  const mail = getSgMail();
-  if (!mail) return;
-
   const text = `Pozdrav ${customerName},
 
 Dobrodošli na QueueUp! Vaš račun za ${shopName} je uspješno kreiran.
@@ -55,23 +111,15 @@ Ako niste kreirali ovaj račun, možete ignorirati ovaj email.
 © ${new Date().getFullYear()} ${shopName}`;
 
   try {
-    await mail.send({
-      to: customerEmail,
-      from: FROM,
-      subject: `Dobrodošli na ${shopName}!`,
-      text,
-    });
+    await sendMail({ to: customerEmail, subject: `Dobrodošli na ${shopName}!`, text });
   } catch (error) {
-    console.error("Failed to send welcome email:", error);
+    logger.error("Failed to send welcome email", "email:welcome", error);
   }
 }
 
 export async function sendPasswordResetEmail(to: string, resetLink: string, shopName: string) {
-  const mail = getSgMail();
-  if (!mail) return;
-  await mail.send({
+  await sendMail({
     to,
-    from: FROM,
     subject: "Reset your password",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #f9f9f9;">
@@ -101,9 +149,6 @@ export async function sendAppointmentReminder({
   date: Date;
   startTime: string;
 }) {
-  const mail = getSgMail();
-  if (!mail) return;
-
   const formattedDate = new Date(date).toLocaleDateString("hr-HR", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
   });
@@ -133,12 +178,7 @@ Otkazivanje: Ako trebate otkazati ili promijeniti termin, kontaktirajte ${shopNa
 
 © ${new Date().getFullYear()} ${shopName}`;
 
-  await mail.send({
-    to: customerEmail,
-    from: FROM,
-    subject: `Podsjetnik za termin — ${shopName}`,
-    text,
-  });
+  await sendMail({ to: customerEmail, subject: `Podsjetnik za termin — ${shopName}`, text });
 }
 
 export async function sendBookingConfirmation({
@@ -160,9 +200,6 @@ export async function sendBookingConfirmation({
   startTime: string;
   totalPrice: number;
 }) {
-  const mail = getSgMail();
-  if (!mail) return;
-
   const formattedDate = new Date(date).toLocaleDateString("hr-HR", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
   });
@@ -193,13 +230,8 @@ Otkazivanje: Ako trebate otkazati ili promijeniti termin, kontaktirajte ${shopNa
 © ${new Date().getFullYear()} ${shopName}`;
 
   try {
-    await mail.send({
-      to: customerEmail,
-      from: FROM,
-      subject: `Potvrda termina — ${shopName}`,
-      text,
-    });
+    await sendMail({ to: customerEmail, subject: `Potvrda termina — ${shopName}`, text });
   } catch (error) {
-    console.error("Failed to send confirmation email:", error);
+    logger.error("Failed to send confirmation email", "email:confirmation", error);
   }
 }

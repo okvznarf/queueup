@@ -2,6 +2,10 @@
 import prisma from "@/lib/prisma";
 import { rateLimit } from "@/lib/security";
 import { requireAdmin } from "@/lib/auth";
+import { cacheGet, cacheSet } from "@/lib/cache";
+import { logger } from "@/lib/logger";
+
+const SHOP_CACHE_TTL = 5 * 60_000; // 5 minutes
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") || "unknown";
@@ -13,6 +17,11 @@ export async function GET(request: NextRequest) {
   if (!slug) {
     return NextResponse.json({ error: "Shop slug is required" }, { status: 400 });
   }
+
+  const cacheKey = `shop:${slug}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return NextResponse.json(cached);
+
   try {
     const shop = await prisma.shop.findUnique({
       where: { slug },
@@ -26,17 +35,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Shop not found" }, { status: 404 });
     }
 
-    // TODO: Re-enable subscription check when billing is live
+    // Block booking if shop is disabled by superadmin
+    if (!shop.subscriptionActive) {
+      return NextResponse.json({ error: "This business is currently unavailable" }, { status: 403 });
+    }
+
+    // TODO: Re-enable trial/billing check when billing is live
     // const now = new Date();
     // const inTrial = shop.trialEndsAt && now < shop.trialEndsAt;
     // const hasPaid = shop.paidUntil && now < shop.paidUntil;
-    // if (!shop.subscriptionActive || (!inTrial && !hasPaid)) {
+    // if (!inTrial && !hasPaid) {
     //   return NextResponse.json({ error: "This business is currently unavailable" }, { status: 403 });
     // }
 
+    cacheSet(cacheKey, shop, SHOP_CACHE_TTL);
     return NextResponse.json(shop);
   } catch (error) {
-    console.error("Error fetching shop:", error);
+    logger.error("Failed to fetch shop", "api:shops", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -73,7 +88,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(shop, { status: 201 });
   } catch (error) {
-    console.error("Error creating shop:", error);
+    logger.error("Failed to create shop", "api:shops", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

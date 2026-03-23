@@ -28,81 +28,125 @@ function loadPitchIdeas(): string | null {
 
 const PITCH_IDEAS = loadPitchIdeas();
 
-const SYSTEM_PROMPT = `Ti si Fran, prijateljska i znatiželjna osoba koja se obraća vlasnicima malih poduzeća u Hrvatskoj.
-Tvoj cilj je POKRENUTI RAZGOVOR o njihovom poslovanju, a ne im nešto prodati.
+const SYSTEM_PROMPT = `Ti si Fran koji radi na QueueUp-u, online sustavu za naručivanje termina.
+Pišeš vlasnicima malih poduzeća u Hrvatskoj.
 
-Pišeš kratkim, toplim rečenicama na razgovornom hrvatskom. Bez korporativnog tona.
-Postavljaš pitanja. Znatiželjni si.
-Fokusiraš se na njihove izazove, ne na tvoj produkt.
+Tvoj pristup:
+1. Odmah udari na problem — koliko ljudi ne dođe na termin, koliko love se gubi
+2. Stavi konkretan broj (npr. "3-5 ljudi tjedno = 100-200 EUR izgubljeno")
+3. Reci da većina to prihvaća kao normalno, ali ne bi trebali
+4. Ponudi QueueUp kao rješenje — direktno, bez obilaženja
 
-Pravila:
-- Kratke, udarljive rečenice (max 5-8 ukupno u poruci)
-- Emoji koristi rijetko (max 1-2)
-- Oslovljavaj ih imenom salona/firme
-- Nikakve značajke softvera, tehničke detalje, niti naziv platforme
-- Jedno otvoreno pitanje na kraju
-- Razgovorni ton, kao da pišeš kolegi, ne klijentu
-- NIKAD ne spominji booking sustav, software, aplikaciju ni rješenje`;
+Ton:
+- Direktan, konkretan, bez filozofiranja
+- Kratke rečenice, razgovorni hrvatski
+- NIKAD ne koristi emojije
+- NIKAD ne koristi crtice (--)
+- Budi uvjerljiv ali ne napadan
+- Potpiši se samo s "Fran" ili "Lp, Fran"
+
+QueueUp rješava to automatski:
+- Online booking 24/7
+- SMS/email podsjetnici (nema više "zaboravio sam")
+- Manje praznih slotova = više love po danu
+- Setup traje 10 minuta, mi sve postavimo
+
+Primjer dobrog maila:
+"""
+Bok,
+
+kratko pitanje — koliko ti ljudi ne dođe na termin tjedno?
+
+Ako je to samo 3-5 ljudi, to je već 100-200 EUR izgubljeno svaki tjedan.
+
+Većina to prihvaća kao "normalno". Ne bi trebali.
+
+QueueUp rješava to automatski:
+- online booking 24/7
+- SMS podsjetnici (nema više "e brate zaboravio sam")
+- manje praznih slotova, više love po danu
+
+Setup traje 10 minuta i mi ti sve postavimo.
+
+Ako želiš vidjeti kako izgleda u praksi, mogu ti pokazati u 2 minute, bez obaveze.
+
+Lp,
+Fran
+"""
+
+Piši poruke u ovom stilu. Prilagodi za svaku kategoriju (barber, spa, restoran, itd.) ali zadrži istu energiju i strukturu.`;
 
 const CATEGORY_HINTS: Record<BusinessCategory, string> = {
-  barber: "Pitaj o otkazivanjima u zadnji čas, no-showovima ili kako organiziraju raspored.",
-  spa: "Pitaj o vršnim i sporim terminima, ili kako upravljaju zakazivanjem tretmana.",
-  restaurant: "Pitaj o rezervacijama, koliko ih je dnevno i kako ih prate.",
-  fitness: "Pitaj o grupnim treninzima i kako upravljaju prijavama.",
-  dentist: "Pitaj o organizaciji termina pacijenata i čekaonici.",
-  salon: "Pitaj o stalnim klijentima i kako dogovaraju termine.",
-  veterinary: "Pitaj o hitnim posjetima i kako organiziraju raspored.",
-  other: "Pitaj o organizaciji i izazovima u njihovom svakodnevnom poslovanju.",
+  barber: "Fokus na no-showove. Klijenti zakažu i ne dođu. Prazan stolac = izgubljena lova. 3-5 no-showova tjedno = 100-200 EUR.",
+  spa: "Fokus na propuštene tretmane. Termin od 60-90 min prazan = velika izgubljena zarada. Klijenti zaborave ili otkažu kasno.",
+  restaurant: "Fokus na prazne stolove. Rezerviraju stol za 4 i ne dođu. Vikend rezervacije koje propadnu = izgubljena večer.",
+  fitness: "Fokus na grupne treninge. Ljudi se prijave i ne dođu. Trener čeka, oprema spremna, a sala poluprazna.",
+  dentist: "Fokus na propuštene termine. Pacijent ne dođe = 30-60 min prazan stolac. To je 50-150 EUR po no-showu.",
+  salon: "Fokus na otkazivanja u zadnji čas. Klijentica otkaže 30 min prije. Taj termin više nitko ne popuni.",
+  veterinary: "Fokus na organizaciju hitnih i redovnih posjeta. Vlasnici zaborave na kontrole, kaos u čekaonici.",
+  other: "Fokus na izgubljeno vrijeme i novac kad klijenti ne dođu ili otkažu kasno.",
 };
+
+// Sanitize external input (Serper results) before passing to Claude
+// Prevents prompt injection from malicious business names/cities
+function sanitizeInput(input: string, maxLen = 100): string {
+  return input
+    .replace(/[\r\n]/g, " ")          // no newlines (blocks prompt injection)
+    .replace(/[<>{}]/g, "")            // no angle brackets or braces
+    .substring(0, maxLen)
+    .trim();
+}
 
 export async function generatePitch(
   businessName: string,
   category: BusinessCategory,
   city: string,
 ): Promise<string> {
+  const safeName = sanitizeInput(businessName);
+  const safeCity = sanitizeInput(city, 50);
+
   const pitchIdeasSection = PITCH_IDEAS
     ? `\nMoje ideje i primjeri tona koje možeš koristiti kao inspiraciju:\n---\n${PITCH_IDEAS}\n---\n`
     : "";
 
-  const userPrompt = `Napiši PRVU poruku (ne pitch) za:
-- Naziv: ${businessName}
+  const userPrompt = `Napiši outreach email za:
+- Naziv: ${safeName}
 - Kategorija: ${category}
-- Grad: ${city}
+- Grad: ${safeCity}
 
-Savjet za ovu kategoriju: ${CATEGORY_HINTS[category]}
+Kontekst za ovu kategoriju: ${CATEGORY_HINTS[category]}
 ${pitchIdeasSection}
 Poruka mora:
-1. Biti kratka (5-8 rečenica max)
-2. Pokazati da poznaješ njihovu industriju
-3. Sadržavati JEDNO iskreno pitanje na kraju
-4. Zvučati ljudski i prirodno
-5. Biti potpisana samo s "Fran"
+1. Početi samo s "Bok," — NIKAD ne stavljaj ime firme u pozdrav
+2. Odmah udariti na problem s konkretnim brojevima (koliko love gube)
+3. Reći da to nije normalno
+4. Nabrojati što QueueUp rješava (kratki bullet pointovi s crticom -)
+5. Završiti s ponudom da pokažeš kako radi, bez obaveze
+6. Potpisati s "Lp, Fran" ili samo "Fran"
+7. NIKAD emojije, NIKAD crtice (--)
+8. Max 10-12 redova teksta`;
 
-NIKAD ne spominji booking sustav, aplikaciju, software ili rješenje.`;
+  logger.info(`Generating pitch for ${safeName} (${category}, ${safeCity})`);
 
-  logger.info(`Generating pitch for ${businessName} (${category}, ${city})`);
-
-  const stream = await client.messages.stream({
-    model: "claude-opus-4-6",
+  const message = await client.messages.create({
+    model: "claude-sonnet-4-6",
     max_tokens: 400,
-    thinking: { type: "adaptive" },
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: userPrompt }],
   });
 
-  const message = await stream.finalMessage();
   const textBlock = message.content.find((b) => b.type === "text");
   if (!textBlock || textBlock.type !== "text") {
     throw new Error("No text in Claude response");
   }
 
-  logger.info(`Generated pitch for ${businessName}`);
+  logger.info(`Generated pitch for ${safeName}`);
   return textBlock.text.trim();
 }
 
 export function getFollowUpMessage(day: 3 | 7): string {
   if (day === 3) {
-    return `Bok! 👋 Samo da ne ispadne da sam upala i nestala – javite ako vam ikad zatreba pomoć s dogovaranjem termina.\n\nSve najbolje! 😊\n\nFran`;
+    return `Bok,\n\nsamo kratki follow up na prošli mail.\n\nAko te zanima kako smanjiti no-showove i popuniti prazne termine, mogu ti pokazati u 2 minute.\n\nBez obaveze, bez caka.\n\nFran`;
   }
-  return `Vidim da ste aktivni s vašim klijentima – svaka čast na trudu! 💪\n\nMale firme to najteže održavaju. Ako vam ikad zatreba nešto oko logistike termina, slobodno se javite.\n\nFran`;
+  return `Bok,\n\nzadnji put se javljam.\n\nAko ikad odlučiš riješiti problem s propuštenim terminima, javi se. Setup traje 10 minuta i mi sve postavimo.\n\nSretno s poslom!\n\nFran`;
 }

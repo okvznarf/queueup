@@ -24,7 +24,8 @@ program
   .option("--category <category>", "Business category (for quick runs)")
   .option("--cities <cities>", "Comma-separated cities (for quick runs)")
   .option("--max-leads <number>", "Max leads per search", "10")
-  .option("--test <integration>", "Test a specific integration: serper|sheets|sendgrid|claude");
+  .option("--test <integration>", "Test a specific integration: serper|sheets|sendgrid|claude")
+  .option("--to <email>", "Email address for sendgrid test");
 
 program.parse();
 const opts = program.opts();
@@ -233,20 +234,19 @@ async function runTest(integration: string) {
       break;
     }
     case "sheets": {
-      validateEnv(["GOOGLE_SHEETS_CREDENTIALS", "SPREADSHEET_ID"]);
       await ensureSheetExists();
       const leads = await getAllLeads();
-      console.log(`Sheets OK. Found ${leads.length} existing leads.`);
+      console.log(`CSV OK. Found ${leads.length} existing leads. File: outreach-agent/leads.csv`);
       break;
     }
     case "sendgrid": {
       validateEnv(["SENDGRID_API_KEY", "SENDER_EMAIL"]);
-      const testEmail = process.env.SENDER_EMAIL!;
+      const testEmail = opts.to || process.env.SENDER_EMAIL!;
       await sendOutreachEmail({
         to: testEmail,
         businessName: "Test Salon",
         category: "barber",
-        message: "Ovo je testna poruka iz QueueUp outreach agenta. 👋\n\nFran",
+        message: "Bok,\n\nOvo je testna poruka iz QueueUp outreach agenta.\n\nFran",
       });
       console.log(`SendGrid OK. Test email sent to ${testEmail}`);
       break;
@@ -308,7 +308,7 @@ async function runInteractive() {
     delayBetweenEmails: delay,
   };
 
-  validateEnv(["SERPER_API_KEY", "GOOGLE_SHEETS_CREDENTIALS", "SPREADSHEET_ID", "ANTHROPIC_API_KEY", "SENDGRID_API_KEY", "SENDER_EMAIL"]);
+  validateEnv(["SERPER_API_KEY", "ANTHROPIC_API_KEY", "SENDGRID_API_KEY", "SENDER_EMAIL"]);
   const report = await processCampaign(config, isDryRun);
 
   console.log("\n✅ Kampanja završena!");
@@ -333,7 +333,7 @@ async function runBatch(configPath: string) {
   }
 
   const { campaigns } = JSON.parse(fs.readFileSync(configPath, "utf-8")) as { campaigns: CampaignConfig[] };
-  validateEnv(["SERPER_API_KEY", "GOOGLE_SHEETS_CREDENTIALS", "SPREADSHEET_ID", "ANTHROPIC_API_KEY", "SENDGRID_API_KEY", "SENDER_EMAIL"]);
+  validateEnv(["SERPER_API_KEY", "ANTHROPIC_API_KEY", "SENDGRID_API_KEY", "SENDER_EMAIL"]);
 
   logger.info(`Starting batch with ${campaigns.length} campaigns`);
 
@@ -357,7 +357,7 @@ async function main() {
 
   // Follow-up mode
   if (opts.followup) {
-    validateEnv(["GOOGLE_SHEETS_CREDENTIALS", "SPREADSHEET_ID", "SENDGRID_API_KEY", "SENDER_EMAIL"]);
+    validateEnv(["SENDGRID_API_KEY", "SENDER_EMAIL"]);
     const days = parseInt(opts.days as string) as 3 | 7;
     await runFollowUp(days, isDryRun);
     return;
@@ -372,7 +372,7 @@ async function main() {
   // Quick run with CLI flags
   if (opts.category && opts.cities) {
     validateEnv(["SERPER_API_KEY", "ANTHROPIC_API_KEY"]);
-    if (!isDryRun) validateEnv(["GOOGLE_SHEETS_CREDENTIALS", "SPREADSHEET_ID", "SENDGRID_API_KEY", "SENDER_EMAIL"]);
+    if (!isDryRun) validateEnv(["SENDGRID_API_KEY", "SENDER_EMAIL"]);
 
     const config: CampaignConfig = {
       id: `quick-${Date.now()}`,

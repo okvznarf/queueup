@@ -4,6 +4,7 @@ import { verifyPassword, createToken } from "@/lib/auth";
 import { rateLimit } from "@/lib/security";
 import sgMail from "@sendgrid/mail";
 import crypto from "crypto";
+import { logger } from "@/lib/logger";
 
 function generateCode(): string {
   return crypto.randomInt(100000, 999999).toString();
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
     try {
       await sendOTPEmail(user.email, otp);
     } catch (error) {
-      console.error("Failed to send OTP email:", error);
+      logger.error("Failed to send OTP email", "api:superadmin", error);
       return NextResponse.json({ error: "Failed to send verification email" }, { status: 500 });
     }
 

@@ -23,6 +23,7 @@ export default function CustomerDashboard() {
   const [dark, setDark] = useState<boolean | null>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const router = useRouter();
   const accent = "#84934A";
@@ -34,11 +35,13 @@ export default function CustomerDashboard() {
 
   const fetchAppointments = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/customer/appointments");
       if (res.status === 401) { router.push("/customer/login"); return; }
       if (res.ok) { const data = await res.json(); setAppointments(data); }
-    } catch (e) { console.error(e); }
+      else { setError("Failed to load appointments. Please try again."); }
+    } catch { setError("Connection error. Check your internet and try again."); }
     setLoading(false);
   };
 
@@ -61,7 +64,8 @@ export default function CustomerDashboard() {
         body: JSON.stringify({ appointmentId: id }),
       });
       if (res.ok) fetchAppointments();
-    } catch (e) { console.error(e); }
+      else setError("Failed to cancel appointment. Please try again.");
+    } catch { setError("Connection error. Please try again."); }
     setCancellingId(null);
   };
 
@@ -107,9 +111,16 @@ export default function CustomerDashboard() {
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "24px 20px" }}>
         <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: t.text }}>My Bookings</h2>
 
+        {error && (
+          <div style={{ background: "#ef444418", border: "1px solid #ef444440", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ color: "#ef4444", fontSize: 14 }}>{error}</span>
+            <button onClick={() => { setError(null); fetchAppointments(); }} style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 6, padding: "6px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", marginLeft: 12 }}>Retry</button>
+          </div>
+        )}
+
         {loading ? (
           <p style={{ color: t.muted, textAlign: "center", paddingTop: 40 }}>Loading your appointments...</p>
-        ) : appointments.length === 0 ? (
+        ) : appointments.length === 0 && !error ? (
           <div style={{ textAlign: "center", paddingTop: 60 }}>
             <div style={{ fontSize: 48, marginBottom: 16, color: t.muted }}>—</div>
             <h2 style={{ fontSize: 20, fontWeight: 600, margin: "0 0 8px" }}>No Appointments Yet</h2>

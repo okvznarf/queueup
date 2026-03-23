@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   if (password.length < 8) return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
 
   const customer = await prisma.customer.findFirst({
-    where: { resetToken: token, resetTokenExpiry: { gt: new Date() } },
+    where: { resetToken: token, resetTokenExpiry: { gte: new Date() } },
   });
 
   if (!customer) return NextResponse.json({ error: "Invalid or expired link" }, { status: 400 });

@@ -40,7 +40,7 @@ export async function getAvailableSlots(
 
   const existingAppointments = await prisma.appointment.findMany({
     where,
-    include: { service: true },
+    select: { startTime: true, endTime: true },
   });
 
   const bookedSlots = existingAppointments.map((apt) => ({

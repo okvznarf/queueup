@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { sanitize } from "@/lib/security";
 import { requireAdmin } from "@/lib/auth";
+import { cacheDelete } from "@/lib/cache";
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -18,6 +19,7 @@ export async function PATCH(request: NextRequest) {
         phone, email, address, city, state, zipCode, primaryColor, darkMode,
       },
     });
+    cacheDelete("shop:");
     return NextResponse.json(shop);
   } catch (error) { return NextResponse.json({ error: "Server error" }, { status: 500 }); }
 }

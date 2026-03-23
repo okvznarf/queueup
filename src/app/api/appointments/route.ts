@@ -3,6 +3,10 @@ import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 import { sanitize, isValidEmail, isValidPhone, rateLimit, validateRequired } from "@/lib/security";
 import { sendBookingConfirmation } from "@/lib/email";
+import { cacheDelete } from "@/lib/cache";
+import { checkIdempotency, setIdempotency, bookingIdempotencyKey } from "@/lib/resilience";
+import { broadcastToShop } from "@/app/api/events/route";
+import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
   const shopId = request.nextUrl.searchParams.get("shopId");
@@ -18,10 +22,19 @@ export async function GET(request: NextRequest) {
     endOfDay.setHours(23, 59, 59, 999);
     const where: any = { shopId, date: { gte: startOfDay, lte: endOfDay }, status: { notIn: ["CANCELLED"] } };
     if (staffId) where.staffId = staffId;
-    const appointments = await prisma.appointment.findMany({ where, include: { service: true, staff: true, customer: true }, orderBy: { startTime: "asc" } });
+    const appointments = await prisma.appointment.findMany({
+      where,
+      include: {
+        service: { select: { id: true, name: true, duration: true, price: true } },
+        staff: { select: { id: true, name: true } },
+        customer: { select: { id: true, name: true, email: true, phone: true } },
+      },
+      orderBy: { startTime: "asc" },
+      take: 500, // Hard limit — no shop has 500+ appointments/day
+    });
     return NextResponse.json(appointments);
   } catch (error) {
-    console.error("Error fetching appointments:", error);
+    logger.error("Failed to fetch appointments", "api:appointments", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -63,62 +76,116 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
     }
 
-    const conflictWhere: any = { shopId: body.shopId, date: new Date(body.date), startTime: body.startTime, status: { notIn: ["CANCELLED"] } };
-    if (body.staffId) conflictWhere.staffId = body.staffId;
-    const conflict = await prisma.appointment.findFirst({ where: conflictWhere });
+    // ── Idempotency: prevent duplicate bookings from double-clicks / retries ──
+    const idempKey = bookingIdempotencyKey(body.shopId, body.date, body.startTime, customerPhone);
+    const cached = checkIdempotency(idempKey);
+    if (cached) {
+      return NextResponse.json(cached, { status: 201 });
+    }
+
+    // Parallel: check shop status + service + time conflict in one batch
+    const [shop, service, conflict] = await Promise.all([
+      prisma.shop.findUnique({ where: { id: body.shopId }, select: { id: true, name: true, subscriptionActive: true } }),
+      prisma.service.findUnique({ where: { id: body.serviceId }, select: { id: true, name: true, duration: true, price: true } }),
+      prisma.appointment.findFirst({
+        where: {
+          shopId: body.shopId,
+          date: new Date(body.date),
+          startTime: body.startTime,
+          status: { notIn: ["CANCELLED"] },
+          ...(body.staffId ? { staffId: body.staffId } : {}),
+        },
+      }),
+    ]);
+
+    if (!shop || !shop.subscriptionActive) {
+      return NextResponse.json({ error: "This business is currently unavailable" }, { status: 403 });
+    }
     if (conflict) {
       return NextResponse.json({ error: "This time slot is no longer available" }, { status: 409 });
     }
 
-    // Check if customer is logged in
-    let customerId = null;
-    const token = request.cookies.get("customer_token")?.value;
-    if (token) {
-      const decoded = verifyToken(token);
-      if (decoded && decoded.role === "customer") {
-        customerId = decoded.userId;
+    // ── Database transaction: customer upsert + appointment creation are atomic ──
+    const appointment = await prisma.$transaction(async (tx) => {
+      // Find customer: check logged-in token first, then phone/email
+      let customerId = null;
+      const token = request.cookies.get("customer_token")?.value;
+      if (token) {
+        const decoded = verifyToken(token);
+        if (decoded && decoded.role === "customer") {
+          customerId = decoded.userId;
+        }
       }
-    }
 
-    // Find or create customer
-    let customer;
-    if (customerId) {
-      customer = await prisma.customer.findUnique({ where: { id: customerId } });
-    }
+      let customer = customerId
+        ? await tx.customer.findUnique({ where: { id: customerId } })
+        : null;
 
-    if (!customer) {
-      // Try to find by phone
-      customer = await prisma.customer.findUnique({ where: { phone_shopId: { phone: customerPhone, shopId: body.shopId } } });
-    }
+      if (!customer) {
+        customer = await tx.customer.findFirst({
+          where: {
+            shopId: body.shopId,
+            OR: [
+              { phone: customerPhone },
+              ...(customerEmail ? [{ email: customerEmail }] : []),
+            ],
+          },
+        });
+      }
 
-    if (!customer && customerEmail) {
-      // Try to find by email
-      customer = await prisma.customer.findUnique({ where: { email_shopId: { email: customerEmail, shopId: body.shopId } } });
-    }
+      if (!customer) {
+        customer = await tx.customer.create({ data: { name: customerName, phone: customerPhone, email: customerEmail || null, shopId: body.shopId } });
+      } else {
+        await tx.customer.update({ where: { id: customer.id }, data: { name: customerName, email: customerEmail || customer.email } });
+      }
 
-    if (!customer) {
-      customer = await prisma.customer.create({ data: { name: customerName, phone: customerPhone, email: customerEmail || null, shopId: body.shopId } });
-    } else {
-      // Update name and email if changed
-      await prisma.customer.update({ where: { id: customer.id }, data: { name: customerName, email: customerEmail || customer.email } });
-    }
+      // Re-check conflict inside transaction to prevent race conditions
+      const txConflict = await tx.appointment.findFirst({
+        where: {
+          shopId: body.shopId,
+          date: new Date(body.date),
+          startTime: body.startTime,
+          status: { notIn: ["CANCELLED"] },
+          ...(body.staffId ? { staffId: body.staffId } : {}),
+        },
+      });
+      if (txConflict) throw new Error("SLOT_TAKEN");
 
-    const service = await prisma.service.findUnique({ where: { id: body.serviceId } });
-
-    const appointment = await prisma.appointment.create({
-      data: {
-        shopId: body.shopId, serviceId: body.serviceId, staffId: body.staffId || null, customerId: customer.id,
-        date: new Date(body.date), startTime: body.startTime,
-        endTime: body.endTime || calculateEndTime(body.startTime, service?.duration || 30),
-        totalPrice: service?.price || 0, notes,
-        partySize: body.partySize || null, vehicleInfo: vehicleInfo || null, licensePlate: licensePlate || null,
-        status: "CONFIRMED",
-      },
-      include: { service: true, staff: true, customer: true, shop: true },
+      return tx.appointment.create({
+        data: {
+          shopId: body.shopId, serviceId: body.serviceId, staffId: body.staffId || null, customerId: customer.id,
+          date: new Date(body.date), startTime: body.startTime,
+          endTime: body.endTime || calculateEndTime(body.startTime, service?.duration || 30),
+          totalPrice: service?.price || 0, notes,
+          partySize: body.partySize || null, vehicleInfo: vehicleInfo || null, licensePlate: licensePlate || null,
+          status: "CONFIRMED",
+        },
+        select: {
+          id: true, date: true, startTime: true, endTime: true, status: true, totalPrice: true,
+          notes: true, partySize: true, vehicleInfo: true, licensePlate: true, createdAt: true,
+          service: { select: { id: true, name: true, duration: true, price: true } },
+          staff: { select: { id: true, name: true } },
+          customer: { select: { id: true, name: true, email: true, phone: true } },
+          shop: { select: { id: true, name: true } },
+        },
+      });
     });
 
+    // Store in idempotency cache so retries return the same result
+    setIdempotency(idempKey, appointment);
+
+    // Invalidate availability cache for this shop/date
+    cacheDelete("avail:" + body.shopId);
+
+    // Broadcast to admin dashboards watching this shop (SSE)
+    broadcastToShop(body.shopId, "appointment:created", {
+      id: appointment.id, startTime: appointment.startTime, date: appointment.date,
+      service: appointment.service.name, customer: appointment.customer.name,
+    });
+
+    // Send confirmation email without blocking the response
     if (appointment.customer.email) {
-      await sendBookingConfirmation({
+      sendBookingConfirmation({
         customerName: appointment.customer.name,
         customerEmail: appointment.customer.email,
         shopName: appointment.shop.name,
@@ -127,12 +194,15 @@ export async function POST(request: NextRequest) {
         date: appointment.date,
         startTime: appointment.startTime,
         totalPrice: appointment.totalPrice ?? 0,
-      });
+      }).catch((err) => logger.error("Failed to send booking confirmation", "email:confirmation", err));
     }
 
     return NextResponse.json(appointment, { status: 201 });
   } catch (error) {
-    console.error("Error creating appointment:", error);
+    if (error instanceof Error && error.message === "SLOT_TAKEN") {
+      return NextResponse.json({ error: "This time slot is no longer available" }, { status: 409 });
+    }
+    logger.error("Failed to create appointment", "api:appointments", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
