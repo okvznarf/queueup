@@ -43,7 +43,7 @@ async function sendBatch<T>(items: T[], batchSize: number, fn: (item: T) => Prom
 
 export async function GET(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") || "unknown";
-  if (!rateLimit("cron-reminders:" + ip, 2, 3600000)) {
+  if (!rateLimit("cron-reminders:" + ip, 25, 3600000)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
   const secret = process.env.CRON_SECRET;
