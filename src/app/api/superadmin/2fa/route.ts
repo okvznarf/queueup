@@ -17,7 +17,7 @@ async function sendOTPEmail(to: string, code: string) {
 
   await sgMail.send({
     to,
-    from: { email: "info@queueup.me", name: "QueueUp" },
+    from: { email: process.env.EMAIL_FROM || "info@queueup.me", name: process.env.EMAIL_FROM_NAME || "QueueUp" },
     subject: "Your QueueUp login code",
     text: `Your verification code is: ${code}\n\nThis code expires in 5 minutes.\n\nIf you didn't request this, ignore this email.`,
     html: `

@@ -42,7 +42,7 @@ class SendGridProvider implements EmailProvider {
 
 // ─── Provider Registry ──────────────────────────────────────────────────────
 
-const FROM = { email: "info@queueup.me", name: "QueueUp" };
+const FROM = { email: process.env.EMAIL_FROM || "info@queueup.me", name: process.env.EMAIL_FROM_NAME || "QueueUp" };
 let provider: EmailProvider = new SendGridProvider();
 
 // Call this to swap email provider (e.g. in tests or migration)
