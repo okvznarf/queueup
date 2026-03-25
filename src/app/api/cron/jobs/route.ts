@@ -33,7 +33,7 @@ registerJobHandler("email:confirmation", async (payload) => {
 });
 
 registerJobHandler("email:reminder", async (payload) => {
-  const { appointmentId } = payload as { appointmentId: string };
+  const { appointmentId, type } = payload as { appointmentId: string; type?: string };
   const appt = await prisma.appointment.findUnique({
     where: { id: appointmentId },
     select: {
@@ -55,6 +55,7 @@ registerJobHandler("email:reminder", async (payload) => {
     staffName: appt.staff?.name,
     date: appt.date,
     startTime: appt.startTime,
+    reminderType: type === "1h" ? "1h" : "24h",
   });
 });
 

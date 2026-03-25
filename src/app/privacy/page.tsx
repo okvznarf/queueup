@@ -7,7 +7,7 @@ const css = `
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 .pp{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;display:flex;flex-direction:column}
 .pp nav{padding:22px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-.pp .logo{text-decoration:none;display:flex;align-items:center}.pp .logo img{height:150px;width:auto;margin:-40px 0}
+.pp .logo{text-decoration:none;display:flex;align-items:center}.pp .logo img{height:250px;width:auto;margin:-90px 0}
 .pp .nr{display:flex;gap:16px;align-items:center}
 .pp .nb{background:var(--bg-dark);color:#FFF;padding:11px 26px;border-radius:100px;font-weight:600;font-size:0.92rem;text-decoration:none;transition:opacity 0.2s;font-family:var(--fb)}.pp .nb:hover{opacity:0.85}
 .pp .ls{position:relative}.pp .lb{display:flex;align-items:center;gap:6px;background:0;border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-family:var(--fb);font-size:0.85rem;font-weight:500;color:var(--text-mid);cursor:pointer}.pp .lb svg{width:14px;height:14px;opacity:0.5;transition:transform 0.2s}.pp .ls.open .lb svg{transform:rotate(180deg)}

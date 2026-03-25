@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("customer_token")?.value;
@@ -12,14 +13,29 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   try {
+    // Cursor-based pagination: ?limit=20&cursor=<lastId>
+    const limit = Math.min(Number(request.nextUrl.searchParams.get("limit")) || 20, 100);
+    const cursor = request.nextUrl.searchParams.get("cursor");
+
     const appointments = await prisma.appointment.findMany({
       where: { customerId: decoded.userId },
-      include: { service: true, staff: true, shop: true },
+      include: {
+        service: { select: { id: true, name: true, duration: true, price: true } },
+        staff: { select: { id: true, name: true } },
+        shop: { select: { id: true, name: true, slug: true, primaryColor: true } },
+      },
       orderBy: { date: "desc" },
+      take: limit + 1, // Fetch one extra to know if there's a next page
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     });
-    return NextResponse.json(appointments);
+
+    const hasMore = appointments.length > limit;
+    const data = hasMore ? appointments.slice(0, limit) : appointments;
+    const nextCursor = hasMore ? data[data.length - 1].id : null;
+
+    return NextResponse.json({ data, nextCursor, hasMore });
   } catch (error) {
-    console.error("Error:", error);
+    logger.error("Failed to fetch customer appointments", "api:customer", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -48,11 +64,16 @@ export async function PATCH(request: NextRequest) {
     const updated = await prisma.appointment.update({
       where: { id: appointmentId },
       data: { status: "CANCELLED" },
-      include: { service: true, staff: true, shop: true },
+      select: {
+        id: true, date: true, startTime: true, endTime: true, status: true,
+        service: { select: { id: true, name: true } },
+        staff: { select: { id: true, name: true } },
+        shop: { select: { id: true, name: true, slug: true } },
+      },
     });
     return NextResponse.json(updated);
   } catch (error) {
-    console.error("Error:", error);
+    logger.error("Failed to update customer appointment", "api:customer", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

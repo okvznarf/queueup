@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 import { sanitize, isValidEmail, isValidPhone, rateLimit, validateRequired } from "@/lib/security";
 import { sendBookingConfirmation } from "@/lib/email";
+import { enqueueJob } from "@/lib/jobs";
 import { cacheDelete } from "@/lib/cache";
 import { checkIdempotency, setIdempotency, bookingIdempotencyKey } from "@/lib/resilience";
 import { broadcastToShop } from "@/app/api/events/route";
@@ -195,6 +196,24 @@ export async function POST(request: NextRequest) {
         startTime: appointment.startTime,
         totalPrice: appointment.totalPrice ?? 0,
       }).catch((err) => logger.error("Failed to send booking confirmation", "email:confirmation", err));
+
+      // Schedule 24h and 1h reminder emails
+      const [h, m] = appointment.startTime.split(":").map(Number);
+      const aptTime = new Date(appointment.date);
+      aptTime.setUTCHours(h, m, 0, 0);
+
+      const remind24h = new Date(aptTime.getTime() - 24 * 60 * 60 * 1000);
+      const remind1h = new Date(aptTime.getTime() - 1 * 60 * 60 * 1000);
+      const now = new Date();
+
+      if (remind24h > now) {
+        enqueueJob("email:reminder", { appointmentId: appointment.id, type: "24h" }, { runAt: remind24h })
+          .catch((err) => logger.error("Failed to enqueue 24h reminder", "jobs:enqueue", err));
+      }
+      if (remind1h > now) {
+        enqueueJob("email:reminder", { appointmentId: appointment.id, type: "1h" }, { runAt: remind1h })
+          .catch((err) => logger.error("Failed to enqueue 1h reminder", "jobs:enqueue", err));
+      }
     }
 
     return NextResponse.json(appointment, { status: 201 });

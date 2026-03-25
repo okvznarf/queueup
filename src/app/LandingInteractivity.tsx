@@ -47,7 +47,7 @@ export default function LandingInteractivity() {
       }
     } catch(e) {}
 
-    const rv = document.querySelectorAll('.rv');
+    const rv = document.querySelectorAll('.rv, .rv-left, .rv-right');
     const ob = new IntersectionObserver(entries => {
       entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('v'); });
     }, { threshold: 0.1 });

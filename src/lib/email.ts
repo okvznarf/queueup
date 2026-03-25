@@ -140,6 +140,7 @@ export async function sendAppointmentReminder({
   staffName,
   date,
   startTime,
+  reminderType = "24h",
 }: {
   customerName: string;
   customerEmail: string;
@@ -148,6 +149,7 @@ export async function sendAppointmentReminder({
   staffName?: string | null;
   date: Date;
   startTime: string;
+  reminderType?: "24h" | "1h";
 }) {
   const formattedDate = new Date(date).toLocaleDateString("hr-HR", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
@@ -156,9 +158,13 @@ export async function sendAppointmentReminder({
   const [hours, minutes] = startTime.split(":").map(Number);
   const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 
+  const urgency = reminderType === "1h"
+    ? "Podsjećamo vas da imate termin za 1 sat."
+    : "Podsjećamo vas da imate termin sutra.";
+
   const text = `Pozdrav ${customerName},
 
-Podsjećamo vas da imate termin sutra.
+${urgency}
 
 ---
 
@@ -178,7 +184,11 @@ Otkazivanje: Ako trebate otkazati ili promijeniti termin, kontaktirajte ${shopNa
 
 © ${new Date().getFullYear()} ${shopName}`;
 
-  await sendMail({ to: customerEmail, subject: `Podsjetnik za termin — ${shopName}`, text });
+  const subject = reminderType === "1h"
+    ? `Termin za 1 sat — ${shopName}`
+    : `Podsjetnik za termin — ${shopName}`;
+
+  await sendMail({ to: customerEmail, subject, text });
 }
 
 export async function sendBookingConfirmation({

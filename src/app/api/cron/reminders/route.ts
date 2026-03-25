@@ -52,9 +52,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Target moment: exactly 24 hours from now
-  const target = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
   // Get all distinct shop timezones
   const shops = await prisma.shop.findMany({
     select: { id: true, timezone: true },
@@ -72,46 +69,57 @@ export async function GET(req: NextRequest) {
   let totalFailed = 0;
   let skipped = 0;
 
-  for (const [timezone, shopIds] of byTimezone) {
-    const localHour = getLocalHour(target, timezone);
-    const localDateMidnight = getLocalDateMidnightUTC(target, timezone);
-    const localDateEnd = new Date(localDateMidnight.getTime() + 24 * 60 * 60 * 1000);
+  // Send both 24h and 1h reminders
+  const offsets: Array<{ ms: number; type: "24h" | "1h" }> = [
+    { ms: 24 * 60 * 60 * 1000, type: "24h" },
+    { ms: 1 * 60 * 60 * 1000, type: "1h" },
+  ];
 
-    const appointments = await prisma.appointment.findMany({
-      where: {
-        shopId: { in: shopIds },
-        date: { gte: localDateMidnight, lt: localDateEnd },
-        status: { in: ["CONFIRMED", "PENDING"] },
-        startTime: { startsWith: localHour + ":" },
-      },
-      include: { customer: true, service: true, staff: true, shop: true },
-    });
+  for (const offset of offsets) {
+    const target = new Date(Date.now() + offset.ms);
 
-    // Filter out appointments without customer email
-    const withEmail = appointments.filter(a => a.customer.email);
-    skipped += appointments.length - withEmail.length;
+    for (const [timezone, shopIds] of byTimezone) {
+      const localHour = getLocalHour(target, timezone);
+      const localDateMidnight = getLocalDateMidnightUTC(target, timezone);
+      const localDateEnd = new Date(localDateMidnight.getTime() + 24 * 60 * 60 * 1000);
 
-    // Send in batches of 10 concurrently
-    const { sent, failed } = await sendBatch(withEmail, 10, async (appt) => {
-      try {
-        await sendAppointmentReminder({
-          customerName: appt.customer.name,
-          customerEmail: appt.customer.email!,
-          shopName: appt.shop.name,
-          serviceName: appt.service.name,
-          staffName: appt.staff?.name,
-          date: appt.date,
-          startTime: appt.startTime,
-        });
-        return true;
-      } catch (err) {
-        logger.error("Failed to send reminder", "cron:reminders", err);
-        return false;
-      }
-    });
+      const appointments = await prisma.appointment.findMany({
+        where: {
+          shopId: { in: shopIds },
+          date: { gte: localDateMidnight, lt: localDateEnd },
+          status: { in: ["CONFIRMED", "PENDING"] },
+          startTime: { startsWith: localHour + ":" },
+        },
+        include: { customer: true, service: true, staff: true, shop: true },
+      });
 
-    totalSent += sent;
-    totalFailed += failed;
+      // Filter out appointments without customer email
+      const withEmail = appointments.filter(a => a.customer.email);
+      skipped += appointments.length - withEmail.length;
+
+      // Send in batches of 10 concurrently
+      const { sent, failed } = await sendBatch(withEmail, 10, async (appt) => {
+        try {
+          await sendAppointmentReminder({
+            customerName: appt.customer.name,
+            customerEmail: appt.customer.email!,
+            shopName: appt.shop.name,
+            serviceName: appt.service.name,
+            staffName: appt.staff?.name,
+            date: appt.date,
+            startTime: appt.startTime,
+            reminderType: offset.type,
+          });
+          return true;
+        } catch (err) {
+          logger.error(`Failed to send ${offset.type} reminder`, "cron:reminders", err);
+          return false;
+        }
+      });
+
+      totalSent += sent;
+      totalFailed += failed;
+    }
   }
 
   return NextResponse.json({ ok: true, sent: totalSent, failed: totalFailed, skipped });
