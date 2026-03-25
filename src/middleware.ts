@@ -15,6 +15,15 @@ export function middleware(request: NextRequest) {
   response.headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com; frame-src https://accounts.google.com;");
 
   if (request.nextUrl.pathname.startsWith("/api/")) {
+    // Reject oversized payloads (100KB max)
+    const contentLength = request.headers.get("content-length");
+    if (contentLength && parseInt(contentLength) > 102400) {
+      return new NextResponse(JSON.stringify({ error: "Payload too large" }), {
+        status: 413,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const origin = request.headers.get("origin") || "";
     const allowedOrigins = [
       "http://localhost:3000",

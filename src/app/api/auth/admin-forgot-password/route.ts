@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import prisma from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
-import { rateLimit } from "@/lib/security";
+import { rateLimit, sanitize, isValidEmail } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") || "unknown";
@@ -10,8 +10,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
   }
 
-  const { email } = await req.json();
-  if (!email) return NextResponse.json({ error: "Email is required" }, { status: 400 });
+  const body = await req.json();
+  const email = sanitize(body.email || "", 200).toLowerCase();
+  if (!email || !isValidEmail(email)) return NextResponse.json({ error: "Valid email is required" }, { status: 400 });
 
   const user = await prisma.user.findUnique({ where: { email } });
 

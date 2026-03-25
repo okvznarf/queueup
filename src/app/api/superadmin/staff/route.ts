@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
-import { rateLimit, sanitize } from "@/lib/security";
+import { rateLimit, sanitize, isValidEmail, isValidPhone } from "@/lib/security";
 
 function requireSuperadmin(request: NextRequest) {
   const cookieHeader = request.headers.get("cookie") || "";
@@ -47,6 +47,8 @@ export async function POST(request: NextRequest) {
   const { shopId, name, role, email, phone, bio, avatarUrl } = body;
 
   if (!shopId || !name) return NextResponse.json({ error: "shopId and name required" }, { status: 400 });
+  if (email && !isValidEmail(email)) return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+  if (phone && !isValidPhone(phone)) return NextResponse.json({ error: "Invalid phone" }, { status: 400 });
 
   // Validate avatar if provided (must be data URL or https URL, max 500KB base64)
   if (avatarUrl && typeof avatarUrl === "string") {
@@ -63,8 +65,8 @@ export async function POST(request: NextRequest) {
       shopId,
       name: sanitize(name, 100),
       role: sanitize(role || "", 100),
-      email: email || null,
-      phone: phone || null,
+      email: email ? sanitize(email, 200).toLowerCase() : null,
+      phone: phone ? sanitize(phone, 30) : null,
       bio: sanitize(bio || "", 500),
       avatarUrl: avatarUrl || null,
     },
@@ -86,6 +88,8 @@ export async function PATCH(request: NextRequest) {
   const { id, name, role, email, phone, bio, avatarUrl, isActive } = body;
 
   if (!id) return NextResponse.json({ error: "Staff id required" }, { status: 400 });
+  if (email && !isValidEmail(email)) return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+  if (phone && !isValidPhone(phone)) return NextResponse.json({ error: "Invalid phone" }, { status: 400 });
 
   const existing = await prisma.staff.findUnique({ where: { id }, select: { id: true } });
   if (!existing) return NextResponse.json({ error: "Staff not found" }, { status: 404 });
@@ -102,8 +106,8 @@ export async function PATCH(request: NextRequest) {
   const data: Record<string, unknown> = {};
   if (name !== undefined) data.name = sanitize(name, 100);
   if (role !== undefined) data.role = sanitize(role, 100);
-  if (email !== undefined) data.email = email || null;
-  if (phone !== undefined) data.phone = phone || null;
+  if (email !== undefined) data.email = email ? sanitize(email, 200).toLowerCase() : null;
+  if (phone !== undefined) data.phone = phone ? sanitize(phone, 30) : null;
   if (bio !== undefined) data.bio = sanitize(bio, 500);
   if (avatarUrl !== undefined) data.avatarUrl = avatarUrl || null;
   if (typeof isActive === "boolean") data.isActive = isActive;

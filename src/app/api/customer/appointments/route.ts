@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
+import { rateLimit } from "@/lib/security";
 import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!rateLimit("cust-appts:" + ip, 30, 60000)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
   const token = request.cookies.get("customer_token")?.value;
   if (!token) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -14,7 +19,7 @@ export async function GET(request: NextRequest) {
   }
   try {
     // Cursor-based pagination: ?limit=20&cursor=<lastId>
-    const limit = Math.min(Number(request.nextUrl.searchParams.get("limit")) || 20, 100);
+    const limit = Math.min(Math.max(Number(request.nextUrl.searchParams.get("limit")) || 20, 1), 100);
     const cursor = request.nextUrl.searchParams.get("cursor");
 
     const appointments = await prisma.appointment.findMany({
@@ -41,6 +46,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!rateLimit("cust-cancel:" + ip, 10, 60000)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
   const token = request.cookies.get("customer_token")?.value;
   if (!token) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -52,6 +61,9 @@ export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
     const { appointmentId } = body;
+    if (!appointmentId || typeof appointmentId !== "string") {
+      return NextResponse.json({ error: "appointmentId required" }, { status: 400 });
+    }
 
     const appointment = await prisma.appointment.findUnique({ where: { id: appointmentId } });
     if (!appointment || appointment.customerId !== decoded.userId) {

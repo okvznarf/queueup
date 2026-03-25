@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { hashPassword, verifyPassword } from "@/lib/auth";
-import { rateLimit } from "@/lib/security";
+import { rateLimit, sanitize, isValidHexToken } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") || "unknown";
@@ -9,9 +9,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
   }
 
-  const { token, password } = await req.json();
-  if (!token || !password) return NextResponse.json({ error: "Token and password required" }, { status: 400 });
-  if (password.length < 8) return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
+  const body = await req.json();
+  const token = sanitize(body.token || "", 128);
+  const password = body.password;
+  if (!token || !isValidHexToken(token)) return NextResponse.json({ error: "Invalid token" }, { status: 400 });
+  if (!password || typeof password !== "string") return NextResponse.json({ error: "Password required" }, { status: 400 });
+  if (password.length < 8 || password.length > 128) return NextResponse.json({ error: "Password must be 8-128 characters" }, { status: 400 });
 
   const user = await prisma.user.findFirst({
     where: { resetToken: token, resetTokenExpiry: { gte: new Date() } },

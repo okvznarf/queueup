@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyPassword, createToken } from "@/lib/auth";
-import { sanitize, rateLimit } from "@/lib/security";
+import { sanitize, rateLimit, isValidEmail } from "@/lib/security";
 import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
@@ -17,6 +17,9 @@ export async function POST(request: NextRequest) {
 
     if (!email || !password || !shopId) {
       return NextResponse.json({ error: "Email, password and shop are required" }, { status: 400 });
+    }
+    if (!isValidEmail(email)) {
+      return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
     }
 
     const customer = await prisma.customer.findUnique({ where: { email_shopId: { email, shopId } } });

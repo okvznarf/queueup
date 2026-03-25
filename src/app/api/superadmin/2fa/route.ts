@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyPassword, createToken } from "@/lib/auth";
-import { rateLimit } from "@/lib/security";
+import { rateLimit, sanitize, isValidEmail } from "@/lib/security";
 import sgMail from "@sendgrid/mail";
 import crypto from "crypto";
 import { logger } from "@/lib/logger";
@@ -39,15 +39,16 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { email, password, code, step } = body;
+  const { step } = body;
 
   if (step === "login") {
-    if (!email || !password) {
-      return NextResponse.json({ error: "Email and password required" }, { status: 400 });
-    }
+    const email = sanitize(body.email || "", 200).toLowerCase();
+    const password = body.password;
+    if (!email || !isValidEmail(email)) return NextResponse.json({ error: "Valid email required" }, { status: 400 });
+    if (!password || typeof password !== "string") return NextResponse.json({ error: "Password required" }, { status: 400 });
 
     const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
+      where: { email },
       select: { id: true, email: true, name: true, passwordHash: true, role: true },
     });
 
@@ -80,9 +81,10 @@ export async function POST(request: NextRequest) {
   }
 
   if (step === "verify") {
-    const { userId } = body;
-    if (!userId || !code) {
-      return NextResponse.json({ error: "Code required" }, { status: 400 });
+    const { userId, code } = body;
+    if (!userId || typeof userId !== "string") return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    if (!code || typeof code !== "string" || !/^\d{6}$/.test(code)) {
+      return NextResponse.json({ error: "Invalid code format" }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({

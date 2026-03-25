@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken, hashPassword } from "@/lib/auth";
-import { rateLimit } from "@/lib/security";
+import { rateLimit, sanitize, isValidEmail, isValidPhone } from "@/lib/security";
 
 function requireSuperadmin(request: NextRequest) {
   const cookieHeader = request.headers.get("cookie") || "";
@@ -94,10 +94,25 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { name, email, password, businessType, phone, employeeCount: empCount } = body;
+  const { name: rawName, email: rawEmail, password, businessType, phone: rawPhone, employeeCount: empCount } = body;
 
-  if (!name || !email || !password || !businessType) {
+  if (!rawName || !rawEmail || !password || !businessType) {
     return NextResponse.json({ error: "Name, email, password, and business type are required" }, { status: 400 });
+  }
+
+  const name = sanitize(rawName, 100);
+  const email = sanitize(rawEmail, 200).toLowerCase();
+  const phone = rawPhone ? sanitize(rawPhone, 30) : null;
+
+  if (!isValidEmail(email)) return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+  if (phone && !isValidPhone(phone)) return NextResponse.json({ error: "Invalid phone" }, { status: 400 });
+  if (typeof password !== "string" || password.length < 8 || password.length > 128) {
+    return NextResponse.json({ error: "Password must be 8-128 characters" }, { status: 400 });
+  }
+
+  const allowedTypes = ["barber", "salon", "restaurant", "mechanic", "clinic", "spa", "other"];
+  if (!allowedTypes.includes(businessType)) {
+    return NextResponse.json({ error: "Invalid business type" }, { status: 400 });
   }
 
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");

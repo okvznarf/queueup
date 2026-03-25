@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis";
+import type { NextRequest } from "next/server";
 
 // Input sanitization - strips HTML tags and limits length
 export function sanitize(input: string, maxLength: number = 500): string {
@@ -89,3 +90,47 @@ export function validateRequired(obj: Record<string, any>, fields: string[]): st
   }
   return null;
 }
+
+// Validate a positive number (integer or float)
+export function isPositiveNumber(val: unknown): val is number {
+  return typeof val === "number" && isFinite(val) && val >= 0;
+}
+
+// Validate integer in range
+export function isIntInRange(val: unknown, min: number, max: number): val is number {
+  return typeof val === "number" && Number.isInteger(val) && val >= min && val <= max;
+}
+
+// Validate time format HH:MM
+export function isValidTime(val: unknown): val is string {
+  return typeof val === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(val);
+}
+
+// Validate ISO date string (YYYY-MM-DD or full ISO)
+export function isValidDate(val: unknown): boolean {
+  if (typeof val !== "string") return false;
+  const d = new Date(val);
+  return !isNaN(d.getTime());
+}
+
+// Validate UUID format
+export function isValidUUID(val: unknown): val is string {
+  return typeof val === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+}
+
+// Validate hex token (e.g., password reset tokens)
+export function isValidHexToken(val: unknown): val is string {
+  return typeof val === "string" && /^[0-9a-f]{16,128}$/i.test(val);
+}
+
+// Parse JSON body with size limit (returns null if oversized/malformed)
+export async function parseBody(request: NextRequest, maxBytes: number = 100_000): Promise<any | null> {
+  try {
+    const text = await request.text();
+    if (text.length > maxBytes) return null;
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
