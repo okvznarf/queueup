@@ -6,7 +6,7 @@ import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") || "unknown";
-  if (!rateLimit("login:" + ip, 10, 900000)) {
+  if (!rateLimit("login:" + ip, 5, 900000)) {
     return NextResponse.json({ error: "Too many login attempts. Try again in 15 minutes." }, { status: 429 });
   }
 
