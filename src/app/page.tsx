@@ -125,15 +125,17 @@ const css = `
 
 /* ─── MOBILE ─── */
 @media(max-width:900px){
-.lp-root nav{padding:14px 20px}
-.lp-root .logo img{height:160px;margin:-55px 0}
+.lp-root nav{padding:10px 16px}
+.lp-root .logo img{height:100px;margin:-30px 0}
 .lp-root .nl a:not(.bs){display:none}
-.lp-root .bs{padding:9px 20px;font-size:0.85rem}
-.lp-root .hero{padding:110px 20px 64px}
-.lp-root .hero h1{font-size:clamp(2.6rem,7vw,4rem);line-height:0.95}
-.lp-root .hs{font-size:1.02rem;line-height:1.65;margin-top:24px}
-.lp-root .ha{flex-direction:column;align-items:center;gap:12px;margin-top:36px;width:100%}
-.lp-root .bp,.lp-root .bg{width:100%;max-width:300px;text-align:center;padding:15px 32px}
+.lp-root .bs{padding:8px 16px;font-size:0.8rem}
+.lp-root .lb{padding:5px 10px;font-size:0.8rem}
+.lp-root .hero{padding:90px 20px 56px}
+.lp-root .hl{font-size:0.68rem;padding:6px 14px;margin-bottom:24px}
+.lp-root .hero h1{font-size:clamp(2.2rem,6.5vw,3.2rem);line-height:0.95}
+.lp-root .hs{font-size:0.95rem;line-height:1.6;margin-top:20px}
+.lp-root .ha{flex-direction:column;align-items:center;gap:12px;margin-top:32px;width:100%}
+.lp-root .bp,.lp-root .bg{width:100%;max-width:280px;text-align:center;padding:14px 28px;font-size:0.95rem}
 .lp-root .hero::before,.lp-root .hero::after{width:250px;height:250px}
 .lp-root .hero-orb{width:150px;height:150px}
 .lp-root .hm{gap:20px;flex-wrap:wrap;justify-content:center;margin-top:56px;padding-top:32px}
