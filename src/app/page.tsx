@@ -124,7 +124,38 @@ const css = `
 .lp-root .rv.v .rs:nth-child(1){animation:fu 0.5s cubic-bezier(0.16,1,0.3,1) 0s both}.lp-root .rv.v .rs:nth-child(2){animation:fu 0.5s cubic-bezier(0.16,1,0.3,1) 0.08s both}.lp-root .rv.v .rs:nth-child(3){animation:fu 0.5s cubic-bezier(0.16,1,0.3,1) 0.16s both}.lp-root .rv.v .rs:nth-child(4){animation:fu 0.5s cubic-bezier(0.16,1,0.3,1) 0.24s both}
 
 /* ─── MOBILE ─── */
-@media(max-width:900px){.lp-root nav{padding:16px 20px}.lp-root .nl a:not(.bs){display:none}.lp-root .hero{padding:130px 20px 80px}.lp-root .hero::before,.lp-root .hero::after{width:250px;height:250px}.lp-root .hero-orb{width:150px;height:150px}.lp-root .hm{gap:28px;flex-wrap:wrap;justify-content:center}.lp-root .ig,.lp-root .steps{grid-template-columns:1fr}.lp-root .fg{grid-template-columns:1fr}.lp-root .industries,.lp-root .features,.lp-root .how,.lp-root .cta,.lp-root .pricing{padding-left:20px;padding-right:20px}.lp-root .pg{grid-template-columns:1fr}.lp-root footer{padding-left:20px;padding-right:20px}.lp-root .fti{flex-direction:column}}
+@media(max-width:900px){
+.lp-root nav{padding:14px 20px}
+.lp-root .logo img{height:160px;margin:-55px 0}
+.lp-root .nl a:not(.bs){display:none}
+.lp-root .bs{padding:9px 20px;font-size:0.85rem}
+.lp-root .hero{padding:110px 20px 64px}
+.lp-root .hero h1{font-size:clamp(2.6rem,7vw,4rem);line-height:0.95}
+.lp-root .hs{font-size:1.02rem;line-height:1.65;margin-top:24px}
+.lp-root .ha{flex-direction:column;align-items:center;gap:12px;margin-top:36px;width:100%}
+.lp-root .bp,.lp-root .bg{width:100%;max-width:300px;text-align:center;padding:15px 32px}
+.lp-root .hero::before,.lp-root .hero::after{width:250px;height:250px}
+.lp-root .hero-orb{width:150px;height:150px}
+.lp-root .hm{gap:20px;flex-wrap:wrap;justify-content:center;margin-top:56px;padding-top:32px}
+.lp-root .metric h3{font-size:2.2rem}
+.lp-root .metric p{font-size:0.75rem}
+.lp-root .ig,.lp-root .steps{grid-template-columns:1fr}
+.lp-root .fg{grid-template-columns:1fr}
+.lp-root .industries,.lp-root .features,.lp-root .how,.lp-root .cta,.lp-root .pricing{padding-left:20px;padding-right:20px}
+.lp-root .industries,.lp-root .features,.lp-root .pricing{padding-top:80px;padding-bottom:80px}
+.lp-root .how{padding-top:80px;padding-bottom:80px}
+.lp-root .how .sh{margin-bottom:48px}
+.lp-root .step{padding:36px 24px}
+.lp-root .cta{padding-top:80px;padding-bottom:80px}
+.lp-root .st{font-size:clamp(1.8rem,5vw,2.4rem)}
+.lp-root .sd{font-size:0.95rem}
+.lp-root .pc{padding:32px 24px}
+.lp-root .pg{gap:32px}
+.lp-root .pg{grid-template-columns:1fr}
+.lp-root footer{padding-left:20px;padding-right:20px}
+.lp-root .fti{flex-direction:column;gap:32px}
+.lp-root .ftm{flex-direction:column;gap:8px;text-align:center}
+}
 `;
 
 export default function HomePage() {
