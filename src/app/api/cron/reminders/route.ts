@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import prisma from "@/lib/prisma";
 import { sendAppointmentReminder } from "@/lib/email";
-import { rateLimit } from "@/lib/security";
+import { rateLimit, getClientIp } from "@/lib/security";
 import { logger } from "@/lib/logger";
 
 // Given a UTC datetime and a timezone string (e.g. "Europe/Zagreb"),
@@ -42,13 +43,14 @@ async function sendBatch<T>(items: T[], batchSize: number, fn: (item: T) => Prom
 }
 
 export async function GET(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(req);
   if (!rateLimit("cron-reminders:" + ip, 25, 3600000)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
   const secret = process.env.CRON_SECRET;
-  const auth = req.headers.get("authorization");
-  if (!secret || auth !== `Bearer ${secret}`) {
+  const auth = req.headers.get("authorization") || "";
+  const expected = `Bearer ${secret}`;
+  if (!secret || auth.length !== expected.length || !timingSafeEqual(Buffer.from(auth), Buffer.from(expected))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -69,57 +71,50 @@ export async function GET(req: NextRequest) {
   let totalFailed = 0;
   let skipped = 0;
 
-  // Send both 24h and 1h reminders
-  const offsets: Array<{ ms: number; type: "24h" | "1h" }> = [
-    { ms: 24 * 60 * 60 * 1000, type: "24h" },
-    { ms: 1 * 60 * 60 * 1000, type: "1h" },
-  ];
+  // Send 24h reminders only (daily cron)
+  const target = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-  for (const offset of offsets) {
-    const target = new Date(Date.now() + offset.ms);
+  for (const [timezone, shopIds] of byTimezone) {
+    const localHour = getLocalHour(target, timezone);
+    const localDateMidnight = getLocalDateMidnightUTC(target, timezone);
+    const localDateEnd = new Date(localDateMidnight.getTime() + 24 * 60 * 60 * 1000);
 
-    for (const [timezone, shopIds] of byTimezone) {
-      const localHour = getLocalHour(target, timezone);
-      const localDateMidnight = getLocalDateMidnightUTC(target, timezone);
-      const localDateEnd = new Date(localDateMidnight.getTime() + 24 * 60 * 60 * 1000);
+    const appointments = await prisma.appointment.findMany({
+      where: {
+        shopId: { in: shopIds },
+        date: { gte: localDateMidnight, lt: localDateEnd },
+        status: { in: ["CONFIRMED", "PENDING"] },
+        startTime: { startsWith: localHour + ":" },
+      },
+      include: { customer: true, service: true, staff: true, shop: true },
+    });
 
-      const appointments = await prisma.appointment.findMany({
-        where: {
-          shopId: { in: shopIds },
-          date: { gte: localDateMidnight, lt: localDateEnd },
-          status: { in: ["CONFIRMED", "PENDING"] },
-          startTime: { startsWith: localHour + ":" },
-        },
-        include: { customer: true, service: true, staff: true, shop: true },
-      });
+    // Filter out appointments without customer email
+    const withEmail = appointments.filter(a => a.customer.email);
+    skipped += appointments.length - withEmail.length;
 
-      // Filter out appointments without customer email
-      const withEmail = appointments.filter(a => a.customer.email);
-      skipped += appointments.length - withEmail.length;
+    // Send in batches of 10 concurrently
+    const { sent, failed } = await sendBatch(withEmail, 10, async (appt) => {
+      try {
+        await sendAppointmentReminder({
+          customerName: appt.customer.name,
+          customerEmail: appt.customer.email!,
+          shopName: appt.shop.name,
+          serviceName: appt.service.name,
+          staffName: appt.staff?.name,
+          date: appt.date,
+          startTime: appt.startTime,
+          reminderType: "24h",
+        });
+        return true;
+      } catch (err) {
+        logger.error("Failed to send 24h reminder", "cron:reminders", err);
+        return false;
+      }
+    });
 
-      // Send in batches of 10 concurrently
-      const { sent, failed } = await sendBatch(withEmail, 10, async (appt) => {
-        try {
-          await sendAppointmentReminder({
-            customerName: appt.customer.name,
-            customerEmail: appt.customer.email!,
-            shopName: appt.shop.name,
-            serviceName: appt.service.name,
-            staffName: appt.staff?.name,
-            date: appt.date,
-            startTime: appt.startTime,
-            reminderType: offset.type,
-          });
-          return true;
-        } catch (err) {
-          logger.error(`Failed to send ${offset.type} reminder`, "cron:reminders", err);
-          return false;
-        }
-      });
-
-      totalSent += sent;
-      totalFailed += failed;
-    }
+    totalSent += sent;
+    totalFailed += failed;
   }
 
   return NextResponse.json({ ok: true, sent: totalSent, failed: totalFailed, skipped });
