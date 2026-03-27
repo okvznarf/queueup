@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { processJobs, registerJobHandler } from "@/lib/jobs";
 import { sendBookingConfirmation, sendAppointmentReminder } from "@/lib/email";
 import prisma from "@/lib/prisma";
@@ -63,8 +64,10 @@ registerJobHandler("email:reminder", async (payload) => {
 // Schedule: every 1 minute via Vercel cron
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const secret = process.env.CRON_SECRET;
+  const authHeader = request.headers.get("authorization") || "";
+  const expected = `Bearer ${secret}`;
+  if (!secret || authHeader.length !== expected.length || !timingSafeEqual(Buffer.from(authHeader), Buffer.from(expected))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

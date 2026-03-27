@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
-import { rateLimit } from "@/lib/security";
+import { rateLimit, getClientIp } from "@/lib/security";
 import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("cust-appts:" + ip, 30, 60000)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("cust-cancel:" + ip, 10, 60000)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }

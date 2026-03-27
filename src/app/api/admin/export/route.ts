@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
-import { rateLimit } from "@/lib/security";
+import { rateLimit, getClientIp } from "@/lib/security";
 
 // GET /api/admin/export?shopId=X&type=appointments&from=2026-01-01&to=2026-03-31
 // Streams CSV — browser downloads it progressively, never holds full dataset in memory.
@@ -9,20 +9,20 @@ import { rateLimit } from "@/lib/security";
 // iteration and pipe through S3 (see architecture notes below).
 
 export async function GET(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("admin-export:" + ip, 5, 300000)) {
     return new Response("Too many export requests. Try again in 5 minutes.", { status: 429 });
   }
 
-  const admin = await requireAdmin(request);
+  const shopId = request.nextUrl.searchParams.get("shopId");
+  if (!shopId) return new Response("shopId required", { status: 400 });
+
+  const admin = await requireAdmin(request, shopId);
   if (admin.error) return admin.error;
 
-  const shopId = request.nextUrl.searchParams.get("shopId");
   const type = request.nextUrl.searchParams.get("type") || "appointments";
   const from = request.nextUrl.searchParams.get("from");
   const to = request.nextUrl.searchParams.get("to");
-
-  if (!shopId) return new Response("shopId required", { status: 400 });
 
   const stream = new ReadableStream({
     async start(controller) {

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAvailableSlots } from "@/lib/availability";
-import { rateLimit } from "@/lib/security";
+import { rateLimit, getClientIp } from "@/lib/security";
 import { logger } from "@/lib/logger";
 import { cacheGet, cacheSet } from "@/lib/cache";
 
 const CACHE_TTL = 60_000; // 1 minute — short enough that new bookings appear quickly
 
 export async function GET(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("avail:" + ip, 60, 60000)) {
     return NextResponse.json({ error: "Too many requests. Please slow down." }, { status: 429 });
   }

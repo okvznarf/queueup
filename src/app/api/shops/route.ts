@@ -1,6 +1,6 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { rateLimit } from "@/lib/security";
+import { rateLimit, getClientIp } from "@/lib/security";
 import { requireAdmin } from "@/lib/auth";
 import { cacheGet, cacheSet } from "@/lib/cache";
 import { logger } from "@/lib/logger";
@@ -8,7 +8,7 @@ import { logger } from "@/lib/logger";
 const SHOP_CACHE_TTL = 5 * 60_000; // 5 minutes
 
 export async function GET(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("shops:" + ip, 60, 60000)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }

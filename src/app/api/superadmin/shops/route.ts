@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken, hashPassword } from "@/lib/auth";
-import { rateLimit, sanitize, isValidEmail, isValidPhone } from "@/lib/security";
+import { rateLimit, sanitize, isValidEmail, isValidPhone, getClientIp } from "@/lib/security";
 
 function requireSuperadmin(request: NextRequest) {
   const cookieHeader = request.headers.get("cookie") || "";
@@ -15,7 +15,7 @@ function requireSuperadmin(request: NextRequest) {
 
 // GET all shops with subscription info
 export async function GET(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("superadmin-get:" + ip, 30, 60000)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
 // PATCH - update subscription for a shop
 export async function PATCH(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("superadmin-patch:" + ip, 20, 60000)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
@@ -86,7 +86,7 @@ export async function PATCH(request: NextRequest) {
 
 // POST - create a new shop with admin user
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("superadmin-post:" + ip, 10, 60000)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }

@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import prisma from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
-import { rateLimit, sanitize, isValidEmail } from "@/lib/security";
+import { rateLimit, sanitize, isValidEmail, getClientIp } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(req);
   if (!rateLimit("admin-forgot:" + ip, 5, 900000)) {
     return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
   }

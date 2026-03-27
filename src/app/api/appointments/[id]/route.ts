@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
-import { rateLimit } from "@/lib/security";
+import { rateLimit, getClientIp } from "@/lib/security";
 import { logger } from "@/lib/logger";
 import { broadcastToShop } from "@/app/api/events/route";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("appt-patch:" + ip, 20, 600000)) {
     return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 });
   }

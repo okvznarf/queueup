@@ -47,7 +47,7 @@ Ton:
 
 QueueUp rješava to automatski:
 - Online booking 24/7
-- SMS/email podsjetnici (nema više "zaboravio sam")
+- Email podsjetnici (nema više "zaboravio sam")
 - Manje praznih slotova = više love po danu
 - Setup traje 10 minuta, mi sve postavimo
 
@@ -63,7 +63,7 @@ Većina to prihvaća kao "normalno". Ne bi trebali.
 
 QueueUp rješava to automatski:
 - online booking 24/7
-- SMS podsjetnici (nema više "e brate zaboravio sam")
+- email podsjetnici (nema više "e brate zaboravio sam")
 - manje praznih slotova, više love po danu
 
 Setup traje 10 minuta i mi ti sve postavimo.

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyPassword, createToken } from "@/lib/auth";
-import { rateLimit, sanitize, isValidEmail } from "@/lib/security";
+import { rateLimit, sanitize, isValidEmail, getClientIp } from "@/lib/security";
 import sgMail from "@sendgrid/mail";
 import crypto from "crypto";
 import { logger } from "@/lib/logger";
 
 function generateCode(): string {
-  return crypto.randomInt(100000, 999999).toString();
+  return crypto.randomInt(10000000, 99999999).toString();
 }
 
 async function sendOTPEmail(to: string, code: string) {
@@ -33,7 +33,7 @@ async function sendOTPEmail(to: string, code: string) {
 
 // POST - handle 2FA flow
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("superadmin-2fa:" + ip, 10, 900000)) {
     return NextResponse.json({ error: "Too many attempts. Try again in 15 minutes." }, { status: 429 });
   }
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
   if (step === "verify") {
     const { userId, code } = body;
     if (!userId || typeof userId !== "string") return NextResponse.json({ error: "Invalid request" }, { status: 400 });
-    if (!code || typeof code !== "string" || !/^\d{6}$/.test(code)) {
+    if (!code || typeof code !== "string" || !/^\d{8}$/.test(code)) {
       return NextResponse.json({ error: "Invalid code format" }, { status: 400 });
     }
 

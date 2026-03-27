@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import prisma from "@/lib/prisma";
 import { getRecentErrors } from "@/lib/logger";
 import { circuits } from "@/lib/resilience";
@@ -33,8 +34,9 @@ export async function GET(request: NextRequest) {
   // Include recent errors if authorized (prevents leaking error details publicly)
   const wantsErrors = request.nextUrl.searchParams.get("errors") === "true";
   if (wantsErrors) {
-    const secret = request.headers.get("authorization")?.replace("Bearer ", "");
-    if (secret && secret === process.env.CRON_SECRET) {
+    const secret = request.headers.get("authorization")?.replace("Bearer ", "") || "";
+    const expected = process.env.CRON_SECRET || "";
+    if (secret && expected && secret.length === expected.length && timingSafeEqual(Buffer.from(secret), Buffer.from(expected))) {
       checks.recentErrors = getRecentErrors();
     }
   }

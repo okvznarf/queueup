@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hashPassword, verifyPassword } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { rateLimit, sanitize, isValidHexToken } from "@/lib/security";
+import { rateLimit, sanitize, isValidHexToken, getClientIp } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(req);
   if (!rateLimit("reset-pw:" + ip, 5, 900000)) {
     return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
   }

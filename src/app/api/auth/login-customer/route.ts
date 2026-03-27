@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyPassword, createToken } from "@/lib/auth";
-import { sanitize, rateLimit, isValidEmail } from "@/lib/security";
+import { sanitize, rateLimit, isValidEmail, getClientIp } from "@/lib/security";
 import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("cust-login:" + ip, 5, 900000)) {
     return NextResponse.json({ error: "Too many attempts. Try again in 15 minutes." }, { status: 429 });
   }

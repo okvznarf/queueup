@@ -76,11 +76,11 @@ export default function SuperadminLogin() {
 
         {step === "verify" && (
           <>
-            <div style={{ fontSize: 14, color: s.muted, marginBottom: 16, textAlign: "center" }}>We sent a 6-digit code to your email. Enter it below.</div>
+            <div style={{ fontSize: 14, color: s.muted, marginBottom: 16, textAlign: "center" }}>We sent an 8-digit code to your email. Enter it below.</div>
             <div style={{ marginBottom: 16 }}>
-              <input type="text" value={code} onChange={e => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} onKeyDown={e => e.key === "Enter" && code.length === 6 && handleVerify()} placeholder="000000" maxLength={6} autoFocus style={{ ...inputStyle, textAlign: "center", fontSize: 24, letterSpacing: "0.3em", fontWeight: 700 }} />
+              <input type="text" value={code} onChange={e => setCode(e.target.value.replace(/\D/g, "").slice(0, 8))} onKeyDown={e => e.key === "Enter" && code.length === 8 && handleVerify()} placeholder="00000000" maxLength={8} autoFocus style={{ ...inputStyle, textAlign: "center", fontSize: 24, letterSpacing: "0.3em", fontWeight: 700 }} />
             </div>
-            <button onClick={handleVerify} disabled={loading || code.length !== 6} style={{ background: s.accent, color: "#fff", border: "none", borderRadius: 10, padding: "12px 0", fontSize: 15, fontWeight: 700, cursor: "pointer", width: "100%", opacity: (loading || code.length !== 6) ? 0.6 : 1 }}>
+            <button onClick={handleVerify} disabled={loading || code.length !== 8} style={{ background: s.accent, color: "#fff", border: "none", borderRadius: 10, padding: "12px 0", fontSize: 15, fontWeight: 700, cursor: "pointer", width: "100%", opacity: (loading || code.length !== 8) ? 0.6 : 1 }}>
               {loading ? "Verifying..." : "Verify & Login"}
             </button>
             <button onClick={() => { setStep("login"); setCode(""); setError(""); }} style={{ background: "transparent", border: "none", color: s.muted, fontSize: 13, cursor: "pointer", width: "100%", marginTop: 12 }}>Back to login</button>

@@ -12,7 +12,16 @@ export function middleware(request: NextRequest) {
   if (process.env.NODE_ENV === "production") {
     response.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
   }
-  response.headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com; frame-src https://accounts.google.com;");
+  const csp = [
+    "default-src 'self'",
+    `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : ""} https://accounts.google.com https://apis.google.com`,
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: https:",
+    "connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com",
+    "frame-src https://accounts.google.com",
+  ].join("; ");
+  response.headers.set("Content-Security-Policy", csp);
 
   if (request.nextUrl.pathname.startsWith("/api/")) {
     // Reject oversized payloads (100KB max)
@@ -37,6 +46,16 @@ export function middleware(request: NextRequest) {
     response.headers.set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
     response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     if (request.method === "OPTIONS") return new NextResponse(null, { status: 200, headers: response.headers });
+
+    // CSRF: reject state-changing requests from unknown origins
+    if (["POST", "PATCH", "DELETE"].includes(request.method)) {
+      // Cron endpoints use Authorization header, not cookies — exempt from origin check
+      if (!request.nextUrl.pathname.startsWith("/api/cron/")) {
+        if (origin && !allowedOrigins.includes(origin)) {
+          return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { "Content-Type": "application/json" } });
+        }
+      }
+    }
   }
 
   if (request.nextUrl.pathname.startsWith("/admin/") && !request.nextUrl.pathname.startsWith("/admin/login")) {

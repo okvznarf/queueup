@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { rateLimit } from "@/lib/security";
+import { rateLimit, getClientIp } from "@/lib/security";
 
 export async function GET(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(req);
   if (!rateLimit("google-auth:" + ip, 5, 900000)) {
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
     return NextResponse.redirect(`${baseUrl}/customer/login?error=too_many_attempts`);

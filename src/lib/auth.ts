@@ -17,18 +17,26 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 }
 
 export function createToken(payload: { userId: string; email: string; role: string }): string {
-  return jwt.sign(payload, getJwtSecret(), { expiresIn: "7d" });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: "7d", algorithm: "HS256" });
 }
 
-export function verifyToken(token: string): any {
+export interface JwtUser {
+  userId: string;
+  email: string;
+  role: string;
+  iat: number;
+  exp: number;
+}
+
+export function verifyToken(token: string): JwtUser | null {
   try {
-    return jwt.verify(token, getJwtSecret());
+    return jwt.verify(token, getJwtSecret(), { algorithms: ["HS256"] }) as JwtUser;
   } catch {
     return null;
   }
 }
 
-export async function getAuthUser(): Promise<any> {
+export async function getAuthUser(): Promise<JwtUser | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get("auth_token")?.value;
   if (!token) return null;
@@ -36,7 +44,7 @@ export async function getAuthUser(): Promise<any> {
 }
 
 // Verify admin is authenticated and owns the given shop
-export async function requireAdmin(request: Request, shopId?: string): Promise<{ user: any; error?: never } | { user?: never; error: Response }> {
+export async function requireAdmin(request: Request, shopId?: string): Promise<{ user: JwtUser; error?: never } | { user?: never; error: Response }> {
   const cookieHeader = request.headers.get("cookie") || "";
   const tokenMatch = cookieHeader.match(/auth_token=([^;]+)/);
   const token = tokenMatch ? tokenMatch[1] : null;
@@ -58,7 +66,7 @@ export async function requireAdmin(request: Request, shopId?: string): Promise<{
 }
 
 // Verify customer or admin is authenticated
-export function requireAuth(request: Request): { user: any; error?: never } | { user?: never; error: Response } {
+export function requireAuth(request: Request): { user: JwtUser; error?: never } | { user?: never; error: Response } {
   const cookieHeader = request.headers.get("cookie") || "";
   // Check admin token first, then customer token
   const adminMatch = cookieHeader.match(/auth_token=([^;]+)/);

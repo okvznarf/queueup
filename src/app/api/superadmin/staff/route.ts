@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
-import { rateLimit, sanitize, isValidEmail, isValidPhone } from "@/lib/security";
+import { rateLimit, sanitize, isValidEmail, isValidPhone, getClientIp } from "@/lib/security";
 
 function requireSuperadmin(request: NextRequest) {
   const cookieHeader = request.headers.get("cookie") || "";
@@ -15,7 +15,7 @@ function requireSuperadmin(request: NextRequest) {
 
 // GET staff for a shop
 export async function GET(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("superadmin-staff-get:" + ip, 30, 60000)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
 // POST - create staff for a shop
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("superadmin-staff-post:" + ip, 20, 60000)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
 
 // PATCH - update staff (including avatar)
 export async function PATCH(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("superadmin-staff-patch:" + ip, 20, 60000)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
@@ -119,7 +119,7 @@ export async function PATCH(request: NextRequest) {
 
 // DELETE staff
 export async function DELETE(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("superadmin-staff-delete:" + ip, 10, 60000)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }

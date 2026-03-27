@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
-import { sanitize, isValidEmail, isValidPhone, rateLimit, validateRequired } from "@/lib/security";
+import { verifyToken, requireAdmin } from "@/lib/auth";
+import { sanitize, isValidEmail, isValidPhone, rateLimit, validateRequired, getClientIp } from "@/lib/security";
 import { sendBookingConfirmation } from "@/lib/email";
 import { enqueueJob } from "@/lib/jobs";
 import { cacheDelete } from "@/lib/cache";
@@ -16,6 +16,11 @@ export async function GET(request: NextRequest) {
   if (!shopId || !date) {
     return NextResponse.json({ error: "shopId and date are required" }, { status: 400 });
   }
+
+  // Require admin auth — appointment list contains customer PII
+  const auth = await requireAdmin(request, shopId);
+  if (auth.error) return auth.error;
+
   try {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
@@ -49,7 +54,7 @@ function calculateEndTime(startTime: string, durationMinutes: number): string {
 }
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("booking:" + ip, 20, 3600000)) {
     return NextResponse.json({ error: "Too many booking attempts. Please try again later." }, { status: 429 });
   }

@@ -189,7 +189,7 @@ export default function SuperadminDashboard() {
           <h1 style={{ fontSize: 24, fontWeight: 700 }}>QueueUp Admin</h1>
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={() => { setShowCreate(true); setCreateError(""); setNewShop({ name: "", email: "", password: "", businessType: "BARBER", phone: "", employeeCount: 1 }); }} style={{ background: s.accent, color: "#fff", border: "none", padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600, fontFamily: "system-ui" }}>+ Add Shop</button>
-            <button onClick={() => { document.cookie = "auth_token=; path=/; max-age=0"; router.push("/fran/login"); }} style={{ background: "transparent", border: "1px solid #ffffff20", color: s.muted, padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontFamily: "system-ui" }}>Logout</button>
+            <button onClick={async () => { await fetch("/api/auth/logout", { method: "POST" }); router.push("/fran/login"); }} style={{ background: "transparent", border: "1px solid #ffffff20", color: s.muted, padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontFamily: "system-ui" }}>Logout</button>
           </div>
         </div>
 

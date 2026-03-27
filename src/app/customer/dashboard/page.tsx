@@ -87,8 +87,8 @@ export default function CustomerDashboard() {
     setCancellingId(null);
   };
 
-  const handleLogout = () => {
-    document.cookie = "customer_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
     router.push("/customer/login");
   };
 

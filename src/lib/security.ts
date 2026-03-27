@@ -1,6 +1,12 @@
 import { Redis } from "@upstash/redis";
 import type { NextRequest } from "next/server";
 
+// Get the real client IP — prefer Vercel's trusted header over spoofable x-forwarded-for
+export function getClientIp(request: NextRequest | Request): string {
+  const headers = request.headers;
+  return headers.get("x-real-ip") || headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+}
+
 // Input sanitization - strips HTML tags and limits length
 export function sanitize(input: string, maxLength: number = 500): string {
   if (!input) return "";
@@ -30,20 +36,38 @@ export function isValidPhone(phone: string): boolean {
 
 // Upstash Redis client (lazy-initialized)
 let redis: Redis | null = null;
+let redisWarned = false;
 function getRedis(): Redis | null {
   if (redis) return redis;
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return null;
+  if (!url || !token) {
+    if (process.env.NODE_ENV === "production" && !redisWarned) {
+      console.warn("[security] UPSTASH_REDIS_REST_URL/TOKEN not set — rate limiting is in-memory only and ineffective on serverless");
+      redisWarned = true;
+    }
+    return null;
+  }
   redis = new Redis({ url, token });
   return redis;
 }
 
 // In-memory fallback (used when Redis is not configured)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+let lastCleanup = Date.now();
+const CLEANUP_INTERVAL = 60_000; // Purge stale entries every 60s
 
 function rateLimitMemory(key: string, maxRequests: number, windowMs: number): boolean {
   const now = Date.now();
+
+  // Periodically purge expired entries to prevent memory leaks
+  if (now - lastCleanup > CLEANUP_INTERVAL) {
+    for (const [k, v] of rateLimitMap) {
+      if (now > v.resetTime) rateLimitMap.delete(k);
+    }
+    lastCleanup = now;
+  }
+
   const entry = rateLimitMap.get(key);
 
   if (!entry || now > entry.resetTime) {

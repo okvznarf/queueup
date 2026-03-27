@@ -1,11 +1,11 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { rateLimit } from "@/lib/security";
+import { rateLimit, getClientIp } from "@/lib/security";
 import { requireAdmin } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = getClientIp(request);
   if (!rateLimit("services:" + ip, 60, 60000)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }

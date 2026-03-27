@@ -1,4 +1,6 @@
 import { NextRequest } from "next/server";
+import { verifyToken } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
 // In-memory event bus — broadcasts to all connected SSE clients for a shop
 // On Vercel, each serverless instance has its own set of listeners.
@@ -22,6 +24,24 @@ export async function GET(request: NextRequest) {
   const shopId = request.nextUrl.searchParams.get("shopId");
   if (!shopId) {
     return new Response("shopId required", { status: 400 });
+  }
+
+  // Require admin auth — only shop owners (or superadmins) may subscribe
+  const cookieHeader = request.headers.get("cookie") || "";
+  const tokenMatch = cookieHeader.match(/auth_token=([^;]+)/);
+  const token = tokenMatch ? tokenMatch[1] : null;
+  if (!token) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
+  }
+  const user = verifyToken(token);
+  if (!user) {
+    return new Response(JSON.stringify({ error: "Invalid token" }), { status: 401, headers: { "Content-Type": "application/json" } });
+  }
+  if (user.role !== "superadmin") {
+    const shop = await prisma.shop.findUnique({ where: { id: shopId }, select: { ownerId: true } });
+    if (!shop || shop.ownerId !== user.userId) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { "Content-Type": "application/json" } });
+    }
   }
 
   const stream = new ReadableStream({
