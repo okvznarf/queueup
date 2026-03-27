@@ -5,16 +5,6 @@ import { sendAppointmentReminder } from "@/lib/email";
 import { rateLimit, getClientIp } from "@/lib/security";
 import { logger } from "@/lib/logger";
 
-// Given a UTC datetime and a timezone string (e.g. "Europe/Zagreb"),
-// returns the local hour as a zero-padded string like "14"
-function getLocalHour(utcDate: Date, timezone: string): string {
-  return new Intl.DateTimeFormat("en-US", {
-    timeZone: timezone,
-    hour: "2-digit",
-    hour12: false,
-  }).format(utcDate).padStart(2, "0");
-}
-
 // Returns midnight UTC of the calendar date that utcDate falls on
 // when viewed in the given timezone.
 function getLocalDateMidnightUTC(utcDate: Date, timezone: string): Date {
@@ -71,11 +61,12 @@ export async function GET(req: NextRequest) {
   let totalFailed = 0;
   let skipped = 0;
 
-  // Send 24h reminders only (daily cron)
+  // Send 24h reminders for ALL appointments tomorrow (daily cron)
+  // Since this runs once daily, we grab every appointment for tomorrow's
+  // calendar date (in each shop's timezone), regardless of start time.
   const target = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
   for (const [timezone, shopIds] of byTimezone) {
-    const localHour = getLocalHour(target, timezone);
     const localDateMidnight = getLocalDateMidnightUTC(target, timezone);
     const localDateEnd = new Date(localDateMidnight.getTime() + 24 * 60 * 60 * 1000);
 
@@ -84,7 +75,6 @@ export async function GET(req: NextRequest) {
         shopId: { in: shopIds },
         date: { gte: localDateMidnight, lt: localDateEnd },
         status: { in: ["CONFIRMED", "PENDING"] },
-        startTime: { startsWith: localHour + ":" },
       },
       include: { customer: true, service: true, staff: true, shop: true },
     });
