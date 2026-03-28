@@ -122,27 +122,23 @@
 | VOICE-04 | Phase 1 | Pending |
 | VOICE-05 | Phase 1 | Pending |
 | VOICE-06 | Phase 1 | Pending |
-| BOOK-01 | Phase 2 | Pending |
-| BOOK-02 | Phase 2 | Pending |
-| BOOK-03 | Phase 2 | Pending |
-| BOOK-04 | Phase 2 | Pending |
-| BOOK-05 | Phase 2 | Pending |
-| BOOK-06 | Phase 2 | Pending |
-| INTAKE-01 | Phase 2 | Pending |
-| INTAKE-02 | Phase 2 | Pending |
-| INTAKE-03 | Phase 3 | Pending |
-| FAQ-01 | Phase 3 | Pending |
-| FAQ-02 | Phase 2 | Pending |
-| FAQ-03 | Phase 2 | Pending |
-| FAQ-04 | Phase 3 | Pending |
+| BOOK-05 | Phase 1 | Pending |
+| GDPR-01 | Phase 1 | Pending |
+| GDPR-03 | Phase 1 | Pending |
+| GDPR-04 | Phase 1 | Pending |
 | CHAT-01 | Phase 2 | Pending |
 | CHAT-02 | Phase 2 | Pending |
 | CHAT-03 | Phase 2 | Pending |
 | CHAT-04 | Phase 2 | Pending |
-| GDPR-01 | Phase 1 | Pending |
-| GDPR-02 | Phase 3 | Pending |
-| GDPR-03 | Phase 1 | Pending |
-| GDPR-04 | Phase 1 | Pending |
+| BOOK-01 | Phase 2 | Pending |
+| BOOK-02 | Phase 2 | Pending |
+| BOOK-03 | Phase 2 | Pending |
+| BOOK-04 | Phase 2 | Pending |
+| BOOK-06 | Phase 2 | Pending |
+| INTAKE-01 | Phase 2 | Pending |
+| INTAKE-02 | Phase 2 | Pending |
+| FAQ-02 | Phase 2 | Pending |
+| FAQ-03 | Phase 2 | Pending |
 | CLINIC-01 | Phase 3 | Pending |
 | CLINIC-02 | Phase 3 | Pending |
 | CLINIC-03 | Phase 3 | Pending |
@@ -151,20 +147,30 @@
 | CLINIC-06 | Phase 3 | Pending |
 | CLINIC-07 | Phase 3 | Pending |
 | CLINIC-08 | Phase 3 | Pending |
+| INTAKE-03 | Phase 3 | Pending |
+| FAQ-01 | Phase 3 | Pending |
+| FAQ-04 | Phase 3 | Pending |
+| GDPR-02 | Phase 3 | Pending |
 | RESELLER-01 | Phase 4 | Pending |
 | RESELLER-02 | Phase 4 | Pending |
 | RESELLER-03 | Phase 4 | Pending |
 | RESELLER-04 | Phase 4 | Pending |
-| ANALYTICS-01 | Phase 4 | Pending |
-| ANALYTICS-02 | Phase 4 | Pending |
-| ANALYTICS-03 | Phase 4 | Pending |
-| ANALYTICS-04 | Phase 4 | Pending |
+| ANALYTICS-01 | Phase 5 | Pending |
+| ANALYTICS-02 | Phase 5 | Pending |
+| ANALYTICS-03 | Phase 5 | Pending |
+| ANALYTICS-04 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 40 total
-- Mapped to phases: 40
+- v1 requirements: 43 total
+- Mapped to phases: 43
 - Unmapped: 0 ✓
+
+**Note:** Original traceability listed 40 requirements but enumeration yields 43 (VOICE: 6, CHAT: 4, BOOK: 6, INTAKE: 3, FAQ: 4, CLINIC: 8, RESELLER: 4, GDPR: 4, ANALYTICS: 4 = 43). All 43 are mapped.
+
+**Phase changes from initial draft:**
+- BOOK-05 moved Phase 2 → Phase 1 (Redis idempotency must be in place before voice booking goes live — race condition is a Phase 1 risk)
+- ANALYTICS-01–04 moved Phase 4 → Phase 5 (analytics depend on clean data from all prior phases; dedicated phase avoids premature aggregation)
 
 ---
 *Requirements defined: 2026-03-28*
-*Last updated: 2026-03-28 after initial definition*
+*Last updated: 2026-03-28 — traceability updated after roadmap creation*
