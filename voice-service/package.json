@@ -1,0 +1,31 @@
+{
+  "name": "queueup-voice-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "test": "vitest run --reporter=verbose",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
+    "@deepgram/sdk": "^5.0.0",
+    "@elevenlabs/elevenlabs-js": "^2.40.0",
+    "@fastify/websocket": "^11.2.0",
+    "@upstash/redis": "^1.37.0",
+    "dotenv": "^17.3.1",
+    "fastify": "^5.8.4",
+    "twilio": "^5.13.1",
+    "ws": "^8.20.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.21.0",
+    "typescript": "latest",
+    "vitest": "latest"
+  }
+}
