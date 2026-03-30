@@ -7,7 +7,7 @@
 
 ### Voice AI Core
 
-- [ ] **VOICE-01**: Patient can call a clinic's Twilio phone number and be answered by the AI in real-time (Twilio Media Streams, not TwiML IVR)
+- [x] **VOICE-01**: Patient can call a clinic's Twilio phone number and be answered by the AI in real-time (Twilio Media Streams, not TwiML IVR)
 - [ ] **VOICE-02**: AI identifies itself as an AI at the start of every call (EU AI Act Article 52 compliance)
 - [ ] **VOICE-03**: AI obtains verbal consent for health data processing at call start (GDPR Article 9 special category)
 - [ ] **VOICE-04**: Patient can say "talk to a human" at any point and be transferred to a configured staff number
@@ -27,7 +27,7 @@
 - [ ] **BOOK-02**: Patient can book a new appointment via voice or chat (service, date/time, staff preference)
 - [ ] **BOOK-03**: Patient can reschedule an existing appointment (verified by name + DOB)
 - [ ] **BOOK-04**: Patient can cancel an existing appointment (clinic's cancellation policy window enforced)
-- [ ] **BOOK-05**: AI prevents double-booking via Redis-backed idempotency key per slot
+- [x] **BOOK-05**: AI prevents double-booking via Redis-backed idempotency key per slot
 - [ ] **BOOK-06**: Booking confirmation sent to patient after successful booking (email via existing SendGrid integration)
 
 ### Intake Collection
@@ -65,8 +65,8 @@
 
 - [ ] **GDPR-01**: Patient conversation transcripts are automatically deleted after a configurable retention period (default: 90 days)
 - [ ] **GDPR-02**: Clinic admin can delete all data for a specific patient on request (right to erasure)
-- [ ] **GDPR-03**: An audit log records all AI interactions per patient (timestamp, channel, actions taken)
-- [ ] **GDPR-04**: All EU patient data is stored on EU infrastructure (Vercel EU region, EU-hosted voice service)
+- [x] **GDPR-03**: An audit log records all AI interactions per patient (timestamp, channel, actions taken)
+- [x] **GDPR-04**: All EU patient data is stored on EU infrastructure (Vercel EU region, EU-hosted voice service)
 
 ### Analytics
 
@@ -116,16 +116,16 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VOICE-01 | Phase 1 | Pending |
+| VOICE-01 | Phase 1 | Complete |
 | VOICE-02 | Phase 1 | Pending |
 | VOICE-03 | Phase 1 | Pending |
 | VOICE-04 | Phase 1 | Pending |
 | VOICE-05 | Phase 1 | Pending |
 | VOICE-06 | Phase 1 | Pending |
-| BOOK-05 | Phase 1 | Pending |
+| BOOK-05 | Phase 1 | Complete |
 | GDPR-01 | Phase 1 | Pending |
-| GDPR-03 | Phase 1 | Pending |
-| GDPR-04 | Phase 1 | Pending |
+| GDPR-03 | Phase 1 | Complete |
+| GDPR-04 | Phase 1 | Complete |
 | CHAT-01 | Phase 2 | Pending |
 | CHAT-02 | Phase 2 | Pending |
 | CHAT-03 | Phase 2 | Pending |

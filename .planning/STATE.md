@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Phase 1 context gathered
-last_updated: "2026-03-29T09:10:14.338Z"
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-03-30T16:49:34.395Z"
 last_activity: 2026-03-28 — Roadmap created from requirements and research
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 5
+  completed_plans: 1
   percent: 0
 ---
 
@@ -50,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 01 P01 | 25 | 2 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,9 @@ Recent decisions affecting current work:
 - [Roadmap]: GDPR consent infrastructure built in Phase 1 alongside the audio pipeline — cannot defer to a later "compliance phase" as EU patients cannot touch the system without it
 - [Roadmap]: Deepgram Nova-2 (streaming WebSocket) chosen for STT over ElevenLabs STT — ~200-300ms latency for telephony audio; configured for mulaw 8kHz to accept Twilio audio directly
 - [Roadmap]: ElevenLabs output_format=ulaw_8000 must be configured from day 1 — defaults (MP3/PCM at 22-44kHz) produce garbled audio on Twilio calls
+- [Phase 01]: @elevenlabs/elevenlabs-js version corrected to ^2.40.0 — 1.x series does not exist on npm
+- [Phase 01]: voice-service idempotency tests use local src/lib/idempotency.ts wrapper to maintain vi.mock within package boundary; avoids cross-package module resolution issues
+- [Phase 01]: checkIdempotency/setIdempotency in src/lib/resilience.ts are now async — all callers must await
 
 ### Pending Todos
 
@@ -76,6 +80,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T09:10:14.335Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-voice-pipeline-gdpr-foundation/01-CONTEXT.md
+Last session: 2026-03-30T16:49:34.393Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: None
