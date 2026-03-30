@@ -127,23 +127,29 @@ export const circuits = {
 
 // ─── Idempotency ────────────────────────────────────────────────────────────
 
-// In-memory store for processed idempotency keys (survives within a single serverless invocation)
-// For production at scale, use Redis or a DB table
-const processedKeys = new Map<string, { result: unknown; expiresAt: number }>();
-const IDEMPOTENCY_TTL = 5 * 60_000; // 5 minutes
+import { Redis } from "@upstash/redis";
 
-export function checkIdempotency(key: string): unknown | null {
-  const entry = processedKeys.get(key);
-  if (!entry) return null;
-  if (Date.now() > entry.expiresAt) {
-    processedKeys.delete(key);
-    return null;
+// Redis-backed idempotency store — survives across serverless invocations
+// Requires UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN env vars
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+const IDEMPOTENCY_TTL = 300; // 5 minutes in seconds
+
+export async function checkIdempotency(key: string): Promise<unknown | null> {
+  const raw = await redis.get<string>(key);
+  if (!raw) return null;
+  try {
+    return typeof raw === "string" ? JSON.parse(raw) : raw;
+  } catch {
+    return raw;
   }
-  return entry.result;
 }
 
-export function setIdempotency(key: string, result: unknown): void {
-  processedKeys.set(key, { result, expiresAt: Date.now() + IDEMPOTENCY_TTL });
+export async function setIdempotency(key: string, result: unknown): Promise<void> {
+  await redis.set(key, JSON.stringify(result), { ex: IDEMPOTENCY_TTL });
 }
 
 // Generate idempotency key from booking params (same customer + shop + date + time = same booking)

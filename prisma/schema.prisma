@@ -170,9 +170,10 @@ model Appointment {
   vehicleInfo String?
   licensePlate String?
   notes       String?
-  totalPrice  Float?
-  paidAt      DateTime?
-  createdAt   DateTime      @default(now())
+  totalPrice      Float?
+  paidAt          DateTime?
+  reminderSentAt  DateTime?
+  createdAt       DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   shop        Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
   shopId      String
@@ -209,4 +210,52 @@ model StaffWorkingHours {
   staff     Staff     @relation(fields: [staffId], references: [id], onDelete: Cascade)
   staffId   String
   @@unique([staffId, day])
+}
+
+model VoiceCall {
+  id          String   @id @default(cuid())
+  callSid     String   @unique
+  clinicId    String
+  startedAt   DateTime @default(now())
+  endedAt     DateTime?
+  durationSec Int?
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+
+  transcripts VoiceTranscript[]
+  auditLog    VoiceAuditLog?
+
+  @@index([clinicId])
+  @@index([callSid])
+}
+
+model VoiceTranscript {
+  id          String    @id @default(cuid())
+  callId      String
+  call        VoiceCall @relation(fields: [callId], references: [id], onDelete: Cascade)
+  role        String
+  content     String
+  createdAt   DateTime  @default(now())
+  deleteAfter DateTime
+
+  @@index([callId])
+  @@index([deleteAfter])
+}
+
+model VoiceAuditLog {
+  id               String    @id @default(cuid())
+  callId           String    @unique
+  call             VoiceCall @relation(fields: [callId], references: [id], onDelete: Cascade)
+  callSid          String
+  clinicId         String
+  consentTimestamp  DateTime?
+  consentType      String?
+  phoneHash        String?
+  durationSeconds  Int?
+  actionsJson      String
+  wasEscalated     Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+
+  @@index([clinicId])
+  @@index([callSid])
 }

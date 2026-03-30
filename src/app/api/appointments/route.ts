@@ -3,7 +3,6 @@ import prisma from "@/lib/prisma";
 import { verifyToken, requireAdmin } from "@/lib/auth";
 import { sanitize, isValidEmail, isValidPhone, rateLimit, validateRequired, getClientIp } from "@/lib/security";
 import { sendBookingConfirmation } from "@/lib/email";
-import { enqueueJob } from "@/lib/jobs";
 import { cacheDelete } from "@/lib/cache";
 import { checkIdempotency, setIdempotency, bookingIdempotencyKey } from "@/lib/resilience";
 import { broadcastToShop } from "@/app/api/events/route";
@@ -84,7 +83,7 @@ export async function POST(request: NextRequest) {
 
     // ── Idempotency: prevent duplicate bookings from double-clicks / retries ──
     const idempKey = bookingIdempotencyKey(body.shopId, body.date, body.startTime, customerPhone);
-    const cached = checkIdempotency(idempKey);
+    const cached = await checkIdempotency(idempKey);
     if (cached) {
       return NextResponse.json(cached, { status: 201 });
     }
@@ -178,7 +177,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Store in idempotency cache so retries return the same result
-    setIdempotency(idempKey, appointment);
+    await setIdempotency(idempKey, appointment);
 
     // Invalidate availability cache for this shop/date
     cacheDelete("avail:" + body.shopId);
@@ -202,23 +201,7 @@ export async function POST(request: NextRequest) {
         totalPrice: appointment.totalPrice ?? 0,
       }).catch((err) => logger.error("Failed to send booking confirmation", "email:confirmation", err));
 
-      // Schedule 24h and 1h reminder emails
-      const [h, m] = appointment.startTime.split(":").map(Number);
-      const aptTime = new Date(appointment.date);
-      aptTime.setUTCHours(h, m, 0, 0);
-
-      const remind24h = new Date(aptTime.getTime() - 24 * 60 * 60 * 1000);
-      const remind1h = new Date(aptTime.getTime() - 1 * 60 * 60 * 1000);
-      const now = new Date();
-
-      if (remind24h > now) {
-        enqueueJob("email:reminder", { appointmentId: appointment.id, type: "24h" }, { runAt: remind24h })
-          .catch((err) => logger.error("Failed to enqueue 24h reminder", "jobs:enqueue", err));
-      }
-      if (remind1h > now) {
-        enqueueJob("email:reminder", { appointmentId: appointment.id, type: "1h" }, { runAt: remind1h })
-          .catch((err) => logger.error("Failed to enqueue 1h reminder", "jobs:enqueue", err));
-      }
+      // Reminders are handled by the daily cron sweep (/api/cron/reminders)
     }
 
     return NextResponse.json(appointment, { status: 201 });
