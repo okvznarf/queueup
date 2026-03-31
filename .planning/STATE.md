@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-04-PLAN.md — Wave 3 complete (escalation + audit logging + call summary)
-last_updated: "2026-03-31T08:54:23.167Z"
+stopped_at: Completed 01-05-PLAN.md — Phase 1 complete (GDPR retention cron + Railway deployment config)
+last_updated: "2026-03-31T09:01:50.414Z"
 last_activity: 2026-03-31 — Wave 2 complete (audio pipeline + AI brain)
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 12
 ---
 
@@ -51,6 +51,7 @@ Progress: [██░░░░░░░░] 12%
 
 *Updated after each plan completion*
 | Phase 01-voice-pipeline-gdpr-foundation P04 | 7 | 2 tasks | 10 files |
+| Phase 01-voice-pipeline-gdpr-foundation P05 | 8 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Escalation triggered at 2 unanswered questions via "I'm not sure about that" phrase detection
 - [Phase 01]: Warm transfer uses Twilio REST API calls(callSid).update() with TwiML Dial — closes Media Stream WebSocket automatically after redirect
 - [Phase 01]: Audit log write is fire-and-forget on stop event — errors are logged but call cleanup is never blocked
+- [Phase 01]: startRetentionCron called inside listen callback — cron starts after server fully bound; 60s startup delay for DB connection settling
+- [Phase 01]: Dockerfile multi-stage build — builder compiles TS, production stage only contains compiled JS and prod deps, reducing image size
+- [Phase 01]: Railway eu-west region — satisfies GDPR-04 EU data residency requirement for voice call data
 
 ### Pending Todos
 
@@ -85,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-31T08:54:23.163Z
-Stopped at: Completed 01-04-PLAN.md — Wave 3 complete (escalation + audit logging + call summary)
+Last session: 2026-03-31T09:01:50.411Z
+Stopped at: Completed 01-05-PLAN.md — Phase 1 complete (GDPR retention cron + Railway deployment config)
 Resume file: None

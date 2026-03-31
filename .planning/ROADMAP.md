@@ -12,7 +12,7 @@ This roadmap builds the AI Receptionist product in five phases, each delivering 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Voice Pipeline + GDPR Foundation** - Deploy the Railway orchestrator, wire Twilio → Deepgram → Claude → ElevenLabs, and establish GDPR consent infrastructure — the non-negotiable runtime and compliance base everything else depends on
+- [x] **Phase 1: Voice Pipeline + GDPR Foundation** - Deploy the Railway orchestrator, wire Twilio → Deepgram → Claude → ElevenLabs, and establish GDPR consent infrastructure — the non-negotiable runtime and compliance base everything else depends on (completed 2026-03-31)
 - [ ] **Phase 2: Booking AI + Web Chat** - Add full appointment booking/cancel/reschedule tool calls to the AI, ship the embeddable web chat widget, and wire booking confirmation emails
 - [ ] **Phase 3: Clinic Admin Portal** - Give clinic admins a portal to configure AI persona, FAQs, intake fields, escalation rules, Twilio phone provisioning, and patient data deletion (GDPR Article 17)
 - [ ] **Phase 4: Reseller Portal** - White-label multi-tenant portal with subdomain routing, clinic account management, reseller branding, and impersonation support
@@ -88,7 +88,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Voice Pipeline + GDPR Foundation | 4/5 | In Progress|  |
+| 1. Voice Pipeline + GDPR Foundation | 5/5 | Complete   | 2026-03-31 |
 | 2. Booking AI + Web Chat | 0/TBD | Not started | - |
 | 3. Clinic Admin Portal | 0/TBD | Not started | - |
 | 4. Reseller Portal | 0/TBD | Not started | - |

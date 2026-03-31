@@ -63,7 +63,7 @@
 
 ### GDPR & Compliance
 
-- [ ] **GDPR-01**: Patient conversation transcripts are automatically deleted after a configurable retention period (default: 90 days)
+- [x] **GDPR-01**: Patient conversation transcripts are automatically deleted after a configurable retention period (default: 90 days)
 - [ ] **GDPR-02**: Clinic admin can delete all data for a specific patient on request (right to erasure)
 - [x] **GDPR-03**: An audit log records all AI interactions per patient (timestamp, channel, actions taken)
 - [x] **GDPR-04**: All EU patient data is stored on EU infrastructure (Vercel EU region, EU-hosted voice service)
@@ -123,7 +123,7 @@
 | VOICE-05 | Phase 1 | Complete |
 | VOICE-06 | Phase 1 | Complete |
 | BOOK-05 | Phase 1 | Complete |
-| GDPR-01 | Phase 1 | Pending |
+| GDPR-01 | Phase 1 | Complete |
 | GDPR-03 | Phase 1 | Complete |
 | GDPR-04 | Phase 1 | Complete |
 | CHAT-01 | Phase 2 | Pending |
