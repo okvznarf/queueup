@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-03-30T16:49:34.395Z"
-last_activity: 2026-03-28 — Roadmap created from requirements and research
+status: executing
+stopped_at: Completed plans 01-01, 01-02, 01-03
+last_updated: "2026-03-31T08:45:00.000Z"
+last_activity: 2026-03-31 — Wave 2 complete (audio pipeline + AI brain)
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 5
-  completed_plans: 1
-  percent: 0
+  completed_plans: 3
+  percent: 12
 ---
 
 # Project State
@@ -26,31 +26,30 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 Phase: 1 of 5 (Voice Pipeline + GDPR Foundation)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-28 — Roadmap created from requirements and research
+Plan: 3 of 5 complete in current phase
+Status: Executing — Wave 3 next (escalation + audit logging)
+Last activity: 2026-03-31 — Wave 2 complete (audio pipeline + AI brain)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 12%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 3
+- Average duration: ~25 min
+- Total execution time: ~1.5 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01 | 3/5 | ~75 min | ~25 min |
 
 **Recent Trend:**
-- Last 5 plans: none yet
-- Trend: -
+- Last 3 plans: 01-01 (25m), 01-02 (25m), 01-03 (25m)
+- Trend: stable
 
 *Updated after each plan completion*
-| Phase 01 P01 | 25 | 2 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -66,6 +65,10 @@ Recent decisions affecting current work:
 - [Phase 01]: @elevenlabs/elevenlabs-js version corrected to ^2.40.0 — 1.x series does not exist on npm
 - [Phase 01]: voice-service idempotency tests use local src/lib/idempotency.ts wrapper to maintain vi.mock within package boundary; avoids cross-package module resolution issues
 - [Phase 01]: checkIdempotency/setIdempotency in src/lib/resilience.ts are now async — all callers must await
+- [Phase 01]: Consent detection checks refusals before affirmatives — "I don't agree" contains "agree" but is a refusal
+- [Phase 01]: Claude conversation engine uses claude-sonnet-4-6 for voice (fast enough for real-time)
+- [Phase 01]: ElevenLabs uses eleven_flash_v2_5 (not deprecated turbo) with ulaw_8000 output
+- [Phase 01]: Escalation triggered at 2 unanswered questions via "I'm not sure about that" phrase detection
 
 ### Pending Todos
 
@@ -73,13 +76,12 @@ None yet.
 
 ### Blockers/Concerns
 
-- [Phase 1]: ElevenLabs model names and SDK shape need verification against current docs (elevenlabs.io/docs) before implementation — training data has `eleven_turbo_v2_5` and `ulaw_8000` but names may have changed
 - [Phase 1]: Deepgram `endpointing` and `speechEndThreshold` parameter values must be measured with real telephony audio — hardcoded values from training data may not be optimal
 - [Phase 1]: Existing timezone bug in QueueUp availability calculations must be scoped before Phase 1 voice booking work begins (may be 1-hour fix or multi-day data migration)
 - [Phase 3]: Twilio EU Regulatory Bundle approval lead times vary by country (Germany, France, Italy, Spain, Netherlands) — start approval process early in Phase 3 to avoid go-live delays
 
 ## Session Continuity
 
-Last session: 2026-03-30T16:49:34.393Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-03-31T08:45:00.000Z
+Stopped at: Completed plans 01-01, 01-02, 01-03 — ready for Wave 3 (01-04)
 Resume file: None
