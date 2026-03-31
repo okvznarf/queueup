@@ -11,6 +11,7 @@ import { healthRoutes } from './routes/health.js';
 import { twimlRoutes } from './routes/twiml.js';
 import { registerVoiceStreamRoute } from './handlers/twilioStream.js';
 import { logger } from './lib/logger.js';
+import { startRetentionCron } from './lib/retentionCron.js';
 
 const app = fastify({ logger: false });
 
@@ -24,6 +25,7 @@ const port = parseInt(process.env.PORT ?? '3001', 10);
 try {
   await app.listen({ port, host: '0.0.0.0' });
   logger.info('Voice service started', { port: port as unknown as string });
+  startRetentionCron();
 } catch (err) {
   logger.error('Failed to start voice service', {}, err);
   process.exit(1);
