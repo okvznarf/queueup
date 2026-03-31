@@ -131,14 +131,17 @@ import { Redis } from "@upstash/redis";
 
 // Redis-backed idempotency store — survives across serverless invocations
 // Requires UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN env vars
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
+const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+  ? new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    })
+  : null;
 
 const IDEMPOTENCY_TTL = 300; // 5 minutes in seconds
 
 export async function checkIdempotency(key: string): Promise<unknown | null> {
+  if (!redis) return null;
   const raw = await redis.get<string>(key);
   if (!raw) return null;
   try {
@@ -149,6 +152,7 @@ export async function checkIdempotency(key: string): Promise<unknown | null> {
 }
 
 export async function setIdempotency(key: string, result: unknown): Promise<void> {
+  if (!redis) return;
   await redis.set(key, JSON.stringify(result), { ex: IDEMPOTENCY_TTL });
 }
 

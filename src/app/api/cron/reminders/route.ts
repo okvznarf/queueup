@@ -75,6 +75,7 @@ export async function GET(req: NextRequest) {
         shopId: { in: shopIds },
         date: { gte: localDateMidnight, lt: localDateEnd },
         status: { in: ["CONFIRMED", "PENDING"] },
+        reminderSentAt: null,
       },
       include: { customer: true, service: true, staff: true, shop: true },
     });
@@ -95,6 +96,10 @@ export async function GET(req: NextRequest) {
           date: appt.date,
           startTime: appt.startTime,
           reminderType: "24h",
+        });
+        await prisma.appointment.update({
+          where: { id: appt.id },
+          data: { reminderSentAt: new Date() },
         });
         return true;
       } catch (err) {

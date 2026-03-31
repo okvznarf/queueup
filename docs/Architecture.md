@@ -45,7 +45,7 @@ prisma/
 ## Email Architecture
 - Provider interface (DI pattern) — swap SendGrid without changing routes
 - Circuit breaker + retry wraps every send
-- 4 email types: welcome, password reset, booking confirmation, appointment reminder
+- 4 email types: welcome, password reset, booking confirmation, appointment reminder (24h before, once per appointment)
 
 ## Links
 - [[Security]]

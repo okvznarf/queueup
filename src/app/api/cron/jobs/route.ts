@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "crypto";
 import { processJobs, registerJobHandler } from "@/lib/jobs";
-import { sendBookingConfirmation, sendAppointmentReminder } from "@/lib/email";
+import { sendBookingConfirmation } from "@/lib/email";
 import prisma from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 
@@ -33,35 +33,8 @@ registerJobHandler("email:confirmation", async (payload) => {
   });
 });
 
-registerJobHandler("email:reminder", async (payload) => {
-  const { appointmentId, type } = payload as { appointmentId: string; type?: string };
-  const appt = await prisma.appointment.findUnique({
-    where: { id: appointmentId },
-    select: {
-      date: true, startTime: true, status: true,
-      customer: { select: { name: true, email: true } },
-      service: { select: { name: true } },
-      staff: { select: { name: true } },
-      shop: { select: { name: true } },
-    },
-  });
-  // Skip if appointment was cancelled between enqueue and execution
-  if (!appt || !appt.customer.email || appt.status === "CANCELLED") return;
-
-  await sendAppointmentReminder({
-    customerName: appt.customer.name,
-    customerEmail: appt.customer.email,
-    shopName: appt.shop.name,
-    serviceName: appt.service.name,
-    staffName: appt.staff?.name,
-    date: appt.date,
-    startTime: appt.startTime,
-    reminderType: type === "1h" ? "1h" : "24h",
-  });
-});
-
 // ─── Cron handler: process pending jobs ─────────────────────────────────────
-// Schedule: every 1 minute via Vercel cron
+// Schedule: daily via Vercel cron
 
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET;

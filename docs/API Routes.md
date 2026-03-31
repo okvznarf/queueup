@@ -64,5 +64,5 @@
 ## Cron
 | Method | Route | Description |
 |--------|-------|-------------|
-| GET | `/api/cron/reminders` | Send appointment reminders hourly (requires CRON_SECRET) |
-| GET | `/api/cron/jobs` | Process background job queue (runs every minute) |
+| GET | `/api/cron/reminders` | Send 24h appointment reminders daily (requires CRON_SECRET) |
+| GET | `/api/cron/jobs` | Process background job queue daily (requires CRON_SECRET) |
