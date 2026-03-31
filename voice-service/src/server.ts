@@ -9,6 +9,7 @@ import fastify from 'fastify';
 import fastifyWebsocket from '@fastify/websocket';
 import { healthRoutes } from './routes/health.js';
 import { twimlRoutes } from './routes/twiml.js';
+import { registerVoiceStreamRoute } from './handlers/twilioStream.js';
 import { logger } from './lib/logger.js';
 
 const app = fastify({ logger: false });
@@ -16,6 +17,7 @@ const app = fastify({ logger: false });
 await app.register(fastifyWebsocket);
 await app.register(healthRoutes);
 await app.register(twimlRoutes);
+await registerVoiceStreamRoute(app);
 
 const port = parseInt(process.env.PORT ?? '3001', 10);
 
