@@ -49,6 +49,7 @@ export type AppointmentMinAggregateOutputType = {
   notes: string | null
   totalPrice: number | null
   paidAt: Date | null
+  reminderSentAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   shopId: string | null
@@ -70,6 +71,7 @@ export type AppointmentMaxAggregateOutputType = {
   notes: string | null
   totalPrice: number | null
   paidAt: Date | null
+  reminderSentAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   shopId: string | null
@@ -91,6 +93,7 @@ export type AppointmentCountAggregateOutputType = {
   notes: number
   totalPrice: number
   paidAt: number
+  reminderSentAt: number
   createdAt: number
   updatedAt: number
   shopId: number
@@ -124,6 +127,7 @@ export type AppointmentMinAggregateInputType = {
   notes?: true
   totalPrice?: true
   paidAt?: true
+  reminderSentAt?: true
   createdAt?: true
   updatedAt?: true
   shopId?: true
@@ -145,6 +149,7 @@ export type AppointmentMaxAggregateInputType = {
   notes?: true
   totalPrice?: true
   paidAt?: true
+  reminderSentAt?: true
   createdAt?: true
   updatedAt?: true
   shopId?: true
@@ -166,6 +171,7 @@ export type AppointmentCountAggregateInputType = {
   notes?: true
   totalPrice?: true
   paidAt?: true
+  reminderSentAt?: true
   createdAt?: true
   updatedAt?: true
   shopId?: true
@@ -274,6 +280,7 @@ export type AppointmentGroupByOutputType = {
   notes: string | null
   totalPrice: number | null
   paidAt: Date | null
+  reminderSentAt: Date | null
   createdAt: Date
   updatedAt: Date
   shopId: string
@@ -318,6 +325,7 @@ export type AppointmentWhereInput = {
   notes?: Prisma.StringNullableFilter<"Appointment"> | string | null
   totalPrice?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   paidAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
+  reminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
   shopId?: Prisma.StringFilter<"Appointment"> | string
@@ -343,6 +351,7 @@ export type AppointmentOrderByWithRelationInput = {
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   totalPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   paidAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  reminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   shopId?: Prisma.SortOrder
@@ -371,6 +380,7 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   notes?: Prisma.StringNullableFilter<"Appointment"> | string | null
   totalPrice?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   paidAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
+  reminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
   shopId?: Prisma.StringFilter<"Appointment"> | string
@@ -396,6 +406,7 @@ export type AppointmentOrderByWithAggregationInput = {
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   totalPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   paidAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  reminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   shopId?: Prisma.SortOrder
@@ -425,6 +436,7 @@ export type AppointmentScalarWhereWithAggregatesInput = {
   notes?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   totalPrice?: Prisma.FloatNullableWithAggregatesFilter<"Appointment"> | number | null
   paidAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
+  reminderSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Appointment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Appointment"> | Date | string
   shopId?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
@@ -446,6 +458,7 @@ export type AppointmentCreateInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   shop: Prisma.ShopCreateNestedOneWithoutAppointmentsInput
@@ -467,6 +480,7 @@ export type AppointmentUncheckedCreateInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   shopId: string
@@ -488,6 +502,7 @@ export type AppointmentUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shop?: Prisma.ShopUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -509,6 +524,7 @@ export type AppointmentUncheckedUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shopId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -530,6 +546,7 @@ export type AppointmentCreateManyInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   shopId: string
@@ -551,6 +568,7 @@ export type AppointmentUpdateManyMutationInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -568,6 +586,7 @@ export type AppointmentUncheckedUpdateManyInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shopId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -599,6 +618,7 @@ export type AppointmentCountOrderByAggregateInput = {
   notes?: Prisma.SortOrder
   totalPrice?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
+  reminderSentAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   shopId?: Prisma.SortOrder
@@ -625,6 +645,7 @@ export type AppointmentMaxOrderByAggregateInput = {
   notes?: Prisma.SortOrder
   totalPrice?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
+  reminderSentAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   shopId?: Prisma.SortOrder
@@ -646,6 +667,7 @@ export type AppointmentMinOrderByAggregateInput = {
   notes?: Prisma.SortOrder
   totalPrice?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
+  reminderSentAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   shopId?: Prisma.SortOrder
@@ -860,6 +882,7 @@ export type AppointmentCreateWithoutShopInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   service: Prisma.ServiceCreateNestedOneWithoutAppointmentsInput
@@ -880,6 +903,7 @@ export type AppointmentUncheckedCreateWithoutShopInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   serviceId: string
@@ -929,6 +953,7 @@ export type AppointmentScalarWhereInput = {
   notes?: Prisma.StringNullableFilter<"Appointment"> | string | null
   totalPrice?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   paidAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
+  reminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
   shopId?: Prisma.StringFilter<"Appointment"> | string
@@ -950,6 +975,7 @@ export type AppointmentCreateWithoutStaffInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   shop: Prisma.ShopCreateNestedOneWithoutAppointmentsInput
@@ -970,6 +996,7 @@ export type AppointmentUncheckedCreateWithoutStaffInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   shopId: string
@@ -1016,6 +1043,7 @@ export type AppointmentCreateWithoutServiceInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   shop: Prisma.ShopCreateNestedOneWithoutAppointmentsInput
@@ -1036,6 +1064,7 @@ export type AppointmentUncheckedCreateWithoutServiceInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   shopId: string
@@ -1082,6 +1111,7 @@ export type AppointmentCreateWithoutCustomerInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   shop: Prisma.ShopCreateNestedOneWithoutAppointmentsInput
@@ -1102,6 +1132,7 @@ export type AppointmentUncheckedCreateWithoutCustomerInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   shopId: string
@@ -1148,6 +1179,7 @@ export type AppointmentCreateManyShopInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   serviceId: string
@@ -1168,6 +1200,7 @@ export type AppointmentUpdateWithoutShopInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   service?: Prisma.ServiceUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -1188,6 +1221,7 @@ export type AppointmentUncheckedUpdateWithoutShopInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1208,6 +1242,7 @@ export type AppointmentUncheckedUpdateManyWithoutShopInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1228,6 +1263,7 @@ export type AppointmentCreateManyStaffInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   shopId: string
@@ -1248,6 +1284,7 @@ export type AppointmentUpdateWithoutStaffInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shop?: Prisma.ShopUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -1268,6 +1305,7 @@ export type AppointmentUncheckedUpdateWithoutStaffInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shopId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1288,6 +1326,7 @@ export type AppointmentUncheckedUpdateManyWithoutStaffInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shopId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1308,6 +1347,7 @@ export type AppointmentCreateManyServiceInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   shopId: string
@@ -1328,6 +1368,7 @@ export type AppointmentUpdateWithoutServiceInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shop?: Prisma.ShopUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -1348,6 +1389,7 @@ export type AppointmentUncheckedUpdateWithoutServiceInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shopId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1368,6 +1410,7 @@ export type AppointmentUncheckedUpdateManyWithoutServiceInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shopId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1388,6 +1431,7 @@ export type AppointmentCreateManyCustomerInput = {
   notes?: string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   shopId: string
@@ -1408,6 +1452,7 @@ export type AppointmentUpdateWithoutCustomerInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shop?: Prisma.ShopUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -1428,6 +1473,7 @@ export type AppointmentUncheckedUpdateWithoutCustomerInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shopId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1448,6 +1494,7 @@ export type AppointmentUncheckedUpdateManyWithoutCustomerInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shopId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1470,6 +1517,7 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   notes?: boolean
   totalPrice?: boolean
   paidAt?: boolean
+  reminderSentAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   shopId?: boolean
@@ -1495,6 +1543,7 @@ export type AppointmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   notes?: boolean
   totalPrice?: boolean
   paidAt?: boolean
+  reminderSentAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   shopId?: boolean
@@ -1520,6 +1569,7 @@ export type AppointmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   notes?: boolean
   totalPrice?: boolean
   paidAt?: boolean
+  reminderSentAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   shopId?: boolean
@@ -1545,6 +1595,7 @@ export type AppointmentSelectScalar = {
   notes?: boolean
   totalPrice?: boolean
   paidAt?: boolean
+  reminderSentAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   shopId?: boolean
@@ -1553,7 +1604,7 @@ export type AppointmentSelectScalar = {
   customerId?: boolean
 }
 
-export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "startTime" | "endTime" | "status" | "partySize" | "tableNumber" | "vehicleInfo" | "licensePlate" | "notes" | "totalPrice" | "paidAt" | "createdAt" | "updatedAt" | "shopId" | "serviceId" | "staffId" | "customerId", ExtArgs["result"]["appointment"]>
+export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "startTime" | "endTime" | "status" | "partySize" | "tableNumber" | "vehicleInfo" | "licensePlate" | "notes" | "totalPrice" | "paidAt" | "reminderSentAt" | "createdAt" | "updatedAt" | "shopId" | "serviceId" | "staffId" | "customerId", ExtArgs["result"]["appointment"]>
 export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   shop?: boolean | Prisma.ShopDefaultArgs<ExtArgs>
   service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
@@ -1594,6 +1645,7 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
     notes: string | null
     totalPrice: number | null
     paidAt: Date | null
+    reminderSentAt: Date | null
     createdAt: Date
     updatedAt: Date
     shopId: string
@@ -2039,6 +2091,7 @@ export interface AppointmentFieldRefs {
   readonly notes: Prisma.FieldRef<"Appointment", 'String'>
   readonly totalPrice: Prisma.FieldRef<"Appointment", 'Float'>
   readonly paidAt: Prisma.FieldRef<"Appointment", 'DateTime'>
+  readonly reminderSentAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly shopId: Prisma.FieldRef<"Appointment", 'String'>

@@ -391,7 +391,10 @@ export const ModelName = {
   Customer: 'Customer',
   Appointment: 'Appointment',
   WorkingHours: 'WorkingHours',
-  StaffWorkingHours: 'StaffWorkingHours'
+  StaffWorkingHours: 'StaffWorkingHours',
+  VoiceCall: 'VoiceCall',
+  VoiceTranscript: 'VoiceTranscript',
+  VoiceAuditLog: 'VoiceAuditLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -407,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "shop" | "user" | "staff" | "service" | "customer" | "appointment" | "workingHours" | "staffWorkingHours"
+    modelProps: "shop" | "user" | "staff" | "service" | "customer" | "appointment" | "workingHours" | "staffWorkingHours" | "voiceCall" | "voiceTranscript" | "voiceAuditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1003,6 +1006,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    VoiceCall: {
+      payload: Prisma.$VoiceCallPayload<ExtArgs>
+      fields: Prisma.VoiceCallFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VoiceCallFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceCallPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VoiceCallFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceCallPayload>
+        }
+        findFirst: {
+          args: Prisma.VoiceCallFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceCallPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VoiceCallFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceCallPayload>
+        }
+        findMany: {
+          args: Prisma.VoiceCallFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceCallPayload>[]
+        }
+        create: {
+          args: Prisma.VoiceCallCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceCallPayload>
+        }
+        createMany: {
+          args: Prisma.VoiceCallCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VoiceCallCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceCallPayload>[]
+        }
+        delete: {
+          args: Prisma.VoiceCallDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceCallPayload>
+        }
+        update: {
+          args: Prisma.VoiceCallUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceCallPayload>
+        }
+        deleteMany: {
+          args: Prisma.VoiceCallDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VoiceCallUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VoiceCallUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceCallPayload>[]
+        }
+        upsert: {
+          args: Prisma.VoiceCallUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceCallPayload>
+        }
+        aggregate: {
+          args: Prisma.VoiceCallAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVoiceCall>
+        }
+        groupBy: {
+          args: Prisma.VoiceCallGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VoiceCallGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VoiceCallCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VoiceCallCountAggregateOutputType> | number
+        }
+      }
+    }
+    VoiceTranscript: {
+      payload: Prisma.$VoiceTranscriptPayload<ExtArgs>
+      fields: Prisma.VoiceTranscriptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VoiceTranscriptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceTranscriptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VoiceTranscriptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceTranscriptPayload>
+        }
+        findFirst: {
+          args: Prisma.VoiceTranscriptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceTranscriptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VoiceTranscriptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceTranscriptPayload>
+        }
+        findMany: {
+          args: Prisma.VoiceTranscriptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceTranscriptPayload>[]
+        }
+        create: {
+          args: Prisma.VoiceTranscriptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceTranscriptPayload>
+        }
+        createMany: {
+          args: Prisma.VoiceTranscriptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VoiceTranscriptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceTranscriptPayload>[]
+        }
+        delete: {
+          args: Prisma.VoiceTranscriptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceTranscriptPayload>
+        }
+        update: {
+          args: Prisma.VoiceTranscriptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceTranscriptPayload>
+        }
+        deleteMany: {
+          args: Prisma.VoiceTranscriptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VoiceTranscriptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VoiceTranscriptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceTranscriptPayload>[]
+        }
+        upsert: {
+          args: Prisma.VoiceTranscriptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceTranscriptPayload>
+        }
+        aggregate: {
+          args: Prisma.VoiceTranscriptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVoiceTranscript>
+        }
+        groupBy: {
+          args: Prisma.VoiceTranscriptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VoiceTranscriptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VoiceTranscriptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VoiceTranscriptCountAggregateOutputType> | number
+        }
+      }
+    }
+    VoiceAuditLog: {
+      payload: Prisma.$VoiceAuditLogPayload<ExtArgs>
+      fields: Prisma.VoiceAuditLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VoiceAuditLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceAuditLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VoiceAuditLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceAuditLogPayload>
+        }
+        findFirst: {
+          args: Prisma.VoiceAuditLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceAuditLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VoiceAuditLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceAuditLogPayload>
+        }
+        findMany: {
+          args: Prisma.VoiceAuditLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceAuditLogPayload>[]
+        }
+        create: {
+          args: Prisma.VoiceAuditLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceAuditLogPayload>
+        }
+        createMany: {
+          args: Prisma.VoiceAuditLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VoiceAuditLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceAuditLogPayload>[]
+        }
+        delete: {
+          args: Prisma.VoiceAuditLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceAuditLogPayload>
+        }
+        update: {
+          args: Prisma.VoiceAuditLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceAuditLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.VoiceAuditLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VoiceAuditLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VoiceAuditLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceAuditLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.VoiceAuditLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VoiceAuditLogPayload>
+        }
+        aggregate: {
+          args: Prisma.VoiceAuditLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVoiceAuditLog>
+        }
+        groupBy: {
+          args: Prisma.VoiceAuditLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VoiceAuditLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VoiceAuditLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VoiceAuditLogCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1165,6 +1390,7 @@ export const AppointmentScalarFieldEnum = {
   notes: 'notes',
   totalPrice: 'totalPrice',
   paidAt: 'paidAt',
+  reminderSentAt: 'reminderSentAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   shopId: 'shopId',
@@ -1198,6 +1424,50 @@ export const StaffWorkingHoursScalarFieldEnum = {
 } as const
 
 export type StaffWorkingHoursScalarFieldEnum = (typeof StaffWorkingHoursScalarFieldEnum)[keyof typeof StaffWorkingHoursScalarFieldEnum]
+
+
+export const VoiceCallScalarFieldEnum = {
+  id: 'id',
+  callSid: 'callSid',
+  clinicId: 'clinicId',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  durationSec: 'durationSec',
+  status: 'status',
+  summary: 'summary',
+  createdAt: 'createdAt'
+} as const
+
+export type VoiceCallScalarFieldEnum = (typeof VoiceCallScalarFieldEnum)[keyof typeof VoiceCallScalarFieldEnum]
+
+
+export const VoiceTranscriptScalarFieldEnum = {
+  id: 'id',
+  callId: 'callId',
+  role: 'role',
+  content: 'content',
+  createdAt: 'createdAt',
+  deleteAfter: 'deleteAfter'
+} as const
+
+export type VoiceTranscriptScalarFieldEnum = (typeof VoiceTranscriptScalarFieldEnum)[keyof typeof VoiceTranscriptScalarFieldEnum]
+
+
+export const VoiceAuditLogScalarFieldEnum = {
+  id: 'id',
+  callId: 'callId',
+  callSid: 'callSid',
+  clinicId: 'clinicId',
+  consentTimestamp: 'consentTimestamp',
+  consentType: 'consentType',
+  phoneHash: 'phoneHash',
+  durationSeconds: 'durationSeconds',
+  actionsJson: 'actionsJson',
+  wasEscalated: 'wasEscalated',
+  createdAt: 'createdAt'
+} as const
+
+export type VoiceAuditLogScalarFieldEnum = (typeof VoiceAuditLogScalarFieldEnum)[keyof typeof VoiceAuditLogScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1437,6 +1707,9 @@ export type GlobalOmitConfig = {
   appointment?: Prisma.AppointmentOmit
   workingHours?: Prisma.WorkingHoursOmit
   staffWorkingHours?: Prisma.StaffWorkingHoursOmit
+  voiceCall?: Prisma.VoiceCallOmit
+  voiceTranscript?: Prisma.VoiceTranscriptOmit
+  voiceAuditLog?: Prisma.VoiceAuditLogOmit
 }
 
 /* Types for Logging */

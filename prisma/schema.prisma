@@ -220,6 +220,7 @@ model VoiceCall {
   endedAt     DateTime?
   durationSec Int?
   status      String   @default("active")
+  summary     String?
   createdAt   DateTime @default(now())
 
   transcripts VoiceTranscript[]

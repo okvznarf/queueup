@@ -58,7 +58,10 @@ export const ModelName = {
   Customer: 'Customer',
   Appointment: 'Appointment',
   WorkingHours: 'WorkingHours',
-  StaffWorkingHours: 'StaffWorkingHours'
+  StaffWorkingHours: 'StaffWorkingHours',
+  VoiceCall: 'VoiceCall',
+  VoiceTranscript: 'VoiceTranscript',
+  VoiceAuditLog: 'VoiceAuditLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -200,6 +203,7 @@ export const AppointmentScalarFieldEnum = {
   notes: 'notes',
   totalPrice: 'totalPrice',
   paidAt: 'paidAt',
+  reminderSentAt: 'reminderSentAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   shopId: 'shopId',
@@ -233,6 +237,50 @@ export const StaffWorkingHoursScalarFieldEnum = {
 } as const
 
 export type StaffWorkingHoursScalarFieldEnum = (typeof StaffWorkingHoursScalarFieldEnum)[keyof typeof StaffWorkingHoursScalarFieldEnum]
+
+
+export const VoiceCallScalarFieldEnum = {
+  id: 'id',
+  callSid: 'callSid',
+  clinicId: 'clinicId',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  durationSec: 'durationSec',
+  status: 'status',
+  summary: 'summary',
+  createdAt: 'createdAt'
+} as const
+
+export type VoiceCallScalarFieldEnum = (typeof VoiceCallScalarFieldEnum)[keyof typeof VoiceCallScalarFieldEnum]
+
+
+export const VoiceTranscriptScalarFieldEnum = {
+  id: 'id',
+  callId: 'callId',
+  role: 'role',
+  content: 'content',
+  createdAt: 'createdAt',
+  deleteAfter: 'deleteAfter'
+} as const
+
+export type VoiceTranscriptScalarFieldEnum = (typeof VoiceTranscriptScalarFieldEnum)[keyof typeof VoiceTranscriptScalarFieldEnum]
+
+
+export const VoiceAuditLogScalarFieldEnum = {
+  id: 'id',
+  callId: 'callId',
+  callSid: 'callSid',
+  clinicId: 'clinicId',
+  consentTimestamp: 'consentTimestamp',
+  consentType: 'consentType',
+  phoneHash: 'phoneHash',
+  durationSeconds: 'durationSeconds',
+  actionsJson: 'actionsJson',
+  wasEscalated: 'wasEscalated',
+  createdAt: 'createdAt'
+} as const
+
+export type VoiceAuditLogScalarFieldEnum = (typeof VoiceAuditLogScalarFieldEnum)[keyof typeof VoiceAuditLogScalarFieldEnum]
 
 
 export const SortOrder = {

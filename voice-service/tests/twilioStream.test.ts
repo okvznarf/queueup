@@ -1,12 +1,41 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { TwilioMediaEvent } from '../src/types/session.js';
 
-// Mock deepgramClient before importing handler
+// Mock all external dependencies before importing the module under test
+
 vi.mock('../src/handlers/deepgramClient.js', () => ({
   createDeepgramConnection: vi.fn(() => ({
     send: vi.fn(),
     finish: vi.fn(),
   })),
+}));
+
+vi.mock('../src/handlers/elevenLabsTts.js', () => ({
+  streamTtsToTwilio: vi.fn().mockResolvedValue(undefined),
+  playConsentGreeting: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('../src/handlers/consentFlow.js', () => ({
+  detectConsentResponse: vi.fn().mockReturnValue(null),
+  CONSENT_SCRIPT: 'Test consent script',
+}));
+
+vi.mock('../src/handlers/claudeSession.js', () => ({
+  processPatientUtterance: vi.fn().mockResolvedValue(undefined),
+  SYSTEM_PROMPT: 'Test system prompt',
+}));
+
+vi.mock('../src/handlers/escalation.js', () => ({
+  shouldEscalate: vi.fn().mockReturnValue(false),
+  executeWarmTransfer: vi.fn().mockResolvedValue(undefined),
+  TRANSFER_BRIDGE_MESSAGE: "Connecting you now.",
+  ESCALATION_PHRASES: ['talk to a human'],
+}));
+
+vi.mock('../src/lib/auditLog.js', () => ({
+  writeAuditLog: vi.fn().mockResolvedValue('call-id-123'),
+  generateCallSummary: vi.fn().mockResolvedValue('Test summary'),
+  saveCallSummary: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { handleTwilioMessage, sessions } from '../src/handlers/twilioStream.js';
