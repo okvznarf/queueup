@@ -5,7 +5,7 @@ import { createDeepgramConnection } from './deepgramClient.js';
 import { logger } from '../lib/logger.js';
 import { detectConsentResponse, CONSENT_SCRIPT } from './consentFlow.js';
 import { playConsentGreeting, streamTtsToTwilio } from './elevenLabsTts.js';
-import { processPatientUtterance } from './claudeSession.js';
+import { processPatientUtterance, fetchShopContext } from './claudeSession.js';
 import { shouldEscalate, executeWarmTransfer, TRANSFER_BRIDGE_MESSAGE } from './escalation.js';
 import { writeAuditLog, generateCallSummary, saveCallSummary } from '../lib/auditLog.js';
 
@@ -36,8 +36,21 @@ export function handleTwilioMessage(
         startedAt: new Date(),
         actionsLog: [],
         staffPhoneNumber: process.env.DEFAULT_STAFF_PHONE,
+        channel: 'voice',
       };
       sessions.set(callSid, session);
+
+      // Fetch shop context for FAQ and booking tools (fire and continue on failure)
+      if (session.clinicId) {
+        fetchShopContext(session.clinicId)
+          .then((ctx) => {
+            session.shopContext = ctx;
+            logger.info('Shop context loaded', { callSid, shopId: ctx.shopId });
+          })
+          .catch((err) => {
+            logger.error('Failed to load shop context — AI will work without FAQ context', { callSid }, err);
+          });
+      }
 
       // Create Deepgram connection for this call
       const dgConnection = createDeepgramConnection(async (transcript) => {
