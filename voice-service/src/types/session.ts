@@ -1,4 +1,45 @@
+import type Anthropic from '@anthropic-ai/sdk';
+
 export type ConsentState = 'pending' | 'granted' | 'declined';
+
+export interface ShopService {
+  id: string;
+  name: string;
+  duration: number;
+  price: number;
+}
+
+export interface ShopStaff {
+  id: string;
+  name: string;
+  role: string;
+}
+
+export interface WorkingHours {
+  day: string;
+  openTime: string;
+  closeTime: string;
+  isClosed: boolean;
+}
+
+export interface ShopContext {
+  shopId: string;
+  shopName: string;
+  businessType: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  timezone: string;
+  currency: string;
+  primaryColor?: string;
+  staffLabel: string;
+  serviceLabel: string;
+  bookingLabel: string;
+  staffCount: number;
+  services: ShopService[];
+  staff: ShopStaff[];
+  workingHours: WorkingHours[];
+}
 
 export interface Session {
   callSid: string;
@@ -6,13 +47,15 @@ export interface Session {
   clinicId: string;
   consentState: ConsentState;
   consentTimestamp?: Date;
-  messages: Array<{ role: 'user' | 'assistant'; content: string }>;
+  messages: Anthropic.MessageParam[];
   unansweredQuestions: number;
   escalationTriggered: boolean;
   startedAt: Date;
   actionsLog: string[];
   patientPhoneHash?: string;
   staffPhoneNumber?: string;
+  shopContext?: ShopContext;
+  channel: 'voice' | 'chat';
 }
 
 export interface TwilioMediaEvent {
