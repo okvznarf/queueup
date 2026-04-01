@@ -89,7 +89,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Voice Pipeline + GDPR Foundation | 5/5 | Complete   | 2026-03-31 |
-| 2. Booking AI + Web Chat | 0/TBD | Not started | - |
+| 2. Booking AI + Web Chat | 1/2 | In Progress|  |
 | 3. Clinic Admin Portal | 0/TBD | Not started | - |
 | 4. Reseller Portal | 0/TBD | Not started | - |
 | 5. Analytics Dashboard | 0/TBD | Not started | - |

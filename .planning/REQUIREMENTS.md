@@ -25,8 +25,8 @@
 
 - [ ] **BOOK-01**: AI checks real-time availability from QueueUp before confirming any appointment
 - [ ] **BOOK-02**: Patient can book a new appointment via voice or chat (service, date/time, staff preference)
-- [ ] **BOOK-03**: Patient can reschedule an existing appointment (verified by name + DOB)
-- [ ] **BOOK-04**: Patient can cancel an existing appointment (clinic's cancellation policy window enforced)
+- [x] **BOOK-03**: Patient can reschedule an existing appointment (verified by name + DOB)
+- [x] **BOOK-04**: Patient can cancel an existing appointment (clinic's cancellation policy window enforced)
 - [x] **BOOK-05**: AI prevents double-booking via Redis-backed idempotency key per slot
 - [ ] **BOOK-06**: Booking confirmation sent to patient after successful booking (email via existing SendGrid integration)
 
@@ -39,8 +39,8 @@
 ### FAQ & Knowledge Base
 
 - [ ] **FAQ-01**: Clinic admin can create and edit a clinic-specific FAQ knowledge base (Q&A pairs)
-- [ ] **FAQ-02**: AI answers patient questions from clinic FAQ first, falls back to general healthcare knowledge
-- [ ] **FAQ-03**: AI covers standard FAQ topics: hours, location, pricing, services, insurance accepted
+- [x] **FAQ-02**: AI answers patient questions from clinic FAQ first, falls back to general healthcare knowledge
+- [x] **FAQ-03**: AI covers standard FAQ topics: hours, location, pricing, services, insurance accepted
 - [ ] **FAQ-04**: Questions the AI cannot answer are logged so clinic admin can add them to the FAQ
 
 ### Clinic Admin Portal
@@ -132,13 +132,13 @@
 | CHAT-04 | Phase 2 | Pending |
 | BOOK-01 | Phase 2 | Pending |
 | BOOK-02 | Phase 2 | Pending |
-| BOOK-03 | Phase 2 | Pending |
-| BOOK-04 | Phase 2 | Pending |
+| BOOK-03 | Phase 2 | Complete |
+| BOOK-04 | Phase 2 | Complete |
 | BOOK-06 | Phase 2 | Pending |
 | INTAKE-01 | Phase 2 | Pending |
 | INTAKE-02 | Phase 2 | Pending |
-| FAQ-02 | Phase 2 | Pending |
-| FAQ-03 | Phase 2 | Pending |
+| FAQ-02 | Phase 2 | Complete |
+| FAQ-03 | Phase 2 | Complete |
 | CLINIC-01 | Phase 3 | Pending |
 | CLINIC-02 | Phase 3 | Pending |
 | CLINIC-03 | Phase 3 | Pending |

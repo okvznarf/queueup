@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 2 context gathered
-last_updated: "2026-03-31T13:01:34.699Z"
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-04-01T16:47:27.538Z"
 last_activity: 2026-03-31 — Wave 2 complete (audio pipeline + AI brain)
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 7
+  completed_plans: 6
   percent: 12
 ---
 
@@ -52,6 +52,8 @@ Progress: [██░░░░░░░░] 12%
 *Updated after each plan completion*
 | Phase 01-voice-pipeline-gdpr-foundation P04 | 7 | 2 tasks | 10 files |
 | Phase 01-voice-pipeline-gdpr-foundation P05 | 8 | 2 tasks | 5 files |
+| Phase 02-booking-ai-web-chat P01 | 3 | 2 tasks | 4 files |
+| Phase 02-booking-ai-web-chat P01 | 3 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -76,6 +78,9 @@ Recent decisions affecting current work:
 - [Phase 01]: startRetentionCron called inside listen callback — cron starts after server fully bound; 60s startup delay for DB connection settling
 - [Phase 01]: Dockerfile multi-stage build — builder compiles TS, production stage only contains compiled JS and prod deps, reducing image size
 - [Phase 01]: Railway eu-west region — satisfies GDPR-04 EU data residency requirement for voice call data
+- [Phase 02-01]: requireServiceOrAdmin() tries service token first (no DB lookup), falls back to requireAdmin() — allows voice/chat service and admin dashboard to share the same endpoints
+- [Phase 02-01]: PATCH /api/appointments/[id] service-token path skips role-based checks entirely — AI acts as trusted service agent, not as a user
+- [Phase 02-01]: Shop context cached 2 minutes in-memory — reduces latency for parallel AI session initializations
 
 ### Pending Todos
 
@@ -89,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-31T13:01:34.696Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-booking-ai-web-chat/02-CONTEXT.md
+Last session: 2026-04-01T16:47:27.535Z
+Stopped at: Completed 02-01-PLAN.md
+Resume file: None
