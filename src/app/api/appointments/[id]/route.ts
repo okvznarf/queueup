@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
+import { verifyServiceToken } from "@/lib/serviceAuth";
 import { rateLimit, getClientIp } from "@/lib/security";
 import { logger } from "@/lib/logger";
 import { broadcastToShop } from "@/app/api/events/route";
@@ -14,8 +15,17 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   }
 
   const { id } = await context.params;
-  const auth = requireAuth(request);
-  if (auth.error) return auth.error;
+
+  // Service token path: AI acting on behalf of a patient — skip user auth
+  const isServiceToken = verifyServiceToken(request);
+
+  if (!isServiceToken) {
+    const auth = requireAuth(request);
+    if (auth.error) return auth.error;
+  }
+
+  // Re-read auth for role checks below (only relevant for non-service-token path)
+  const auth = isServiceToken ? null : requireAuth(request);
 
   try {
     const body = await request.json();
@@ -31,21 +41,26 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const existing = await prisma.appointment.findUnique({ where: { id }, select: { shopId: true, customerId: true } });
     if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    // Customers can only cancel their own appointments
-    if (auth.user.role === "customer") {
-      if (existing.customerId !== auth.user.userId) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    // Service token: the AI may perform any status change on behalf of the patient
+    // User JWT: enforce role-based access control
+    if (!isServiceToken && auth && !auth.error) {
+      const user = auth.user!;
+      // Customers can only cancel their own appointments
+      if (user.role === "customer") {
+        if (existing.customerId !== user.userId) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+        if (status !== "CANCELLED") {
+          return NextResponse.json({ error: "Customers can only cancel appointments" }, { status: 403 });
+        }
       }
-      if (status !== "CANCELLED") {
-        return NextResponse.json({ error: "Customers can only cancel appointments" }, { status: 403 });
-      }
-    }
 
-    // Admins can only modify appointments in their own shop
-    if (auth.user.role !== "customer" && auth.user.role !== "superadmin") {
-      const shop = await prisma.shop.findUnique({ where: { id: existing.shopId }, select: { ownerId: true } });
-      if (!shop || shop.ownerId !== auth.user.userId) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      // Admins can only modify appointments in their own shop
+      if (user.role !== "customer" && user.role !== "superadmin") {
+        const shop = await prisma.shop.findUnique({ where: { id: existing.shopId }, select: { ownerId: true } });
+        if (!shop || shop.ownerId !== user.userId) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
       }
     }
 
