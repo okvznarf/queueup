@@ -58,6 +58,7 @@ function makeSession(overrides: Partial<Session> = {}): Session {
     actionsLog: ['consent_granted', 'greeted'],
     patientPhoneHash: 'abc123hash',
     staffPhoneNumber: '+15551234567',
+    channel: 'voice',
     ...overrides,
   };
 }

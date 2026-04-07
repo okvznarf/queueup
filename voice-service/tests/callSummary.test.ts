@@ -44,6 +44,7 @@ function makeSession(overrides: Partial<Session> = {}): Session {
     escalationTriggered: false,
     startedAt: new Date(),
     actionsLog: [],
+    channel: 'voice',
     ...overrides,
   };
 }

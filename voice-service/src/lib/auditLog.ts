@@ -11,6 +11,13 @@ export function hashPhoneLastFour(phone: string): string {
   return crypto.createHash('sha256').update(lastFour).digest('hex').substring(0, 16);
 }
 
+function contentToString(content: string | Anthropic.ContentBlockParam[]): string {
+  if (typeof content === 'string') return content;
+  return content
+    .map((block) => ('text' in block ? block.text : JSON.stringify(block)))
+    .join('');
+}
+
 export async function writeAuditLog(session: Session): Promise<string> {
   const durationSeconds = Math.floor((Date.now() - session.startedAt.getTime()) / 1000);
   const phoneHash = session.patientPhoneHash || null;
@@ -51,7 +58,7 @@ export async function writeAuditLog(session: Session): Promise<string> {
       data: session.messages.map((msg) => ({
         callId: voiceCall.id,
         role: msg.role,
-        content: msg.content,
+        content: contentToString(msg.content),
         deleteAfter,
       })),
     });
@@ -71,7 +78,7 @@ export async function generateCallSummary(session: Session): Promise<string> {
     messages: [
       {
         role: 'user',
-        content: `Call transcript:\n${session.messages.map((m) => `${m.role}: ${m.content}`).join('\n')}`,
+        content: `Call transcript:\n${session.messages.map((m) => `${m.role}: ${contentToString(m.content)}`).join('\n')}`,
       },
     ],
   });

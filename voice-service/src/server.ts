@@ -10,6 +10,7 @@ import fastifyWebsocket from '@fastify/websocket';
 import { healthRoutes } from './routes/health.js';
 import { twimlRoutes } from './routes/twiml.js';
 import { registerVoiceStreamRoute } from './handlers/twilioStream.js';
+import { chatRoutes } from './routes/chatRoute.js';
 import { logger } from './lib/logger.js';
 import { startRetentionCron } from './lib/retentionCron.js';
 
@@ -18,6 +19,7 @@ const app = fastify({ logger: false });
 await app.register(fastifyWebsocket);
 await app.register(healthRoutes);
 await app.register(twimlRoutes);
+await app.register(chatRoutes);
 await registerVoiceStreamRoute(app);
 
 const port = parseInt(process.env.PORT ?? '3001', 10);

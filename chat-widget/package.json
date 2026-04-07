@@ -1,0 +1,17 @@
+{
+  "name": "queueup-chat-widget",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js --watch"
+  },
+  "dependencies": {
+    "preact": "^10.29.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.4",
+    "typescript": "latest"
+  }
+}
