@@ -90,7 +90,7 @@ describe('saveCallSummary', () => {
     process.env.VOICE_SERVICE_TOKEN = 'test-token-secret';
     process.env.QUEUEUP_API_URL = 'http://localhost:3000';
 
-    await saveCallSummary('CA-test', 'Patient booked an appointment.');
+    await saveCallSummary('CA-test', 'Patient booked an appointment.', 'shop-1');
 
     expect(global.fetch).toHaveBeenCalledWith(
       expect.stringContaining('/api/voice/summary'),
@@ -99,6 +99,7 @@ describe('saveCallSummary', () => {
         headers: expect.objectContaining({
           'Content-Type': 'application/json',
           'x-voice-service-token': 'test-token-secret',
+          'x-shop-id': 'shop-1',
         }),
         body: JSON.stringify({ callSid: 'CA-test', summary: 'Patient booked an appointment.' }),
       })
@@ -113,7 +114,7 @@ describe('saveCallSummary', () => {
     });
 
     await expect(
-      saveCallSummary('CA-test', 'some summary')
+      saveCallSummary('CA-test', 'some summary', 'shop-1')
     ).rejects.toThrow('Failed to save call summary');
   });
 });

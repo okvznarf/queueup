@@ -1,7 +1,13 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import type { WebSocket } from 'ws';
 
-const client = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
+let _client: ElevenLabsClient | null = null;
+function getClient() {
+  if (!_client) {
+    _client = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
+  }
+  return _client;
+}
 
 export async function streamTtsToTwilio(
   text: string,
@@ -10,7 +16,7 @@ export async function streamTtsToTwilio(
 ): Promise<void> {
   const voiceId = process.env.ELEVENLABS_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL';
 
-  const audioStream = await client.textToSpeech.stream(voiceId, {
+  const audioStream = await getClient().textToSpeech.stream(voiceId, {
     text,
     model_id: 'eleven_flash_v2_5',
     output_format: 'ulaw_8000',

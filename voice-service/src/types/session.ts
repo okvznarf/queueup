@@ -22,6 +22,54 @@ export interface WorkingHours {
   isClosed: boolean;
 }
 
+export type AiToolName =
+  | 'book_appointment'
+  | 'book_dropoff'
+  | 'check_availability'
+  | 'check_repair_status'
+  | 'request_quote'
+  | 'cancel_appointment'
+  | 'reschedule_appointment'
+  | 'check_services'
+  | 'lookup_customer'
+  | 'request_callback';
+
+export type BookingModel = 'FIXED_SLOT' | 'DROP_OFF_WINDOW' | 'QUEUE';
+
+export interface VerticalIntake {
+  showVehicleInfo: boolean;
+  showLicensePlate: boolean;
+  showPartySize: boolean;
+  requirePhone: boolean;
+  customFields: Array<{
+    name: string;
+    label: string;
+    required: boolean;
+    type: 'text' | 'textarea' | 'select' | 'date';
+    options?: string[];
+  }>;
+}
+
+export interface VerticalPackContext {
+  slug: string;
+  bookingModel: BookingModel;
+  intake: VerticalIntake;
+  ai: {
+    systemPromptTemplate: string;
+    voicePersona: {
+      provider: 'elevenlabs';
+      voiceId: string;
+      voiceName: string;
+      style: string;
+      gender: 'male' | 'female';
+    };
+    tools: AiToolName[];
+    escalationTriggers: string[];
+    greeting: string;
+    language: 'hr-HR' | 'en-US';
+  };
+}
+
 export interface ShopContext {
   shopId: string;
   shopName: string;
@@ -39,6 +87,7 @@ export interface ShopContext {
   services: ShopService[];
   staff: ShopStaff[];
   workingHours: WorkingHours[];
+  pack?: VerticalPackContext | null;
 }
 
 export interface Session {

@@ -3,7 +3,11 @@ import type { Session } from '../types/session.js';
 import Anthropic from '@anthropic-ai/sdk';
 import crypto from 'crypto';
 
-const anthropic = new Anthropic();
+let _anthropic: Anthropic | null = null;
+function getAnthropic() {
+  if (!_anthropic) _anthropic = new Anthropic();
+  return _anthropic;
+}
 const RETENTION_DAYS = parseInt(process.env.TRANSCRIPT_RETENTION_DAYS || '90', 10);
 
 export function hashPhoneLastFour(phone: string): string {
@@ -70,7 +74,7 @@ export async function writeAuditLog(session: Session): Promise<string> {
 export async function generateCallSummary(session: Session): Promise<string> {
   if (session.messages.length === 0) return 'Call ended without conversation.';
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 200,
     system:
@@ -90,7 +94,8 @@ export async function generateCallSummary(session: Session): Promise<string> {
 
 export async function saveCallSummary(
   callSid: string,
-  summary: string
+  summary: string,
+  shopId: string,
 ): Promise<void> {
   const baseUrl = process.env.QUEUEUP_API_URL || 'http://localhost:3000';
   const url = new URL('/api/voice/summary', baseUrl).toString();
@@ -100,6 +105,7 @@ export async function saveCallSummary(
     headers: {
       'Content-Type': 'application/json',
       'x-voice-service-token': process.env.VOICE_SERVICE_TOKEN!,
+      'x-shop-id': shopId,
     },
     body: JSON.stringify({ callSid, summary }),
   });

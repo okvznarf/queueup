@@ -101,7 +101,8 @@ export function handleTwilioMessage(
               logger.info('Audit log written', { callSid: stopCallSid });
               try {
                 const summary = await generateCallSummary(session);
-                await saveCallSummary(stopCallSid, summary);
+                const summaryShopId = session.shopContext?.shopId ?? session.clinicId;
+                await saveCallSummary(stopCallSid, summary, summaryShopId);
                 logger.info('Call summary saved', { callSid: stopCallSid });
               } catch (err) {
                 logger.error('Failed to save call summary', { callSid: stopCallSid }, err);

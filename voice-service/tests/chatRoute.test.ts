@@ -28,6 +28,18 @@ vi.mock('../src/handlers/claudeSession.js', () => ({
   buildSystemPrompt: vi.fn().mockReturnValue('system prompt'),
 }));
 
+// Mock prisma shop lookup (route rejects unknown shops with 404)
+vi.mock('../src/lib/prisma.js', () => ({
+  default: {
+    shop: {
+      findFirst: vi.fn().mockResolvedValue({ id: 'shop-1' }),
+    },
+  },
+}));
+
+// 16+ char session id to pass SESSION_ID_RE in chatRoute
+const VALID_SESSION_ID = 'sess-abcdef123456';
+
 import {
   getOrCreateChatSession,
   processChatMessage,
@@ -175,7 +187,7 @@ describe('chatRoute integration', () => {
       },
     });
     expect(res.statusCode).toBe(400);
-    expect(JSON.parse(res.payload)).toEqual({ error: 'Missing required fields' });
+    expect(JSON.parse(res.payload).error).toMatch(/missing|invalid/i);
     await app.close();
   });
 
@@ -191,7 +203,7 @@ describe('chatRoute integration', () => {
       url: '/chat',
       payload: {
         shopId: 'shop-1',
-        sessionId: 'sess-sse',
+        sessionId: VALID_SESSION_ID,
         message: 'What are your hours?',
         consentGranted: true,
       },

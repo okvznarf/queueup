@@ -1,10 +1,14 @@
 import Anthropic from '@anthropic-ai/sdk';
 import type { Session, ShopContext } from '../types/session.js';
-import { BOOKING_TOOLS, dispatchTool, MAX_TOOL_ITERATIONS } from './bookingTools.js';
+import { dispatchTool, MAX_TOOL_ITERATIONS, getToolsForPack } from './bookingTools.js';
 
-const anthropic = new Anthropic();
+let _anthropic: Anthropic | null = null;
+function getAnthropic() {
+  if (!_anthropic) _anthropic = new Anthropic();
+  return _anthropic;
+}
 
-export function buildSystemPrompt(ctx: ShopContext, channel: 'voice' | 'chat'): string {
+function buildLegacyPrompt(ctx: ShopContext, channel: 'voice' | 'chat'): string {
   const hoursText = ctx.workingHours
     .filter((h) => !h.isClosed)
     .map((h) => `  ${h.day}: ${h.openTime}–${h.closeTime}`)
@@ -15,14 +19,20 @@ export function buildSystemPrompt(ctx: ShopContext, channel: 'voice' | 'chat'): 
     .join('\n');
 
   const staffLabel = ctx.staffLabel;
-  const staffPlural = `${staffLabel}s`;
 
   const staffPreferenceRule =
     ctx.staffCount >= 2
       ? `Ask "Do you have a preferred ${staffLabel}?" after service is selected`
       : `No staff preference needed (single provider)`;
 
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    timeZone: ctx.timezone || 'UTC',
+  });
+
   return `You are Aria, a warm and friendly AI receptionist assistant for ${ctx.shopName}.
+
+TODAY'S DATE: ${today}
 
 CLINIC INFORMATION (answer patient questions from this data):
 Name: ${ctx.shopName}
@@ -51,7 +61,65 @@ CONVERSATION RULES:
 - Use patient's first name once or twice naturally after they provide it
 - Never provide medical advice, diagnosis, or triage
 - If uncertain after 2 questions, offer to connect with a team member
-- When you cannot answer a question confidently, say "I'm not sure about that" so the system can track unanswered questions`;
+- When you cannot answer a question confidently, say "I'm not sure about that" so the system can track unanswered questions
+- Do NOT use emojis in your responses
+- Always use proper spacing after punctuation (periods, commas, exclamation marks, question marks)`;
+}
+
+function fillTemplate(template: string, replacements: Record<string, string>): string {
+  return template.replace(/\{\{(\w+)\}\}/g, (match, key) => replacements[key] ?? match);
+}
+
+function buildPackPrompt(ctx: ShopContext, channel: 'voice' | 'chat'): string {
+  if (!ctx.pack) {
+    throw new Error('buildPackPrompt called without a pack');
+  }
+
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    timeZone: ctx.timezone || 'UTC',
+  });
+
+  const serviceCatalogJson = JSON.stringify(
+    ctx.services.map((s) => ({ id: s.id, name: s.name, duration: s.duration, price: s.price })),
+  );
+
+  const workingHoursJson = JSON.stringify(
+    ctx.workingHours.map((h) => ({
+      day: h.day,
+      open: h.openTime,
+      close: h.closeTime,
+      closed: h.isClosed,
+    })),
+  );
+
+  const staffJson = JSON.stringify(
+    ctx.staff.map((s) => ({ id: s.id, name: s.name, role: s.role })),
+  );
+
+  const filledTemplate = fillTemplate(ctx.pack.ai.systemPromptTemplate, {
+    shopName: ctx.shopName,
+    serviceCatalogJson,
+    workingHoursJson,
+    staffJson,
+    today,
+    timezone: ctx.timezone,
+    currency: ctx.currency,
+  });
+
+  const channelSuffix =
+    channel === 'voice'
+      ? '\n\nCHANNEL: voice call. Keep responses short and conversational — under 2 sentences per turn when possible.'
+      : '\n\nCHANNEL: web chat. Responses may be longer but stay concise.';
+
+  return filledTemplate + channelSuffix;
+}
+
+export function buildSystemPrompt(ctx: ShopContext, channel: 'voice' | 'chat'): string {
+  if (ctx.pack) {
+    return buildPackPrompt(ctx, channel);
+  }
+  return buildLegacyPrompt(ctx, channel);
 }
 
 export async function fetchShopContext(shopId: string): Promise<ShopContext> {
@@ -105,11 +173,26 @@ export async function processPatientUtterance(
 
     iterations++;
 
-    const response = await anthropic.messages.create({
+    const tools = getToolsForPack(session.shopContext?.pack ?? null);
+    // Mark last tool with cache_control to cache the entire tools array.
+    // System prompt also marked — both are static per shop/pack and dominate input tokens.
+    const cachedTools: Anthropic.Tool[] = tools.map((t, i) =>
+      i === tools.length - 1
+        ? ({ ...t, cache_control: { type: 'ephemeral' } } as Anthropic.Tool)
+        : t,
+    );
+
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 600,
-      system: systemPrompt,
-      tools: BOOKING_TOOLS,
+      system: [
+        {
+          type: 'text',
+          text: systemPrompt,
+          cache_control: { type: 'ephemeral' },
+        },
+      ],
+      tools: cachedTools,
       messages: session.messages,
     });
 

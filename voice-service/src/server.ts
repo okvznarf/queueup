@@ -3,7 +3,10 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: resolve(__dirname, '../../.env') });
+dotenv.config({ path: [
+  resolve(__dirname, '../../.env.local'),
+  resolve(__dirname, '../../.env'),
+] });
 
 import fastify from 'fastify';
 import fastifyWebsocket from '@fastify/websocket';
