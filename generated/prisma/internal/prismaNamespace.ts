@@ -1299,6 +1299,11 @@ export const ShopScalarFieldEnum = {
   employeeCount: 'employeeCount',
   paidUntil: 'paidUntil',
   monthlyPrice: 'monthlyPrice',
+  lastUsageAlertSentAt: 'lastUsageAlertSentAt',
+  lastUsageAlertLevel: 'lastUsageAlertLevel',
+  stripeCustomerId: 'stripeCustomerId',
+  stripeSubscriptionId: 'stripeSubscriptionId',
+  trialNoticesLevel: 'trialNoticesLevel',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   ownerId: 'ownerId'

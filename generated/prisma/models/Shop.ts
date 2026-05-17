@@ -29,11 +29,15 @@ export type AggregateShop = {
 export type ShopAvgAggregateOutputType = {
   employeeCount: number | null
   monthlyPrice: number | null
+  lastUsageAlertLevel: number | null
+  trialNoticesLevel: number | null
 }
 
 export type ShopSumAggregateOutputType = {
   employeeCount: number | null
   monthlyPrice: number | null
+  lastUsageAlertLevel: number | null
+  trialNoticesLevel: number | null
 }
 
 export type ShopMinAggregateOutputType = {
@@ -68,6 +72,11 @@ export type ShopMinAggregateOutputType = {
   employeeCount: number | null
   paidUntil: Date | null
   monthlyPrice: number | null
+  lastUsageAlertSentAt: Date | null
+  lastUsageAlertLevel: number | null
+  stripeCustomerId: string | null
+  stripeSubscriptionId: string | null
+  trialNoticesLevel: number | null
   createdAt: Date | null
   updatedAt: Date | null
   ownerId: string | null
@@ -105,6 +114,11 @@ export type ShopMaxAggregateOutputType = {
   employeeCount: number | null
   paidUntil: Date | null
   monthlyPrice: number | null
+  lastUsageAlertSentAt: Date | null
+  lastUsageAlertLevel: number | null
+  stripeCustomerId: string | null
+  stripeSubscriptionId: string | null
+  trialNoticesLevel: number | null
   createdAt: Date | null
   updatedAt: Date | null
   ownerId: string | null
@@ -142,6 +156,11 @@ export type ShopCountAggregateOutputType = {
   employeeCount: number
   paidUntil: number
   monthlyPrice: number
+  lastUsageAlertSentAt: number
+  lastUsageAlertLevel: number
+  stripeCustomerId: number
+  stripeSubscriptionId: number
+  trialNoticesLevel: number
   createdAt: number
   updatedAt: number
   ownerId: number
@@ -152,11 +171,15 @@ export type ShopCountAggregateOutputType = {
 export type ShopAvgAggregateInputType = {
   employeeCount?: true
   monthlyPrice?: true
+  lastUsageAlertLevel?: true
+  trialNoticesLevel?: true
 }
 
 export type ShopSumAggregateInputType = {
   employeeCount?: true
   monthlyPrice?: true
+  lastUsageAlertLevel?: true
+  trialNoticesLevel?: true
 }
 
 export type ShopMinAggregateInputType = {
@@ -191,6 +214,11 @@ export type ShopMinAggregateInputType = {
   employeeCount?: true
   paidUntil?: true
   monthlyPrice?: true
+  lastUsageAlertSentAt?: true
+  lastUsageAlertLevel?: true
+  stripeCustomerId?: true
+  stripeSubscriptionId?: true
+  trialNoticesLevel?: true
   createdAt?: true
   updatedAt?: true
   ownerId?: true
@@ -228,6 +256,11 @@ export type ShopMaxAggregateInputType = {
   employeeCount?: true
   paidUntil?: true
   monthlyPrice?: true
+  lastUsageAlertSentAt?: true
+  lastUsageAlertLevel?: true
+  stripeCustomerId?: true
+  stripeSubscriptionId?: true
+  trialNoticesLevel?: true
   createdAt?: true
   updatedAt?: true
   ownerId?: true
@@ -265,6 +298,11 @@ export type ShopCountAggregateInputType = {
   employeeCount?: true
   paidUntil?: true
   monthlyPrice?: true
+  lastUsageAlertSentAt?: true
+  lastUsageAlertLevel?: true
+  stripeCustomerId?: true
+  stripeSubscriptionId?: true
+  trialNoticesLevel?: true
   createdAt?: true
   updatedAt?: true
   ownerId?: true
@@ -389,6 +427,11 @@ export type ShopGroupByOutputType = {
   employeeCount: number
   paidUntil: Date | null
   monthlyPrice: number
+  lastUsageAlertSentAt: Date | null
+  lastUsageAlertLevel: number | null
+  stripeCustomerId: string | null
+  stripeSubscriptionId: string | null
+  trialNoticesLevel: number
   createdAt: Date
   updatedAt: Date
   ownerId: string | null
@@ -449,6 +492,11 @@ export type ShopWhereInput = {
   employeeCount?: Prisma.IntFilter<"Shop"> | number
   paidUntil?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
   monthlyPrice?: Prisma.FloatFilter<"Shop"> | number
+  lastUsageAlertSentAt?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
+  lastUsageAlertLevel?: Prisma.IntNullableFilter<"Shop"> | number | null
+  stripeCustomerId?: Prisma.StringNullableFilter<"Shop"> | string | null
+  stripeSubscriptionId?: Prisma.StringNullableFilter<"Shop"> | string | null
+  trialNoticesLevel?: Prisma.IntFilter<"Shop"> | number
   createdAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   ownerId?: Prisma.StringNullableFilter<"Shop"> | string | null
@@ -492,6 +540,11 @@ export type ShopOrderByWithRelationInput = {
   employeeCount?: Prisma.SortOrder
   paidUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   monthlyPrice?: Prisma.SortOrder
+  lastUsageAlertSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastUsageAlertLevel?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  trialNoticesLevel?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -506,6 +559,8 @@ export type ShopOrderByWithRelationInput = {
 export type ShopWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   slug?: string
+  stripeCustomerId?: string
+  stripeSubscriptionId?: string
   AND?: Prisma.ShopWhereInput | Prisma.ShopWhereInput[]
   OR?: Prisma.ShopWhereInput[]
   NOT?: Prisma.ShopWhereInput | Prisma.ShopWhereInput[]
@@ -538,6 +593,9 @@ export type ShopWhereUniqueInput = Prisma.AtLeast<{
   employeeCount?: Prisma.IntFilter<"Shop"> | number
   paidUntil?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
   monthlyPrice?: Prisma.FloatFilter<"Shop"> | number
+  lastUsageAlertSentAt?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
+  lastUsageAlertLevel?: Prisma.IntNullableFilter<"Shop"> | number | null
+  trialNoticesLevel?: Prisma.IntFilter<"Shop"> | number
   createdAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   ownerId?: Prisma.StringNullableFilter<"Shop"> | string | null
@@ -547,7 +605,7 @@ export type ShopWhereUniqueInput = Prisma.AtLeast<{
   appointments?: Prisma.AppointmentListRelationFilter
   workingHours?: Prisma.WorkingHoursListRelationFilter
   customers?: Prisma.CustomerListRelationFilter
-}, "id" | "slug">
+}, "id" | "slug" | "stripeCustomerId" | "stripeSubscriptionId">
 
 export type ShopOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -581,6 +639,11 @@ export type ShopOrderByWithAggregationInput = {
   employeeCount?: Prisma.SortOrder
   paidUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   monthlyPrice?: Prisma.SortOrder
+  lastUsageAlertSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastUsageAlertLevel?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  trialNoticesLevel?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -626,6 +689,11 @@ export type ShopScalarWhereWithAggregatesInput = {
   employeeCount?: Prisma.IntWithAggregatesFilter<"Shop"> | number
   paidUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"Shop"> | Date | string | null
   monthlyPrice?: Prisma.FloatWithAggregatesFilter<"Shop"> | number
+  lastUsageAlertSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Shop"> | Date | string | null
+  lastUsageAlertLevel?: Prisma.IntNullableWithAggregatesFilter<"Shop"> | number | null
+  stripeCustomerId?: Prisma.StringNullableWithAggregatesFilter<"Shop"> | string | null
+  stripeSubscriptionId?: Prisma.StringNullableWithAggregatesFilter<"Shop"> | string | null
+  trialNoticesLevel?: Prisma.IntWithAggregatesFilter<"Shop"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Shop"> | Date | string
   ownerId?: Prisma.StringNullableWithAggregatesFilter<"Shop"> | string | null
@@ -663,6 +731,11 @@ export type ShopCreateInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedShopsInput
@@ -705,6 +778,11 @@ export type ShopUncheckedCreateInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -747,6 +825,11 @@ export type ShopUpdateInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedShopsNestedInput
@@ -789,6 +872,11 @@ export type ShopUncheckedUpdateInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -831,6 +919,11 @@ export type ShopCreateManyInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -868,6 +961,11 @@ export type ShopUpdateManyMutationInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -904,6 +1002,11 @@ export type ShopUncheckedUpdateManyInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -941,6 +1044,11 @@ export type ShopCountOrderByAggregateInput = {
   employeeCount?: Prisma.SortOrder
   paidUntil?: Prisma.SortOrder
   monthlyPrice?: Prisma.SortOrder
+  lastUsageAlertSentAt?: Prisma.SortOrder
+  lastUsageAlertLevel?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
+  trialNoticesLevel?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
@@ -949,6 +1057,8 @@ export type ShopCountOrderByAggregateInput = {
 export type ShopAvgOrderByAggregateInput = {
   employeeCount?: Prisma.SortOrder
   monthlyPrice?: Prisma.SortOrder
+  lastUsageAlertLevel?: Prisma.SortOrder
+  trialNoticesLevel?: Prisma.SortOrder
 }
 
 export type ShopMaxOrderByAggregateInput = {
@@ -983,6 +1093,11 @@ export type ShopMaxOrderByAggregateInput = {
   employeeCount?: Prisma.SortOrder
   paidUntil?: Prisma.SortOrder
   monthlyPrice?: Prisma.SortOrder
+  lastUsageAlertSentAt?: Prisma.SortOrder
+  lastUsageAlertLevel?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
+  trialNoticesLevel?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
@@ -1020,6 +1135,11 @@ export type ShopMinOrderByAggregateInput = {
   employeeCount?: Prisma.SortOrder
   paidUntil?: Prisma.SortOrder
   monthlyPrice?: Prisma.SortOrder
+  lastUsageAlertSentAt?: Prisma.SortOrder
+  lastUsageAlertLevel?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
+  trialNoticesLevel?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
@@ -1028,6 +1148,8 @@ export type ShopMinOrderByAggregateInput = {
 export type ShopSumOrderByAggregateInput = {
   employeeCount?: Prisma.SortOrder
   monthlyPrice?: Prisma.SortOrder
+  lastUsageAlertLevel?: Prisma.SortOrder
+  trialNoticesLevel?: Prisma.SortOrder
 }
 
 export type ShopListRelationFilter = {
@@ -1075,6 +1197,14 @@ export type IntFieldUpdateOperationsInput = {
 
 export type FloatFieldUpdateOperationsInput = {
   set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
   increment?: number
   decrement?: number
   multiply?: number
@@ -1229,6 +1359,11 @@ export type ShopCreateWithoutOwnerInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   staff?: Prisma.StaffCreateNestedManyWithoutShopInput
@@ -1270,6 +1405,11 @@ export type ShopUncheckedCreateWithoutOwnerInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   staff?: Prisma.StaffUncheckedCreateNestedManyWithoutShopInput
@@ -1340,6 +1480,11 @@ export type ShopScalarWhereInput = {
   employeeCount?: Prisma.IntFilter<"Shop"> | number
   paidUntil?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
   monthlyPrice?: Prisma.FloatFilter<"Shop"> | number
+  lastUsageAlertSentAt?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
+  lastUsageAlertLevel?: Prisma.IntNullableFilter<"Shop"> | number | null
+  stripeCustomerId?: Prisma.StringNullableFilter<"Shop"> | string | null
+  stripeSubscriptionId?: Prisma.StringNullableFilter<"Shop"> | string | null
+  trialNoticesLevel?: Prisma.IntFilter<"Shop"> | number
   createdAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   ownerId?: Prisma.StringNullableFilter<"Shop"> | string | null
@@ -1377,6 +1522,11 @@ export type ShopCreateWithoutStaffInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedShopsInput
@@ -1418,6 +1568,11 @@ export type ShopUncheckedCreateWithoutStaffInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1475,6 +1630,11 @@ export type ShopUpdateWithoutStaffInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedShopsNestedInput
@@ -1516,6 +1676,11 @@ export type ShopUncheckedUpdateWithoutStaffInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1557,6 +1722,11 @@ export type ShopCreateWithoutServicesInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedShopsInput
@@ -1598,6 +1768,11 @@ export type ShopUncheckedCreateWithoutServicesInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1655,6 +1830,11 @@ export type ShopUpdateWithoutServicesInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedShopsNestedInput
@@ -1696,6 +1876,11 @@ export type ShopUncheckedUpdateWithoutServicesInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1737,6 +1922,11 @@ export type ShopCreateWithoutCustomersInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedShopsInput
@@ -1778,6 +1968,11 @@ export type ShopUncheckedCreateWithoutCustomersInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1835,6 +2030,11 @@ export type ShopUpdateWithoutCustomersInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedShopsNestedInput
@@ -1876,6 +2076,11 @@ export type ShopUncheckedUpdateWithoutCustomersInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1917,6 +2122,11 @@ export type ShopCreateWithoutAppointmentsInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedShopsInput
@@ -1958,6 +2168,11 @@ export type ShopUncheckedCreateWithoutAppointmentsInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -2015,6 +2230,11 @@ export type ShopUpdateWithoutAppointmentsInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedShopsNestedInput
@@ -2056,6 +2276,11 @@ export type ShopUncheckedUpdateWithoutAppointmentsInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2097,6 +2322,11 @@ export type ShopCreateWithoutWorkingHoursInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedShopsInput
@@ -2138,6 +2368,11 @@ export type ShopUncheckedCreateWithoutWorkingHoursInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -2195,6 +2430,11 @@ export type ShopUpdateWithoutWorkingHoursInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedShopsNestedInput
@@ -2236,6 +2476,11 @@ export type ShopUncheckedUpdateWithoutWorkingHoursInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2277,6 +2522,11 @@ export type ShopCreateManyOwnerInput = {
   employeeCount?: number
   paidUntil?: Date | string | null
   monthlyPrice?: number
+  lastUsageAlertSentAt?: Date | string | null
+  lastUsageAlertLevel?: number | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  trialNoticesLevel?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -2313,6 +2563,11 @@ export type ShopUpdateWithoutOwnerInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   staff?: Prisma.StaffUpdateManyWithoutShopNestedInput
@@ -2354,6 +2609,11 @@ export type ShopUncheckedUpdateWithoutOwnerInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   staff?: Prisma.StaffUncheckedUpdateManyWithoutShopNestedInput
@@ -2395,6 +2655,11 @@ export type ShopUncheckedUpdateManyWithoutOwnerInput = {
   employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
   paidUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monthlyPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  lastUsageAlertSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUsageAlertLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialNoticesLevel?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -2498,6 +2763,11 @@ export type ShopSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   employeeCount?: boolean
   paidUntil?: boolean
   monthlyPrice?: boolean
+  lastUsageAlertSentAt?: boolean
+  lastUsageAlertLevel?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
+  trialNoticesLevel?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
@@ -2542,6 +2812,11 @@ export type ShopSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   employeeCount?: boolean
   paidUntil?: boolean
   monthlyPrice?: boolean
+  lastUsageAlertSentAt?: boolean
+  lastUsageAlertLevel?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
+  trialNoticesLevel?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
@@ -2580,6 +2855,11 @@ export type ShopSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   employeeCount?: boolean
   paidUntil?: boolean
   monthlyPrice?: boolean
+  lastUsageAlertSentAt?: boolean
+  lastUsageAlertLevel?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
+  trialNoticesLevel?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
@@ -2618,12 +2898,17 @@ export type ShopSelectScalar = {
   employeeCount?: boolean
   paidUntil?: boolean
   monthlyPrice?: boolean
+  lastUsageAlertSentAt?: boolean
+  lastUsageAlertLevel?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
+  trialNoticesLevel?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
 }
 
-export type ShopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "businessType" | "description" | "phone" | "email" | "website" | "address" | "city" | "state" | "zipCode" | "country" | "logoUrl" | "primaryColor" | "darkMode" | "timezone" | "currency" | "requirePayment" | "allowWalkIns" | "showStaffPicker" | "showPartySize" | "showVehicleInfo" | "staffLabel" | "serviceLabel" | "bookingLabel" | "subscriptionActive" | "trialEndsAt" | "employeeCount" | "paidUntil" | "monthlyPrice" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["shop"]>
+export type ShopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "businessType" | "description" | "phone" | "email" | "website" | "address" | "city" | "state" | "zipCode" | "country" | "logoUrl" | "primaryColor" | "darkMode" | "timezone" | "currency" | "requirePayment" | "allowWalkIns" | "showStaffPicker" | "showPartySize" | "showVehicleInfo" | "staffLabel" | "serviceLabel" | "bookingLabel" | "subscriptionActive" | "trialEndsAt" | "employeeCount" | "paidUntil" | "monthlyPrice" | "lastUsageAlertSentAt" | "lastUsageAlertLevel" | "stripeCustomerId" | "stripeSubscriptionId" | "trialNoticesLevel" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["shop"]>
 export type ShopInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.Shop$ownerArgs<ExtArgs>
   staff?: boolean | Prisma.Shop$staffArgs<ExtArgs>
@@ -2682,6 +2967,11 @@ export type $ShopPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     employeeCount: number
     paidUntil: Date | null
     monthlyPrice: number
+    lastUsageAlertSentAt: Date | null
+    lastUsageAlertLevel: number | null
+    stripeCustomerId: string | null
+    stripeSubscriptionId: string | null
+    trialNoticesLevel: number
     createdAt: Date
     updatedAt: Date
     ownerId: string | null
@@ -3145,6 +3435,11 @@ export interface ShopFieldRefs {
   readonly employeeCount: Prisma.FieldRef<"Shop", 'Int'>
   readonly paidUntil: Prisma.FieldRef<"Shop", 'DateTime'>
   readonly monthlyPrice: Prisma.FieldRef<"Shop", 'Float'>
+  readonly lastUsageAlertSentAt: Prisma.FieldRef<"Shop", 'DateTime'>
+  readonly lastUsageAlertLevel: Prisma.FieldRef<"Shop", 'Int'>
+  readonly stripeCustomerId: Prisma.FieldRef<"Shop", 'String'>
+  readonly stripeSubscriptionId: Prisma.FieldRef<"Shop", 'String'>
+  readonly trialNoticesLevel: Prisma.FieldRef<"Shop", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Shop", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Shop", 'DateTime'>
   readonly ownerId: Prisma.FieldRef<"Shop", 'String'>

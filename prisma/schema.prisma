@@ -71,6 +71,19 @@ model Shop {
   employeeCount     Int       @default(1)
   paidUntil         DateTime?
   monthlyPrice      Float     @default(30)
+  // Usage-based AI alert tracking (Option B billing model).
+  // Cron checks these to avoid sending duplicate alerts within a billing period.
+  // Reset to null when a new period starts.
+  lastUsageAlertSentAt DateTime?
+  lastUsageAlertLevel  Int?      // 80 or 100, or null if no alert sent this period
+  // Stripe integration. Customer created at onboarding (no card / no subscription
+  // yet — that happens at trial end). Subscription created when card captured.
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  // Trial reminder/deactivation cron state.
+  // 0 = no notice sent yet, 1 = 7-day reminder sent, 2 = 1-day reminder sent,
+  // 3 = trial-ended notice sent + shop deactivated.
+  trialNoticesLevel    Int       @default(0)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   owner        User?        @relation("ShopOwner", fields: [ownerId], references: [id])

@@ -81,3 +81,18 @@ export type WorkingHours = Prisma.WorkingHoursModel
  * 
  */
 export type StaffWorkingHours = Prisma.StaffWorkingHoursModel
+/**
+ * Model VoiceCall
+ * 
+ */
+export type VoiceCall = Prisma.VoiceCallModel
+/**
+ * Model VoiceTranscript
+ * 
+ */
+export type VoiceTranscript = Prisma.VoiceTranscriptModel
+/**
+ * Model VoiceAuditLog
+ * 
+ */
+export type VoiceAuditLog = Prisma.VoiceAuditLogModel
