@@ -2,11 +2,13 @@ import { render } from 'preact';
 import { App } from './App';
 import { getStyles } from './styles';
 
+// Capture currentScript immediately (before IIFE or async execution nullifies it)
+const _currentScript = document.currentScript as HTMLScriptElement | null;
+
 function mount() {
-  // Find the script tag that loaded this widget
   const script =
-    (document.currentScript as HTMLScriptElement) ||
-    document.querySelector('script[data-shop-id]');
+    _currentScript ||
+    document.querySelector<HTMLScriptElement>('script[data-shop-id]');
 
   if (!script) {
     console.error('QueueUp widget: could not find script tag');
@@ -46,4 +48,8 @@ function mount() {
   render(<App shopId={shopId} />, root);
 }
 
-mount();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mount);
+} else {
+  mount();
+}
