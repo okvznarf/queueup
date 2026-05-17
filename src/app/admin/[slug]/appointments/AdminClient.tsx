@@ -31,6 +31,8 @@ export default function AdminClient({ shop }: { shop: Shop }) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("appointments");
   const accent = shop.primaryColor || "#C8A45A";
+  const currencySymbol = shop.currency === "EUR" ? "€" : shop.currency === "USD" ? "$" : (shop.currency || "$");
+  const isCroatia = shop.country === "HR";
 
   // Services state
   const [services, setServices] = useState<any[]>(shop.services || []);
@@ -42,6 +44,14 @@ export default function AdminClient({ shop }: { shop: Shop }) {
 
   // Working hours state
   const [workingHours, setWorkingHours] = useState<any[]>(shop.workingHours || []);
+
+  // AI usage state (Option B billing model — Usage tab)
+  const [usage, setUsage] = useState<any | null>(null);
+  const [usageLoading, setUsageLoading] = useState(false);
+
+  // Billing state (Stripe Checkout + Portal)
+  const [billingBusy, setBillingBusy] = useState(false);
+  const [billingError, setBillingError] = useState("");
 
   // Shop settings state
   const [shopInfo, setShopInfo] = useState({
@@ -94,6 +104,65 @@ export default function AdminClient({ shop }: { shop: Shop }) {
   }, [shop.id]);
 
   useEffect(() => { fetchServices(); }, [fetchServices]);
+
+  // ── Usage ─────────────────────────────────────────────────────────────────
+  const fetchUsage = useCallback(async () => {
+    setUsageLoading(true);
+    try {
+      const res = await fetch("/api/admin/usage?shopId=" + shop.id);
+      if (res.ok) setUsage(await res.json());
+    } catch (e) { console.error(e); }
+    setUsageLoading(false);
+  }, [shop.id]);
+
+  useEffect(() => {
+    if (activeTab === "usage") fetchUsage();
+  }, [activeTab, fetchUsage]);
+
+  // ── Billing actions ───────────────────────────────────────────────────────
+  const startCheckout = async (billingCycle: "monthly" | "annual") => {
+    setBillingError("");
+    setBillingBusy(true);
+    try {
+      const res = await fetch("/api/billing/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ shopId: shop.id, billingCycle }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        setBillingError(data.error ?? "Failed to start checkout");
+        setBillingBusy(false);
+        return;
+      }
+      window.location.href = data.url;
+    } catch {
+      setBillingError("Connection error. Please try again.");
+      setBillingBusy(false);
+    }
+  };
+
+  const openBillingPortal = async () => {
+    setBillingError("");
+    setBillingBusy(true);
+    try {
+      const res = await fetch("/api/billing/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ shopId: shop.id }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        setBillingError(data.error ?? "Failed to open billing portal");
+        setBillingBusy(false);
+        return;
+      }
+      window.location.href = data.url;
+    } catch {
+      setBillingError("Connection error. Please try again.");
+      setBillingBusy(false);
+    }
+  };
 
   const saveService = async (data: any) => {
     setSaving(true);
@@ -228,6 +297,8 @@ export default function AdminClient({ shop }: { shop: Shop }) {
             { id: "staff", label: shop.staffLabel + "s" },
             { id: "services", label: shop.serviceLabel + "s" },
             { id: "hours", label: "Hours" },
+            { id: "usage", label: "AI Usage" },
+            { id: "billing", label: "Billing" },
             { id: "settings", label: "Settings" },
           ].map((tab) => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
@@ -250,7 +321,7 @@ export default function AdminClient({ shop }: { shop: Shop }) {
                 <StatCard label="Total Today" value={stats.total} color="#3b82f6" />
                 <StatCard label="Confirmed" value={stats.confirmed} color="#22c55e" />
                 <StatCard label="Completed" value={stats.completed} color="#6b7280" />
-                <StatCard label="Revenue" value={"$" + stats.revenue} color={accent} />
+                <StatCard label="Revenue" value={currencySymbol + stats.revenue} color={accent} />
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
                 <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Appointments</h2>
@@ -277,7 +348,7 @@ export default function AdminClient({ shop }: { shop: Shop }) {
                       <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: 600, fontSize: 15 }}>{apt.customer?.name}</div>
                         <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>
-                          {apt.service?.name}{apt.staff ? " with " + apt.staff.name : ""}{apt.totalPrice ? " — $" + apt.totalPrice : ""}
+                          {apt.service?.name}{apt.staff ? " with " + apt.staff.name : ""}{apt.totalPrice ? " — " + currencySymbol + apt.totalPrice : ""}
                         </div>
                         <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{apt.customer?.phone}{apt.customer?.email ? " | " + apt.customer.email : ""}</div>
                         {apt.notes && <div style={{ fontSize: 12, color: "#555", marginTop: 4, fontStyle: "italic" }}>Note: {apt.notes}</div>}
@@ -346,7 +417,7 @@ export default function AdminClient({ shop }: { shop: Shop }) {
                     </div>
                     {sv.description && <div style={{ fontSize: 12, color: "#666", marginTop: 4, lineHeight: 1.4 }}>{sv.description}</div>}
                     <div style={{ fontSize: 13, color: "#888", marginTop: 8 }}>{sv.duration} min</div>
-                    <div style={{ fontSize: 22, fontWeight: 700, color: accent, marginTop: 4 }}>{sv.price > 0 ? "$" + sv.price : "Free"}</div>
+                    <div style={{ fontSize: 22, fontWeight: 700, color: accent, marginTop: 4 }}>{sv.price > 0 ? currencySymbol + sv.price : "Free"}</div>
                     <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
                       <button onClick={() => setServiceModal({ open: true, item: sv })} style={{ flex: 1, padding: "7px 0", borderRadius: 7, border: "1px solid #ffffff15", background: "transparent", color: "#aaa", fontSize: 13, cursor: "pointer" }}>Edit</button>
                       <button onClick={() => deleteService(sv.id)} style={{ padding: "7px 12px", borderRadius: 7, border: "1px solid #ef444430", background: "transparent", color: "#ef4444", fontSize: 13, cursor: "pointer" }}>Delete</button>
@@ -368,6 +439,45 @@ export default function AdminClient({ shop }: { shop: Shop }) {
                 })}
               </div>
             </div>
+          )}
+
+          {/* ── USAGE ── */}
+          {activeTab === "usage" && (
+            <div style={{ maxWidth: 720 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 4 }}>AI Receptionist Usage</h2>
+              <p style={{ color: "#666", fontSize: 13, marginBottom: 20 }}>
+                Calls handled by your AI receptionist this billing period. Calls beyond your plan&apos;s included quota are billed as overage.
+              </p>
+
+              {usageLoading && !usage && (
+                <div style={{ color: "#666" }}>Loading usage...</div>
+              )}
+
+              {usage && !usage.pricing && (
+                <div style={{ background: "#141414", border: "1px solid #ffffff10", borderRadius: 12, padding: 24 }}>
+                  <p style={{ color: "#aaa", fontSize: 14 }}>
+                    Your shop is on the legacy plan. AI usage tracking is available for shops on the v3 multi-vertical plan.
+                  </p>
+                </div>
+              )}
+
+              {usage && usage.pricing && (
+                <UsageWidget usage={usage} accent={accent} currencySymbol={currencySymbol} />
+              )}
+            </div>
+          )}
+
+          {/* ── BILLING ── */}
+          {activeTab === "billing" && (
+            <BillingTab
+              shop={shop}
+              accent={accent}
+              currencySymbol={currencySymbol}
+              busy={billingBusy}
+              error={billingError}
+              onSubscribe={startCheckout}
+              onOpenPortal={openBillingPortal}
+            />
           )}
 
           {/* ── SETTINGS ── */}
@@ -393,19 +503,23 @@ export default function AdminClient({ shop }: { shop: Shop }) {
                   <label style={LABEL}>Address</label>
                   <input style={INPUT} value={shopInfo.address} onChange={(e) => setShopInfo({ ...shopInfo, address: e.target.value })} />
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isCroatia ? "1fr" : "1fr 1fr 1fr", gap: 14 }}>
                   <div>
                     <label style={LABEL}>City</label>
                     <input style={INPUT} value={shopInfo.city} onChange={(e) => setShopInfo({ ...shopInfo, city: e.target.value })} />
                   </div>
-                  <div>
-                    <label style={LABEL}>State</label>
-                    <input style={INPUT} value={shopInfo.state} onChange={(e) => setShopInfo({ ...shopInfo, state: e.target.value })} />
-                  </div>
-                  <div>
-                    <label style={LABEL}>ZIP</label>
-                    <input style={INPUT} value={shopInfo.zipCode} onChange={(e) => setShopInfo({ ...shopInfo, zipCode: e.target.value })} />
-                  </div>
+                  {!isCroatia && (
+                    <>
+                      <div>
+                        <label style={LABEL}>State</label>
+                        <input style={INPUT} value={shopInfo.state} onChange={(e) => setShopInfo({ ...shopInfo, state: e.target.value })} />
+                      </div>
+                      <div>
+                        <label style={LABEL}>ZIP</label>
+                        <input style={INPUT} value={shopInfo.zipCode} onChange={(e) => setShopInfo({ ...shopInfo, zipCode: e.target.value })} />
+                      </div>
+                    </>
+                  )}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, alignItems: "end" }}>
                   <div>
@@ -465,6 +579,293 @@ export default function AdminClient({ shop }: { shop: Shop }) {
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
+
+// Display-only mapping of vertical → per-unit price & label for the Billing tab.
+// Source of truth is the pack files server-side; this is just for UI labels.
+const PACK_DISPLAY: Record<string, { perUnit: number; unitLabel: string }> = {
+  MECHANIC: { perUnit: 10, unitLabel: "mechanic" },
+  BARBER: { perUnit: 7, unitLabel: "chair" },
+  DENTIST: { perUnit: 25, unitLabel: "operatory" },
+};
+
+function BillingTab({
+  shop,
+  accent,
+  currencySymbol,
+  busy,
+  error,
+  onSubscribe,
+  onOpenPortal,
+}: {
+  shop: any;
+  accent: string;
+  currencySymbol: string;
+  busy: boolean;
+  error: string;
+  onSubscribe: (cycle: "monthly" | "annual") => void;
+  onOpenPortal: () => void;
+}) {
+  const hasSubscription = !!shop.stripeSubscriptionId;
+  const isTrialing = !hasSubscription && shop.trialEndsAt && new Date(shop.trialEndsAt) > new Date();
+  const trialEnd = shop.trialEndsAt ? new Date(shop.trialEndsAt) : null;
+  const trialDaysLeft = trialEnd
+    ? Math.max(0, Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0;
+
+  const base = shop.monthlyPrice ?? 0;
+  const packDisplay = PACK_DISPLAY[shop.businessType] ?? { perUnit: 0, unitLabel: shop.staffLabel?.toLowerCase() ?? "staff" };
+
+  return (
+    <div style={{ maxWidth: 720 }}>
+      <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 4 }}>Billing</h2>
+      <p style={{ color: "#666", fontSize: 13, marginBottom: 20 }}>
+        {hasSubscription
+          ? "Manage your subscription, update your card, and view past invoices."
+          : isTrialing
+          ? `You're in your free trial. Add a payment method now to continue without interruption when the trial ends.`
+          : "Activate your subscription to keep your AI receptionist running."}
+      </p>
+
+      {error && (
+        <div style={{ background: "#ef444418", border: "1px solid #ef444440", borderRadius: 8, padding: "10px 14px", marginBottom: 16, color: "#ef4444", fontSize: 13 }}>
+          {error}
+        </div>
+      )}
+
+      {/* Current status card */}
+      <div style={{ background: "#141414", border: "1px solid #ffffff10", borderRadius: 12, padding: 20, marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+          <div style={{ fontSize: 13, color: "#666" }}>Status</div>
+          <StatusBadge
+            label={hasSubscription ? "Active" : isTrialing ? "Free trial" : "Inactive"}
+            color={hasSubscription ? "#22c55e" : isTrialing ? "#f59e0b" : "#ef4444"}
+          />
+        </div>
+
+        {isTrialing && (
+          <div style={{ fontSize: 14, color: "#e8e4dd", marginBottom: 12 }}>
+            Trial ends in <strong style={{ color: accent }}>{trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"}</strong>
+            {trialEnd && <span style={{ color: "#666" }}> ({trialEnd.toLocaleDateString()})</span>}
+          </div>
+        )}
+
+        {hasSubscription && shop.paidUntil && (
+          <div style={{ fontSize: 14, color: "#e8e4dd", marginBottom: 12 }}>
+            Next bill on <strong>{new Date(shop.paidUntil).toLocaleDateString()}</strong>
+          </div>
+        )}
+
+        <div style={{ fontSize: 13, color: "#888" }}>
+          Plan: {currencySymbol}{base}/month base
+          {shop.employeeCount > 1 && packDisplay.perUnit > 0 && (
+            <> + {currencySymbol}{packDisplay.perUnit} × {shop.employeeCount} {packDisplay.unitLabel}s</>
+          )}
+        </div>
+      </div>
+
+      {/* Action buttons */}
+      {hasSubscription ? (
+        <button
+          onClick={onOpenPortal}
+          disabled={busy}
+          style={{
+            background: accent,
+            color: "#111",
+            border: "none",
+            borderRadius: 10,
+            padding: "12px 28px",
+            fontSize: 14,
+            fontWeight: 700,
+            cursor: busy ? "not-allowed" : "pointer",
+            opacity: busy ? 0.6 : 1,
+          }}
+        >
+          {busy ? "Opening..." : "Manage subscription"}
+        </button>
+      ) : (
+        <div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+            <PlanCard
+              title="Monthly"
+              price={`${currencySymbol}${base}/mo`}
+              hint="Cancel anytime"
+              cta="Subscribe monthly"
+              accent={accent}
+              busy={busy}
+              onClick={() => onSubscribe("monthly")}
+            />
+            <PlanCard
+              title="Annual"
+              price={`${currencySymbol}${Math.round(base * 10)}/year`}
+              hint="2 months free"
+              cta="Subscribe annual"
+              accent={accent}
+              busy={busy}
+              onClick={() => onSubscribe("annual")}
+              recommended
+            />
+          </div>
+          {isTrialing && (
+            <p style={{ fontSize: 12, color: "#666", textAlign: "center" }}>
+              No charge until your trial ends on {trialEnd?.toLocaleDateString()}.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PlanCard({
+  title,
+  price,
+  hint,
+  cta,
+  accent,
+  busy,
+  onClick,
+  recommended,
+}: {
+  title: string;
+  price: string;
+  hint: string;
+  cta: string;
+  accent: string;
+  busy: boolean;
+  onClick: () => void;
+  recommended?: boolean;
+}) {
+  return (
+    <div
+      style={{
+        background: "#141414",
+        border: recommended ? `1.5px solid ${accent}` : "1px solid #ffffff10",
+        borderRadius: 12,
+        padding: 18,
+        position: "relative",
+      }}
+    >
+      {recommended && (
+        <div style={{ position: "absolute", top: -10, left: 12, background: accent, color: "#111", fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4, letterSpacing: 0.5 }}>
+          BEST VALUE
+        </div>
+      )}
+      <div style={{ fontSize: 12, color: "#888", marginBottom: 6 }}>{title}</div>
+      <div style={{ fontSize: 22, fontWeight: 700, color: "#e8e4dd", marginBottom: 4 }}>{price}</div>
+      <div style={{ fontSize: 11, color: "#666", marginBottom: 14 }}>{hint}</div>
+      <button
+        onClick={onClick}
+        disabled={busy}
+        style={{
+          width: "100%",
+          background: recommended ? accent : "transparent",
+          color: recommended ? "#111" : "#e8e4dd",
+          border: recommended ? "none" : "1px solid #ffffff20",
+          borderRadius: 8,
+          padding: "8px 0",
+          fontSize: 13,
+          fontWeight: 700,
+          cursor: busy ? "not-allowed" : "pointer",
+          opacity: busy ? 0.6 : 1,
+        }}
+      >
+        {busy ? "Loading..." : cta}
+      </button>
+    </div>
+  );
+}
+
+function StatusBadge({ label, color }: { label: string; color: string }) {
+  return (
+    <span style={{ fontSize: 11, fontWeight: 700, color, background: `${color}20`, padding: "3px 10px", borderRadius: 6, letterSpacing: 0.5 }}>
+      {label.toUpperCase()}
+    </span>
+  );
+}
+
+function UsageWidget({ usage, accent, currencySymbol }: { usage: any; accent: string; currencySymbol: string }) {
+  const pct = Math.min(usage.usagePercent, 100);
+  const overPct = Math.max(0, usage.usagePercent - 100);
+  const barColor = usage.usagePercent >= 100 ? "#ef4444" : usage.usagePercent >= 80 ? "#f59e0b" : accent;
+
+  const periodEnd = new Date(usage.periodEnd);
+  const daysLeft = Math.max(0, usage.daysInPeriod - usage.daysIntoPeriod);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Hero card: used / included with progress bar */}
+      <div style={{ background: "#141414", border: "1px solid #ffffff10", borderRadius: 12, padding: 24 }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
+          <div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: barColor }}>
+              {usage.used} <span style={{ fontSize: 18, color: "#888", fontWeight: 500 }}>/ {usage.included} calls</span>
+            </div>
+            <div style={{ fontSize: 13, color: "#888", marginTop: 4 }}>
+              {usage.usagePercent}% of monthly quota
+            </div>
+          </div>
+          {usage.overageCalls > 0 && (
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 11, color: "#ef4444", textTransform: "uppercase", letterSpacing: 1, fontWeight: 600 }}>Overage</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#ef4444" }}>
+                +{usage.overageCalls} · {currencySymbol}{usage.overageCostEur.toFixed(2)}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Progress bar */}
+        <div style={{ position: "relative", height: 10, background: "#1a1a1a", borderRadius: 6, overflow: "hidden" }}>
+          <div style={{
+            position: "absolute", left: 0, top: 0, bottom: 0,
+            width: pct + "%",
+            background: barColor,
+            transition: "width 0.3s ease",
+          }} />
+          {overPct > 0 && (
+            <div style={{
+              position: "absolute", left: 0, top: 0, bottom: 0,
+              width: "100%",
+              background: "repeating-linear-gradient(135deg, #ef444440 0, #ef444440 6px, transparent 6px, transparent 12px)",
+            }} />
+          )}
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 11, color: "#666" }}>
+          <span>Day {usage.daysIntoPeriod} of {usage.daysInPeriod}</span>
+          <span>{daysLeft} day{daysLeft === 1 ? "" : "s"} left in period</span>
+        </div>
+      </div>
+
+      {/* Stat row */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+        <StatCard label="Plan quota" value={usage.included + " calls/mo"} color="#888" />
+        <StatCard label="Overage rate" value={currencySymbol + usage.pricing.overageRateEur + "/call"} color="#888" />
+        <StatCard label="Projected total" value={usage.projectedTotal + " calls"} color={usage.projectedTotal > usage.included ? "#f59e0b" : "#888"} />
+      </div>
+
+      {/* Projection / context */}
+      {usage.projectedOverageCalls > 0 && usage.overageCalls === 0 && (
+        <div style={{ background: "#f59e0b15", border: "1px solid #f59e0b30", borderRadius: 10, padding: 14, fontSize: 13, color: "#f59e0b" }}>
+          At your current pace you&apos;ll exceed your quota by ~{usage.projectedOverageCalls} calls
+          this period, adding about {currencySymbol}{usage.projectedOverageCostEur.toFixed(2)} in overage charges.
+        </div>
+      )}
+
+      {usage.overageCalls > 0 && (
+        <div style={{ background: "#ef444415", border: "1px solid #ef444430", borderRadius: 10, padding: 14, fontSize: 13, color: "#ef4444" }}>
+          You&apos;ve used all your included calls. Additional calls are billed at {currencySymbol}{usage.pricing.overageRateEur.toFixed(2)} each.
+          Period resets {periodEnd.toLocaleDateString()}.
+        </div>
+      )}
+
+      <div style={{ fontSize: 12, color: "#555", lineHeight: 1.5 }}>
+        Counted: AI-handled calls longer than 30 seconds. Hangups and immediate human-transfers don&apos;t count.
+        Period: calendar month. Email alerts go out at 80% and 100% of your quota.
+      </div>
+    </div>
+  );
+}
 
 function StatCard({ label, value, color }: { label: string; value: string | number; color: string }) {
   return (
@@ -541,7 +942,7 @@ function ServiceModal({ item, label, accent, saving, onSave, onClose }: { item: 
             <input type="number" style={INPUT} value={form.duration} min={5} max={480} onChange={(e) => set("duration", parseInt(e.target.value) || 30)} />
           </div>
           <div>
-            <label style={LABEL}>Price ($)</label>
+            <label style={LABEL}>Price</label>
             <input type="number" style={INPUT} value={form.price} min={0} step={0.01} onChange={(e) => set("price", parseFloat(e.target.value) || 0)} />
           </div>
         </div>

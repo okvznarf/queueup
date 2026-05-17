@@ -245,3 +245,144 @@ Otkazivanje: Ako trebate otkazati ili promijeniti termin, kontaktirajte ${shopNa
     logger.error("Failed to send confirmation email", "email:confirmation", error);
   }
 }
+
+// ─── Usage alerts (Option B billing model) ──────────────────────────────────
+
+export async function sendUsageAlert({
+  ownerEmail,
+  ownerName,
+  shopName,
+  level,
+  used,
+  included,
+  overageRateEur,
+  projectedOverageCalls,
+  projectedOverageCostEur,
+  daysLeftInPeriod,
+  dashboardUrl,
+}: {
+  ownerEmail: string;
+  ownerName: string;
+  shopName: string;
+  level: 80 | 100;
+  used: number;
+  included: number;
+  overageRateEur: number;
+  projectedOverageCalls: number;
+  projectedOverageCostEur: number;
+  daysLeftInPeriod: number;
+  dashboardUrl: string;
+}) {
+  const is80 = level === 80;
+  const subject = is80
+    ? `${shopName}: 80% of your AI call quota used`
+    : `${shopName}: AI quota reached — overage charges apply`;
+
+  const headline = is80
+    ? `You've used 80% of this month's included AI calls.`
+    : `You've used 100% of this month's included AI calls.`;
+
+  const body = is80
+    ? `Used ${used} of ${included} calls. At your current pace you'll exceed the quota by about ${projectedOverageCalls} calls before the period resets in ${daysLeftInPeriod} day${daysLeftInPeriod === 1 ? "" : "s"} — that's roughly €${projectedOverageCostEur.toFixed(2)} in overage at €${overageRateEur.toFixed(2)} per call.
+
+No action needed right now. We're flagging it early so you're not surprised on your next invoice.`
+    : `Used ${used} of ${included} calls. Additional calls this period are billed at €${overageRateEur.toFixed(2)} each. Period resets in ${daysLeftInPeriod} day${daysLeftInPeriod === 1 ? "" : "s"}.
+
+The AI receptionist continues to handle calls normally — it doesn't shut off at the quota. We just want you to see what's coming.`;
+
+  const text = `Hi ${ownerName || "there"},
+
+${headline}
+
+${body}
+
+See full usage: ${dashboardUrl}
+
+Questions? Reply to this email.
+
+— QueueUp`;
+
+  try {
+    await sendMail({ to: ownerEmail, subject, text });
+  } catch (error) {
+    logger.error(`Failed to send ${level}% usage alert`, "email:usage", error);
+  }
+}
+
+// ─── Trial lifecycle emails ─────────────────────────────────────────────────
+
+export async function sendTrialReminder({
+  ownerEmail,
+  ownerName,
+  shopName,
+  daysLeft,
+  billingUrl,
+}: {
+  ownerEmail: string;
+  ownerName: string;
+  shopName: string;
+  daysLeft: 7 | 1;
+  billingUrl: string;
+}) {
+  const subject = daysLeft === 7
+    ? `Your QueueUp trial ends in 7 days`
+    : `Your QueueUp trial ends tomorrow`;
+
+  const headline = daysLeft === 7
+    ? `Your free trial for ${shopName} ends in a week.`
+    : `Your free trial for ${shopName} ends tomorrow.`;
+
+  const cta = daysLeft === 7
+    ? `Add a payment method now so your AI receptionist keeps running without interruption when the trial ends. No charge today — Stripe just keeps the card on file for your first invoice next week.`
+    : `Add a payment method today to avoid losing AI receptionist coverage tomorrow. We don't charge anything before your trial ends — this just keeps the lights on.`;
+
+  const text = `Hi ${ownerName || "there"},
+
+${headline}
+
+${cta}
+
+Add payment method: ${billingUrl}
+
+Questions? Reply to this email.
+
+— QueueUp`;
+
+  try {
+    await sendMail({ to: ownerEmail, subject, text });
+  } catch (error) {
+    logger.error(`Failed to send ${daysLeft}-day trial reminder`, "email:trial", error);
+  }
+}
+
+export async function sendTrialEnded({
+  ownerEmail,
+  ownerName,
+  shopName,
+  billingUrl,
+}: {
+  ownerEmail: string;
+  ownerName: string;
+  shopName: string;
+  billingUrl: string;
+}) {
+  const subject = `Your QueueUp trial has ended — AI receptionist paused`;
+
+  const text = `Hi ${ownerName || "there"},
+
+Your free trial for ${shopName} ended today. Because we don't have a payment method on file, your AI receptionist is now paused.
+
+Your booking page is still live and customers can still book online. But incoming calls won't be answered by the AI until you add a card.
+
+Reactivate in one click: ${billingUrl}
+
+Welcome back any time. If you decided QueueUp isn't right for you, no hard feelings — just let me know and I'll close the account cleanly.
+
+— QueueUp`;
+
+  try {
+    await sendMail({ to: ownerEmail, subject, text });
+  } catch (error) {
+    logger.error("Failed to send trial-ended email", "email:trial", error);
+  }
+}
