@@ -1,6 +1,8 @@
 # Outreach Agent
 
-B2B outreach tool for contacting Croatian SMEs (barbers, spas, restaurants, etc.)
+B2B outreach tool for contacting Croatian auto repair shops (mechanics, body shops, tire shops). Primary ICP for QueueUp v2.
+
+> **Why mechanics over barbers/spas/restaurants:** higher cost per missed call (€300–€2,000 vs €30–€50), higher willingness to pay (€80–€150/mo vs €25–€40), less locked into incumbent scheduling software (Booksy dominates barbers; mechanics use a mix of Shopmonkey / spreadsheets / nothing).
 
 **Location:** `outreach-agent/`
 
@@ -17,22 +19,29 @@ B2B outreach tool for contacting Croatian SMEs (barbers, spas, restaurants, etc.
 cd C:\Users\zovko\queueup\outreach-agent
 
 # Dry run (preview without sending)
-npx tsx src/agent.ts --dry-run --category barber --cities Zagreb
+npx tsx src/agent.ts --dry-run --category mechanic --cities Zagreb
 
 # Send to specific email (test)
 npx tsx src/agent.ts --test --to your@email.com
 
-# Batch mode
-npx tsx src/agent.ts --batch --category barber --cities "Zagreb,Split,Rijeka"
+# Batch mode — primary ICP
+npx tsx src/agent.ts --batch --category mechanic --cities "Zagreb,Split,Rijeka,Osijek,Zadar"
+
+# Adjacent categories (test if barber/mechanic logic generalizes)
+npx tsx src/agent.ts --batch --category "auto-servis,vulkanizer,autolimar" --cities "Zagreb,Split"
 
 # Follow-up emails (day 3, day 7)
 npx tsx src/agent.ts --follow-up
 ```
 
+> Serper search queries should use Croatian terms (`auto servis`, `mehaničar`, `vulkanizer`, `autolimar`) for higher hit rate than English `mechanic`.
+
 ## Pitch Style
 - Language: Croatian
 - Tone: direct, no emojis, no dashes (--)
-- Strategy: hit the no-show problem with concrete numbers (3-5 no-shows = 100-200 EUR lost weekly), then offer QueueUp
+- Strategy: hit the **missed-call** problem with concrete numbers (1 missed brake job or clutch = 300–800 EUR walked to the competitor; AI receptionist answers in 1 ring while you're under the lift), then offer QueueUp
+- Anchor pain: shops lose calls when (a) under a car, (b) on the other line, (c) after-hours, (d) lunch break. AI catches all four.
+- Don't lead with "AI" — lead with "your phone never goes to voicemail again"
 - Greeting: just "Bok," — never include business name
 - Loads `pitch-ideas.txt` if present for extra context
 
@@ -47,10 +56,10 @@ SENDER_NAME=Fran
 
 ## Email Contents
 - Personalized pitch message
-- QR code linking to https://queueup.me/booking/demo-barber
+- QR code linking to https://queueup.me/booking/demo-mechanic *(create this demo shop before launching mechanic outreach; currently demo-barber is the only live demo)*
 - Clickable link below QR code
 - Unsubscribe link
-- Category-specific subject lines in Croatian
+- Category-specific subject lines in Croatian (e.g. *"Koliko poziva ste propustili ovaj tjedan?"* — "How many calls did you miss this week?")
 
 ## Data Storage
 - Leads tracked in `outreach-agent/leads.csv`

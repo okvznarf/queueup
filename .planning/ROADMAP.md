@@ -49,8 +49,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 02-01-PLAN.md — QueueUp API prerequisites (service token auth, appointment lookup, shop context)
 - [x] 02-02-PLAN.md — Claude agentic tool_use loop + booking tools + FAQ system prompt
-- [ ] 02-03-PLAN.md — Chat API backend (POST /chat on voice-service with SSE + widget config endpoint)
-- [ ] 02-04-PLAN.md — Embeddable Preact chat widget (bubble, consent gate, session persistence)
+- [x] 02-03-PLAN.md — Chat API backend (POST /chat on voice-service with SSE + widget config endpoint)
+- [x] 02-04-PLAN.md — Embeddable Preact chat widget (code complete; human-verify checkpoint pending)
 
 ### Phase 3: Clinic Admin Portal
 **Goal**: A clinic admin can log in, configure every aspect of the AI (greeting, voice, FAQs, escalation, intake fields, business hours, staff transfer number, and phone provisioning), and fulfill a patient's GDPR erasure request with a single action
@@ -95,7 +95,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Voice Pipeline + GDPR Foundation | 5/5 | Complete   | 2026-03-31 |
-| 2. Booking AI + Web Chat | 2/4 | In Progress|  |
+| 2. Booking AI + Web Chat | 4/4 | Code complete — awaiting human-verify checkpoint | |
 | 3. Clinic Admin Portal | 0/TBD | Not started | - |
 | 4. Reseller Portal | 0/TBD | Not started | - |
 | 5. Analytics Dashboard | 0/TBD | Not started | - |

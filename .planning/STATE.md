@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-04-01T17:00:28.305Z"
-last_activity: 2026-03-31 — Wave 2 complete (audio pipeline + AI brain)
+stopped_at: Completed 02-04-PLAN.md (awaiting human-verify checkpoint)
+last_updated: "2026-04-15T00:00:00.000Z"
+last_activity: 2026-04-15 — Phase 2 code complete; chatRoute tests fixed, summaries written, test page scaffolded
 progress:
   total_phases: 5
-  completed_phases: 2
-  total_plans: 7
-  completed_plans: 7
-  percent: 12
+  completed_phases: 1
+  total_plans: 9
+  completed_plans: 9
+  percent: 20
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 
 ## Current Position
 
-Phase: 1 of 5 (Voice Pipeline + GDPR Foundation)
-Plan: 3 of 5 complete in current phase
-Status: Executing — Wave 3 next (escalation + audit logging)
-Last activity: 2026-03-31 — Wave 2 complete (audio pipeline + AI brain)
+Phase: 2 of 5 (Booking AI + Web Chat)
+Plan: 4 of 4 code complete; Plan 04 human-verify checkpoint pending
+Status: Executing — code shipped, awaiting E2E human sign-off before marking Phase 2 PASS
+Last activity: 2026-04-15 — chatRoute test fixes (115 tests passing), 02-03/04 summaries, test page at public/widget/test.html
 
-Progress: [██░░░░░░░░] 12%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
@@ -98,6 +98,11 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T17:00:28.302Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-04-15T00:00:00.000Z
+Stopped at: Completed 02-04-PLAN.md code (human-verify checkpoint pending — user to run public/widget/test.html)
 Resume file: None
+
+### Resume instructions
+1. Open two terminals: `npm run dev` in queueup root (port 3000) and `npm run dev` in voice-service (port 3001)
+2. Visit `http://localhost:3000/widget/test.html` and walk the 12-step checklist
+3. On approval, mark Phase 2 VERIFICATION PASS and proceed to Phase 3 planning (Clinic Admin Portal)

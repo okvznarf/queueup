@@ -23,17 +23,17 @@
 
 ### Booking AI
 
-- [ ] **BOOK-01**: AI checks real-time availability from QueueUp before confirming any appointment
-- [ ] **BOOK-02**: Patient can book a new appointment via voice or chat (service, date/time, staff preference)
+- [x] **BOOK-01**: AI checks real-time availability from QueueUp before confirming any appointment
+- [x] **BOOK-02**: Patient can book a new appointment via voice or chat (service, date/time, staff preference)
 - [x] **BOOK-03**: Patient can reschedule an existing appointment (verified by name + DOB)
 - [x] **BOOK-04**: Patient can cancel an existing appointment (clinic's cancellation policy window enforced)
 - [x] **BOOK-05**: AI prevents double-booking via Redis-backed idempotency key per slot
-- [ ] **BOOK-06**: Booking confirmation sent to patient after successful booking (email via existing SendGrid integration)
+- [x] **BOOK-06**: Booking confirmation sent to patient after successful booking (email via existing SendGrid integration)
 
 ### Intake Collection
 
-- [ ] **INTAKE-01**: AI collects configured intake fields during or after booking (name, DOB, phone, email, reason for visit, insurance)
-- [ ] **INTAKE-02**: Collected intake data is saved against the appointment record in QueueUp
+- [x] **INTAKE-01**: AI collects configured intake fields during or after booking (name, DOB, phone, email, reason for visit, insurance)
+- [x] **INTAKE-02**: Collected intake data is saved against the appointment record in QueueUp
 - [ ] **INTAKE-03**: Clinic admin can configure which intake fields the AI collects per their practice
 
 ### FAQ & Knowledge Base
@@ -130,13 +130,13 @@
 | CHAT-02 | Phase 2 | Pending |
 | CHAT-03 | Phase 2 | Pending |
 | CHAT-04 | Phase 2 | Pending |
-| BOOK-01 | Phase 2 | Pending |
-| BOOK-02 | Phase 2 | Pending |
+| BOOK-01 | Phase 2 | Complete |
+| BOOK-02 | Phase 2 | Complete |
 | BOOK-03 | Phase 2 | Complete |
 | BOOK-04 | Phase 2 | Complete |
-| BOOK-06 | Phase 2 | Pending |
-| INTAKE-01 | Phase 2 | Pending |
-| INTAKE-02 | Phase 2 | Pending |
+| BOOK-06 | Phase 2 | Complete |
+| INTAKE-01 | Phase 2 | Complete |
+| INTAKE-02 | Phase 2 | Complete |
 | FAQ-02 | Phase 2 | Complete |
 | FAQ-03 | Phase 2 | Complete |
 | CLINIC-01 | Phase 3 | Pending |

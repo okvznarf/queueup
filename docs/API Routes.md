@@ -61,6 +61,31 @@
 | GET | `/api/health` | DB status + error log + circuit breaker states |
 | GET | `/api/admin/export?shopId=X` | Export shop data |
 
+## AI Receptionist — Internal (requires INTERNAL_SERVICE_TOKEN)
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET | `/api/internal/shop-context?shopId=X` | Full shop bundle for AI system prompt (2-min cache) |
+| GET | `/api/appointments/lookup?phone&shopId` | Find upcoming appointments by customer phone |
+
+## AI Receptionist — Public (widget)
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET | `/api/widget/config?shopId=X` | Shop name + primaryColor for chat widget (CORS) |
+
+## AI Receptionist — voice-service (Railway, separate origin)
+| Method | Route | Description |
+|--------|-------|-------------|
+| POST | `/twiml` | TwiML for incoming Twilio calls (signature-validated) |
+| WS | `/voice-stream` | Twilio Media Streams WebSocket (per-call) |
+| POST | `/chat` | Chat message → SSE-streamed Claude response |
+| OPTIONS | `/chat` | CORS preflight |
+| GET | `/health` | voice-service health check |
+
+## Voice Summary
+| Method | Route | Description |
+|--------|-------|-------------|
+| PATCH | `/api/voice/summary` | Save end-of-call summary to appointment (service token) |
+
 ## Cron
 | Method | Route | Description |
 |--------|-------|-------------|

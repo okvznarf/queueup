@@ -35,7 +35,7 @@ Customer model has optional `passwordHash` field — supports both guest booking
 Shop model has configurable fields: `showStaffPicker`, `showPartySize`, `showVehicleInfo`, `staffLabel`, `serviceLabel`, `bookingLabel`, `primaryColor`, `darkMode`, `allowWalkIns` (used as active/inactive toggle).
 
 ## Database Connection
-- `.env` file: `DATABASE_URL="postgresql://postgres:Fran1010@localhost:5432/queueup?schema=public"`
+- `.env` file: `DATABASE_URL="postgresql://user:password@localhost:5432/queueup?schema=public"`
 - `prisma.config.ts` at project root reads DATABASE_URL
 - `src/lib/prisma.ts` uses PrismaPg adapter
 
@@ -238,7 +238,7 @@ C:\Users\zovko\queueup\
 
 ## Environment Variables (.env)
 ```
-DATABASE_URL="postgresql://postgres:Fran1010@localhost:5432/queueup?schema=public"
+DATABASE_URL="postgresql://user:password@localhost:5432/queueup?schema=public"
 NEXTAUTH_SECRET="change-this-to-any-long-random-string-you-want"
 NEXTAUTH_URL="http://localhost:3000"
 # Not yet configured:

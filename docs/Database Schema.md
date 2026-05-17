@@ -64,6 +64,27 @@ End-users who book appointments.
 | Appointment | `status` | Status filtering |
 | Appointment | `customerId` | Customer history |
 
+### VoiceCall
+AI receptionist call records.
+- `id`, `callSid` (unique, Twilio SID), `clinicId`, `status`
+- `startedAt`, `endedAt`, `durationSec`, `summary`
+- Relations: `transcripts` → VoiceTranscript[], `auditLog` → VoiceAuditLog?
+- Indexes: `clinicId`, `callSid`
+
+### VoiceTranscript
+Per-turn conversation transcript (GDPR-retained).
+- `id`, `callId` → VoiceCall, `role`, `content`
+- `deleteAfter` — GDPR retention expiry (default now + 90 days); `retentionCron` deletes past this
+- Indexes: `callId`, `deleteAfter`
+
+### VoiceAuditLog
+GDPR audit trail per call.
+- `id`, `callId` (unique) → VoiceCall, `callSid`, `clinicId`
+- `consentTimestamp`, `consentType`, `phoneHash`
+- `durationSeconds`, `actionsJson`, `wasEscalated`
+- Indexes: `clinicId`, `callSid`
+
 ## Links
 - [[Architecture]]
 - [[API Routes]]
+- [[AI Receptionist]]
