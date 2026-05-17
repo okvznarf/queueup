@@ -29,9 +29,12 @@ function LoginForm() {
       if (!res.ok) {
         setError(data.error || "Something went wrong");
       } else {
+        // Owners with a shop go to their dashboard.
+        // Owners without a shop (fresh register, or returning user who never finished
+        // onboarding) go to the wizard.
         const destination = data.shopSlug
           ? `/admin/${data.shopSlug}/appointments`
-          : redirect;
+          : "/onboarding/setup";
         router.push(destination);
       }
     } catch (e) {
