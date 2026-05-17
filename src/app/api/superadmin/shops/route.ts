@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken, hashPassword } from "@/lib/auth";
-import { rateLimit, sanitize, isValidEmail, isValidPhone, getClientIp } from "@/lib/security";
+import { rateLimit, sanitize, isValidEmail, isValidPhone, getClientIp, parseBody, isValidDate } from "@/lib/security";
 
 function requireSuperadmin(request: NextRequest) {
   const cookieHeader = request.headers.get("cookie") || "";
@@ -66,10 +66,14 @@ export async function PATCH(request: NextRequest) {
   const user = requireSuperadmin(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await request.json();
+  const body = await parseBody(request, 2_000);
+  if (!body) return NextResponse.json({ error: "Invalid or oversized payload" }, { status: 400 });
   const { shopId, employeeCount, subscriptionActive, paidUntil } = body;
 
-  if (!shopId) return NextResponse.json({ error: "shopId required" }, { status: 400 });
+  if (!shopId || typeof shopId !== "string") return NextResponse.json({ error: "shopId required" }, { status: 400 });
+  if (paidUntil !== undefined && paidUntil !== null && !isValidDate(paidUntil)) {
+    return NextResponse.json({ error: "Invalid paidUntil date" }, { status: 400 });
+  }
 
   const data: any = {};
   if (typeof subscriptionActive === "boolean") data.subscriptionActive = subscriptionActive;
@@ -93,10 +97,11 @@ export async function POST(request: NextRequest) {
   const user = requireSuperadmin(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await request.json();
+  const body = await parseBody(request, 5_000);
+  if (!body) return NextResponse.json({ error: "Invalid or oversized payload" }, { status: 400 });
   const { name: rawName, email: rawEmail, password, businessType, phone: rawPhone, employeeCount: empCount } = body;
 
-  if (!rawName || !rawEmail || !password || !businessType) {
+  if (typeof rawName !== "string" || typeof rawEmail !== "string" || typeof password !== "string" || typeof businessType !== "string") {
     return NextResponse.json({ error: "Name, email, password, and business type are required" }, { status: 400 });
   }
 
@@ -136,7 +141,7 @@ export async function POST(request: NextRequest) {
     data: {
       name,
       slug,
-      businessType,
+      businessType: businessType as any,
       email,
       phone: phone || null,
       ownerId: adminUser.id,

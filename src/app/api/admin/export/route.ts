@@ -112,8 +112,10 @@ export async function GET(request: NextRequest) {
 }
 
 function csvEscape(value: string): string {
-  if (value.includes(",") || value.includes('"') || value.includes("\n")) {
-    return `"${value.replace(/"/g, '""')}"`;
+  // Neutralize CSV formula-injection triggers (Excel/Sheets execute cells starting with these)
+  const safe = /^[=+\-@\t\r]/.test(value) ? "'" + value : value;
+  if (safe.includes(",") || safe.includes('"') || safe.includes("\n")) {
+    return `"${safe.replace(/"/g, '""')}"`;
   }
-  return value;
+  return safe;
 }

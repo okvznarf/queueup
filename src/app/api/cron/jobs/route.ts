@@ -4,6 +4,7 @@ import { processJobs, registerJobHandler } from "@/lib/jobs";
 import { sendBookingConfirmation } from "@/lib/email";
 import prisma from "@/lib/prisma";
 import { logger } from "@/lib/logger";
+import { rateLimit, getClientIp } from "@/lib/security";
 
 // ─── Register job handlers ──────────────────────────────────────────────────
 
@@ -37,6 +38,10 @@ registerJobHandler("email:confirmation", async (payload) => {
 // Schedule: daily via Vercel cron
 
 export async function GET(request: NextRequest) {
+  const ip = getClientIp(request);
+  if (!rateLimit("cron-jobs:" + ip, 25, 3600000)) {
+    return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+  }
   const secret = process.env.CRON_SECRET;
   const authHeader = request.headers.get("authorization") || "";
   const expected = `Bearer ${secret}`;

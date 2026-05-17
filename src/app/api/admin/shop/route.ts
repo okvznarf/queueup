@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { sanitize, isValidEmail, isValidPhone } from "@/lib/security";
+import { sanitize, isValidEmail, isValidPhone, rateLimit, getClientIp, parseBody } from "@/lib/security";
 import { requireAdmin } from "@/lib/auth";
 import { cacheDelete } from "@/lib/cache";
 
 export async function PATCH(request: NextRequest) {
+  const ip = getClientIp(request);
+  if (!rateLimit("admin-shop:" + ip, 20, 60000)) {
+    return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 });
+  }
   try {
-    const body = await request.json();
+    const body = await parseBody(request, 10_000);
+    if (!body) return NextResponse.json({ error: "Invalid or oversized payload" }, { status: 400 });
     const { id, name, description, phone, email, address, city, state, zipCode, primaryColor, darkMode } = body;
-    if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+    if (!id || typeof id !== "string") return NextResponse.json({ error: "id required" }, { status: 400 });
     if (email && !isValidEmail(email)) return NextResponse.json({ error: "Invalid email" }, { status: 400 });
     if (phone && !isValidPhone(phone)) return NextResponse.json({ error: "Invalid phone" }, { status: 400 });
     if (primaryColor && !/^#[0-9a-fA-F]{6}$/.test(primaryColor)) return NextResponse.json({ error: "Invalid color format" }, { status: 400 });

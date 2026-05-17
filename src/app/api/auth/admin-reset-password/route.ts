@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { hashPassword, verifyPassword } from "@/lib/auth";
-import { rateLimit, sanitize, isValidHexToken, getClientIp } from "@/lib/security";
+import { rateLimit, sanitize, isValidHexToken, getClientIp, hashToken } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   if (password.length < 8 || password.length > 128) return NextResponse.json({ error: "Password must be 8-128 characters" }, { status: 400 });
 
   const user = await prisma.user.findFirst({
-    where: { resetToken: token, resetTokenExpiry: { gte: new Date() } },
+    where: { resetToken: hashToken(token), resetTokenExpiry: { gte: new Date() } },
   });
 
   if (!user) return NextResponse.json({ error: "Invalid or expired reset link" }, { status: 400 });

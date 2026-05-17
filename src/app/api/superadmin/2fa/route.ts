@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyPassword, createToken } from "@/lib/auth";
-import { rateLimit, sanitize, isValidEmail, getClientIp } from "@/lib/security";
+import { rateLimit, sanitize, isValidEmail, getClientIp, parseBody } from "@/lib/security";
 import sgMail from "@sendgrid/mail";
 import crypto from "crypto";
 import { logger } from "@/lib/logger";
@@ -38,8 +38,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Too many attempts. Try again in 15 minutes." }, { status: 429 });
   }
 
-  const body = await request.json();
+  const body = await parseBody(request, 2_000);
+  if (!body) {
+    return NextResponse.json({ error: "Invalid or oversized payload" }, { status: 400 });
+  }
   const { step } = body;
+  if (body.password !== undefined && (typeof body.password !== "string" || body.password.length > 200)) {
+    return NextResponse.json({ error: "Invalid credentials" }, { status: 400 });
+  }
 
   if (step === "login") {
     const email = sanitize(body.email || "", 200).toLowerCase();

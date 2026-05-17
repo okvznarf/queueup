@@ -6,7 +6,6 @@ export function middleware(request: NextRequest) {
 
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("X-Frame-Options", "SAMEORIGIN");
-  response.headers.set("X-XSS-Protection", "1; mode=block");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   if (process.env.NODE_ENV === "production") {
@@ -20,6 +19,10 @@ export function middleware(request: NextRequest) {
     "img-src 'self' data: https:",
     "connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com",
     "frame-src https://accounts.google.com",
+    "frame-ancestors 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "form-action 'self'",
   ].join("; ");
   response.headers.set("Content-Security-Policy", csp);
 

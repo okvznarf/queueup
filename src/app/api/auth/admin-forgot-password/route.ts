@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import prisma from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
-import { rateLimit, sanitize, isValidEmail, getClientIp } from "@/lib/security";
+import { rateLimit, sanitize, isValidEmail, getClientIp, hashToken } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
@@ -19,16 +19,17 @@ export async function POST(req: NextRequest) {
   // Always return success to prevent email enumeration
   if (!user) return NextResponse.json({ ok: true });
 
-  const token = randomBytes(32).toString("hex");
+  const rawToken = randomBytes(32).toString("hex");
   const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
+  // Store only the hash — raw token is emailed to the user
   await prisma.user.update({
     where: { id: user.id },
-    data: { resetToken: token, resetTokenExpiry: expiry },
+    data: { resetToken: hashToken(rawToken), resetTokenExpiry: expiry },
   });
 
   const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-  const resetLink = `${baseUrl}/admin/reset-password?token=${token}`;
+  const resetLink = `${baseUrl}/admin/reset-password?token=${rawToken}`;
 
   await sendPasswordResetEmail(user.email, resetLink, "QueueUp Admin");
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import { verifyServiceToken } from "@/lib/serviceAuth";
-import { rateLimit, getClientIp } from "@/lib/security";
+import { rateLimit, getClientIp, parseBody } from "@/lib/security";
 import { logger } from "@/lib/logger";
 import { broadcastToShop } from "@/app/api/events/route";
 
@@ -18,6 +18,12 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
   // Service token path: AI acting on behalf of a patient — skip user auth
   const isServiceToken = verifyServiceToken(request);
+  // Service token must declare which shop it's acting on. Resource ownership
+  // is re-verified below so a leaked token can't pivot across tenants.
+  const declaredShopId = isServiceToken ? request.headers.get("x-shop-id") : null;
+  if (isServiceToken && !declaredShopId) {
+    return NextResponse.json({ error: "x-shop-id header required for service token" }, { status: 400 });
+  }
 
   if (!isServiceToken) {
     const auth = requireAuth(request);
@@ -28,7 +34,10 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   const auth = isServiceToken ? null : requireAuth(request);
 
   try {
-    const body = await request.json();
+    const body = await parseBody(request, 1_000);
+    if (!body) {
+      return NextResponse.json({ error: "Invalid or oversized payload" }, { status: 400 });
+    }
     const { status } = body;
 
     // Validate status value
@@ -40,6 +49,11 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     // Verify the user has access to this appointment
     const existing = await prisma.appointment.findUnique({ where: { id }, select: { shopId: true, customerId: true } });
     if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    // Service token: resource must belong to the declared shop (blast-radius limit).
+    if (isServiceToken && existing.shopId !== declaredShopId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     // Service token: the AI may perform any status change on behalf of the patient
     // User JWT: enforce role-based access control

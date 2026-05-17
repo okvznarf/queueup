@@ -4,6 +4,7 @@ import { requireServiceOrAdmin } from "@/lib/serviceAuth";
 import { rateLimit, getClientIp } from "@/lib/security";
 import { cacheGet, cacheSet } from "@/lib/cache";
 import { logger } from "@/lib/logger";
+import { getPack } from "@/lib/verticals";
 
 const CACHE_TTL_MS = 2 * 60 * 1000; // 2 minutes
 
@@ -41,25 +42,35 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(cached);
   }
 
+  const shopIncludes = {
+    services: {
+      where: { isActive: true },
+      orderBy: { sortOrder: "asc" as const },
+      select: { id: true, name: true, duration: true, price: true, description: true },
+    },
+    staff: {
+      where: { isActive: true },
+      orderBy: { sortOrder: "asc" as const },
+      select: { id: true, name: true, role: true },
+    },
+    workingHours: {
+      select: { day: true, openTime: true, closeTime: true, isClosed: true },
+    },
+  };
+
   try {
-    const shop = await prisma.shop.findUnique({
-      where: { id: shopId },
-      include: {
-        services: {
-          where: { isActive: true },
-          orderBy: { sortOrder: "asc" },
-          select: { id: true, name: true, duration: true, price: true, description: true },
-        },
-        staff: {
-          where: { isActive: true },
-          orderBy: { sortOrder: "asc" },
-          select: { id: true, name: true, role: true },
-        },
-        workingHours: {
-          select: { day: true, openTime: true, closeTime: true, isClosed: true },
-        },
-      },
+    // Try by slug first (most common for widget/voice), then by ID
+    let shop = await prisma.shop.findFirst({
+      where: { slug: shopId },
+      include: shopIncludes,
     });
+
+    if (!shop) {
+      shop = await prisma.shop.findUnique({
+        where: { id: shopId },
+        include: shopIncludes,
+      });
+    }
 
     if (!shop) {
       return NextResponse.json({ error: "Shop not found" }, { status: 404 });
@@ -68,6 +79,8 @@ export async function GET(request: NextRequest) {
     if (!shop.subscriptionActive) {
       return NextResponse.json({ error: "Shop subscription is not active" }, { status: 403 });
     }
+
+    const pack = getPack(shop.businessType);
 
     const context = {
       shopId: shop.id,
@@ -86,6 +99,21 @@ export async function GET(request: NextRequest) {
       services: shop.services,
       staff: shop.staff,
       workingHours: shop.workingHours,
+      pack: pack
+        ? {
+            slug: pack.slug,
+            bookingModel: pack.bookingModel,
+            intake: pack.intake,
+            ai: {
+              systemPromptTemplate: pack.ai.systemPromptTemplate,
+              voicePersona: pack.ai.voicePersona,
+              tools: pack.ai.tools,
+              escalationTriggers: pack.ai.escalationTriggers,
+              greeting: pack.ai.greeting,
+              language: pack.ai.language,
+            },
+          }
+        : null,
     };
 
     cacheSet(cacheKey, context, CACHE_TTL_MS);

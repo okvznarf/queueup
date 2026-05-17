@@ -1,6 +1,7 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { rateLimit, getClientIp } from "@/lib/security";
 
 // In-memory event bus — broadcasts to all connected SSE clients for a shop
 // On Vercel, each serverless instance has its own set of listeners.
@@ -9,6 +10,14 @@ import prisma from "@/lib/prisma";
 type Listener = (event: string, data: string) => void;
 
 const shopListeners = new Map<string, Set<Listener>>();
+const MAX_LISTENERS_PER_SHOP = 20;
+const MAX_TOTAL_LISTENERS = 500;
+
+function totalListeners(): number {
+  let n = 0;
+  for (const set of shopListeners.values()) n += set.size;
+  return n;
+}
 
 export function broadcastToShop(shopId: string, event: string, data: unknown) {
   const listeners = shopListeners.get(shopId);
@@ -21,6 +30,10 @@ export function broadcastToShop(shopId: string, event: string, data: unknown) {
 
 // GET /api/events?shopId=xxx → Server-Sent Events stream
 export async function GET(request: NextRequest) {
+  const ip = getClientIp(request);
+  if (!rateLimit("events:" + ip, 10, 60000)) {
+    return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+  }
   const shopId = request.nextUrl.searchParams.get("shopId");
   if (!shopId) {
     return new Response("shopId required", { status: 400 });
@@ -42,6 +55,20 @@ export async function GET(request: NextRequest) {
     if (!shop || shop.ownerId !== user.userId) {
       return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { "Content-Type": "application/json" } });
     }
+  }
+
+  // Cap concurrent SSE connections to prevent memory-exhaustion DoS
+  if ((shopListeners.get(shopId)?.size ?? 0) >= MAX_LISTENERS_PER_SHOP) {
+    return new Response(JSON.stringify({ error: "Too many concurrent connections for this shop" }), {
+      status: 429,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+  if (totalListeners() >= MAX_TOTAL_LISTENERS) {
+    return new Response(JSON.stringify({ error: "Server at capacity" }), {
+      status: 503,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const stream = new ReadableStream({

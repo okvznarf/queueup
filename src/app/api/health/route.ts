@@ -3,11 +3,16 @@ import { timingSafeEqual } from "crypto";
 import prisma from "@/lib/prisma";
 import { getRecentErrors } from "@/lib/logger";
 import { circuits } from "@/lib/resilience";
+import { rateLimit, getClientIp } from "@/lib/security";
 
 // Health check endpoint — use for deployment verification + monitoring
 // GET /api/health → { status, db, circuits, recentErrors, timestamp }
 // Add ?errors=true to include recent error log (protected by CRON_SECRET)
 export async function GET(request: NextRequest) {
+  const ip = getClientIp(request);
+  if (!rateLimit("health:" + ip, 60, 60000)) {
+    return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+  }
   const checks: Record<string, unknown> = { status: "ok" };
 
   // Database connectivity
@@ -31,17 +36,22 @@ export async function GET(request: NextRequest) {
     checks.status = "degraded";
   }
 
-  // Include recent errors if authorized (prevents leaking error details publicly)
-  const wantsErrors = request.nextUrl.searchParams.get("errors") === "true";
-  if (wantsErrors) {
-    const secret = request.headers.get("authorization")?.replace("Bearer ", "") || "";
-    const expected = process.env.CRON_SECRET || "";
-    if (secret && expected && secret.length === expected.length && timingSafeEqual(Buffer.from(secret), Buffer.from(expected))) {
+  // Include recent errors + count only if authorized (prevents leaking error details publicly)
+  const secret = request.headers.get("authorization")?.replace("Bearer ", "") || "";
+  const expected = process.env.CRON_SECRET || "";
+  const authorized =
+    !!secret &&
+    !!expected &&
+    secret.length === expected.length &&
+    timingSafeEqual(Buffer.from(secret), Buffer.from(expected));
+
+  if (authorized) {
+    checks.errorCount = getRecentErrors().length;
+    if (request.nextUrl.searchParams.get("errors") === "true") {
       checks.recentErrors = getRecentErrors();
     }
   }
 
-  checks.errorCount = getRecentErrors().length;
   checks.timestamp = new Date().toISOString();
 
   const status = checks.status === "ok" ? 200 : 503;

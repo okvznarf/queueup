@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken, requireAdmin } from "@/lib/auth";
-import { sanitize, isValidEmail, isValidPhone, rateLimit, validateRequired, getClientIp } from "@/lib/security";
+import { sanitize, isValidEmail, isValidPhone, rateLimit, validateRequired, getClientIp, parseBody, isValidDate, isValidTime, isIntInRange } from "@/lib/security";
 import { sendBookingConfirmation } from "@/lib/email";
 import { cacheDelete } from "@/lib/cache";
 import { checkIdempotency, setIdempotency, bookingIdempotencyKey } from "@/lib/resilience";
@@ -9,11 +9,18 @@ import { broadcastToShop } from "@/app/api/events/route";
 import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
+  const ip = getClientIp(request);
+  if (!rateLimit("appointments-get:" + ip, 60, 60000)) {
+    return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 });
+  }
   const shopId = request.nextUrl.searchParams.get("shopId");
   const date = request.nextUrl.searchParams.get("date");
   const staffId = request.nextUrl.searchParams.get("staffId");
   if (!shopId || !date) {
     return NextResponse.json({ error: "shopId and date are required" }, { status: 400 });
+  }
+  if (!isValidDate(date)) {
+    return NextResponse.json({ error: "Invalid date" }, { status: 400 });
   }
 
   // Require admin auth — appointment list contains customer PII
@@ -59,11 +66,41 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = await parseBody(request, 10_000);
+    if (!body) {
+      return NextResponse.json({ error: "Invalid or oversized payload" }, { status: 400 });
+    }
+
+    if (
+      typeof body.shopId !== "string" ||
+      typeof body.serviceId !== "string" ||
+      typeof body.date !== "string" ||
+      typeof body.startTime !== "string" ||
+      typeof body.customerName !== "string" ||
+      typeof body.customerPhone !== "string"
+    ) {
+      return NextResponse.json({ error: "Missing or invalid fields" }, { status: 400 });
+    }
+
+    if (!isValidDate(body.date)) {
+      return NextResponse.json({ error: "Invalid date" }, { status: 400 });
+    }
+    if (!isValidTime(body.startTime)) {
+      return NextResponse.json({ error: "Invalid startTime (HH:MM)" }, { status: 400 });
+    }
+    if (body.endTime !== undefined && body.endTime !== null && !isValidTime(body.endTime)) {
+      return NextResponse.json({ error: "Invalid endTime (HH:MM)" }, { status: 400 });
+    }
+    if (body.staffId !== undefined && body.staffId !== null && typeof body.staffId !== "string") {
+      return NextResponse.json({ error: "Invalid staffId" }, { status: 400 });
+    }
+    if (body.partySize !== undefined && body.partySize !== null && !isIntInRange(body.partySize, 1, 50)) {
+      return NextResponse.json({ error: "Invalid partySize" }, { status: 400 });
+    }
 
     const customerName = sanitize(body.customerName, 100);
     const customerPhone = sanitize(body.customerPhone, 30);
-    const customerEmail = sanitize(body.customerEmail, 200).toLowerCase();
+    const customerEmail = body.customerEmail ? sanitize(body.customerEmail, 200).toLowerCase() : "";
     const notes = sanitize(body.notes || "", 500);
     const vehicleInfo = sanitize(body.vehicleInfo || "", 200);
     const licensePlate = sanitize(body.licensePlate || "", 20);

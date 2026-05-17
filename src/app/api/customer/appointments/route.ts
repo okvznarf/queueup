@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
-import { rateLimit, getClientIp } from "@/lib/security";
+import { rateLimit, getClientIp, parseBody } from "@/lib/security";
 import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
@@ -59,7 +59,10 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   try {
-    const body = await request.json();
+    const body = await parseBody(request, 1_000);
+    if (!body) {
+      return NextResponse.json({ error: "Invalid or oversized payload" }, { status: 400 });
+    }
     const { appointmentId } = body;
     if (!appointmentId || typeof appointmentId !== "string") {
       return NextResponse.json({ error: "appointmentId required" }, { status: 400 });

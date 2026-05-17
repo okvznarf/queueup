@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAvailableSlots } from "@/lib/availability";
-import { rateLimit, getClientIp } from "@/lib/security";
+import { rateLimit, getClientIp, isValidDate } from "@/lib/security";
 import { logger } from "@/lib/logger";
 import { cacheGet, cacheSet } from "@/lib/cache";
 
@@ -20,8 +20,15 @@ export async function GET(request: NextRequest) {
   if (!shopId || !date) {
     return NextResponse.json({ error: "shopId and date required" }, { status: 400 });
   }
+  if (!isValidDate(date)) {
+    return NextResponse.json({ error: "Invalid date" }, { status: 400 });
+  }
+  const durationNum = duration ? parseInt(duration, 10) : 30;
+  if (!Number.isFinite(durationNum) || durationNum < 1 || durationNum > 480) {
+    return NextResponse.json({ error: "Invalid duration" }, { status: 400 });
+  }
 
-  const cacheKey = `avail:${shopId}:${date}:${staffId || "any"}:${duration || 30}`;
+  const cacheKey = `avail:${shopId}:${date}:${staffId || "any"}:${durationNum}`;
   const cached = cacheGet(cacheKey);
   if (cached) return NextResponse.json(cached);
 
@@ -30,7 +37,7 @@ export async function GET(request: NextRequest) {
       shopId,
       new Date(date),
       staffId || null,
-      duration ? parseInt(duration) : 30
+      durationNum
     );
     cacheSet(cacheKey, slots, CACHE_TTL);
     return NextResponse.json(slots);

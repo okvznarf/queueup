@@ -21,10 +21,12 @@ export async function GET(req: NextRequest) {
   let shopSlug = "";
   try {
     const stateData = JSON.parse(Buffer.from(stateParam, "base64url").toString());
-    shopSlug = stateData.shop || "";
+    const rawShop = typeof stateData.shop === "string" ? stateData.shop : "";
+    // Restrict to slug charset to prevent open-redirect / header-injection via crafted state
+    shopSlug = /^[a-z0-9-]{1,64}$/i.test(rawShop) ? rawShop : "";
     const storedCsrf = req.cookies.get("oauth_state")?.value;
     if (!storedCsrf || storedCsrf !== stateData.csrf) {
-      return NextResponse.redirect(`${baseUrl}/customer/login?error=invalid_state&shop=${shopSlug}`);
+      return NextResponse.redirect(`${baseUrl}/customer/login?error=invalid_state&shop=${encodeURIComponent(shopSlug)}`);
     }
   } catch {
     return NextResponse.redirect(`${baseUrl}/customer/login?error=invalid_state`);
@@ -32,7 +34,7 @@ export async function GET(req: NextRequest) {
 
   // Exchange code for tokens
   if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-    return NextResponse.redirect(`${baseUrl}/customer/login?error=oauth_not_configured&shop=${shopSlug}`);
+    return NextResponse.redirect(`${baseUrl}/customer/login?error=oauth_not_configured&shop=${encodeURIComponent(shopSlug)}`);
   }
   const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
@@ -46,7 +48,7 @@ export async function GET(req: NextRequest) {
     }),
   });
 
-  if (!tokenRes.ok) return NextResponse.redirect(`${baseUrl}/customer/login?error=google_failed&shop=${shopSlug}`);
+  if (!tokenRes.ok) return NextResponse.redirect(`${baseUrl}/customer/login?error=google_failed&shop=${encodeURIComponent(shopSlug)}`);
 
   const { access_token } = await tokenRes.json();
 
@@ -55,12 +57,12 @@ export async function GET(req: NextRequest) {
     headers: { Authorization: `Bearer ${access_token}` },
   });
 
-  if (!userRes.ok) return NextResponse.redirect(`${baseUrl}/customer/login?error=google_failed&shop=${shopSlug}`);
+  if (!userRes.ok) return NextResponse.redirect(`${baseUrl}/customer/login?error=google_failed&shop=${encodeURIComponent(shopSlug)}`);
 
   const googleUser = await userRes.json();
   const { id: googleId, email, name } = googleUser;
 
-  if (!email) return NextResponse.redirect(`${baseUrl}/customer/login?error=no_email&shop=${shopSlug}`);
+  if (!email) return NextResponse.redirect(`${baseUrl}/customer/login?error=no_email&shop=${encodeURIComponent(shopSlug)}`);
 
   // Find the shop
   const shop = await prisma.shop.findUnique({ where: { slug: shopSlug } });

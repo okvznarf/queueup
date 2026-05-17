@@ -1,5 +1,13 @@
 import { Redis } from "@upstash/redis";
+import { createHash } from "crypto";
 import type { NextRequest } from "next/server";
+
+// Hash a password-reset token for at-rest storage.
+// Store hashToken(raw) in DB; email the raw token to the user.
+// On redeem, hash the submitted token and compare hashes.
+export function hashToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
 
 // Get the real client IP — prefer Vercel's trusted header over spoofable x-forwarded-for
 export function getClientIp(request: NextRequest | Request): string {
@@ -103,6 +111,66 @@ export async function rateLimitRedis(key: string, maxRequests: number, windowMs:
 // Synchronous rate limiter (backward-compatible, uses in-memory only)
 export function rateLimit(key: string, maxRequests: number = 10, windowMs: number = 60000): boolean {
   return rateLimitMemory(key, maxRequests, windowMs);
+}
+
+// --- Account Lockout ---
+//
+// Per-account lockout on failed authentication, separate from IP rate-limiting.
+// IP limits alone don't stop distributed credential stuffing, and account-level
+// tracking makes targeted password spraying expensive.
+//
+// Threshold: LOCKOUT_MAX failed attempts within LOCKOUT_WINDOW_MS → account locked
+// for LOCKOUT_DURATION_MS. Successful auth must call clearFailedLogins() to reset.
+
+const LOCKOUT_MAX = 10;
+const LOCKOUT_WINDOW_MS = 60 * 60 * 1000; // 1 hour rolling window
+const LOCKOUT_DURATION_MS = 30 * 60 * 1000; // 30 min lockout after threshold
+
+const failedLoginMap = new Map<string, { count: number; firstAt: number; lockedUntil: number }>();
+let lastLockoutCleanup = Date.now();
+
+function accountKey(scope: string, identifier: string): string {
+  return `${scope}:${identifier.toLowerCase().trim()}`;
+}
+
+// Returns remaining milliseconds of lockout, or 0 if not locked.
+export function isAccountLocked(scope: string, identifier: string): number {
+  const now = Date.now();
+  if (now - lastLockoutCleanup > CLEANUP_INTERVAL) {
+    for (const [k, v] of failedLoginMap) {
+      if (now > v.lockedUntil && now - v.firstAt > LOCKOUT_WINDOW_MS) {
+        failedLoginMap.delete(k);
+      }
+    }
+    lastLockoutCleanup = now;
+  }
+  const entry = failedLoginMap.get(accountKey(scope, identifier));
+  if (!entry) return 0;
+  if (now < entry.lockedUntil) return entry.lockedUntil - now;
+  return 0;
+}
+
+// Records a failed login. Returns true if this attempt triggered a lockout.
+export function recordFailedLogin(scope: string, identifier: string): boolean {
+  const key = accountKey(scope, identifier);
+  const now = Date.now();
+  const entry = failedLoginMap.get(key);
+
+  if (!entry || now - entry.firstAt > LOCKOUT_WINDOW_MS) {
+    failedLoginMap.set(key, { count: 1, firstAt: now, lockedUntil: 0 });
+    return false;
+  }
+
+  entry.count += 1;
+  if (entry.count >= LOCKOUT_MAX && entry.lockedUntil < now) {
+    entry.lockedUntil = now + LOCKOUT_DURATION_MS;
+    return true;
+  }
+  return false;
+}
+
+export function clearFailedLogins(scope: string, identifier: string): void {
+  failedLoginMap.delete(accountKey(scope, identifier));
 }
 
 // Validate required fields exist and are non-empty strings

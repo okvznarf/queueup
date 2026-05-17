@@ -1,6 +1,6 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { rateLimit, getClientIp } from "@/lib/security";
+import { rateLimit, getClientIp, parseBody, sanitize, isValidEmail, isValidPhone } from "@/lib/security";
 import { requireAdmin } from "@/lib/auth";
 import { cacheGet, cacheSet } from "@/lib/cache";
 import { logger } from "@/lib/logger";
@@ -57,12 +57,39 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+  if (!rateLimit("shops-post:" + ip, 10, 60000)) {
+    return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 });
+  }
   const auth = await requireAdmin(request);
   if (auth.error) return auth.error;
   try {
-    const body = await request.json();
+    const body = await parseBody(request, 10_000);
+    if (!body) {
+      return NextResponse.json({ error: "Invalid or oversized payload" }, { status: 400 });
+    }
     const { name, businessType, email, phone } = body;
-    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    if (!name || typeof name !== "string" || !businessType || typeof businessType !== "string") {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+    const allowedTypes = ["BARBER","RESTAURANT","MECHANIC","SALON","DENTIST","SPA","FITNESS","VETERINARY","OTHER"];
+    if (!allowedTypes.includes(businessType)) {
+      return NextResponse.json({ error: "Invalid businessType" }, { status: 400 });
+    }
+    if (email && (typeof email !== "string" || !isValidEmail(email))) {
+      return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+    }
+    if (phone && (typeof phone !== "string" || !isValidPhone(phone))) {
+      return NextResponse.json({ error: "Invalid phone" }, { status: 400 });
+    }
+    const cleanName = sanitize(name, 100);
+    if (!cleanName) {
+      return NextResponse.json({ error: "Invalid name" }, { status: 400 });
+    }
+    const slug = cleanName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    if (!slug) {
+      return NextResponse.json({ error: "Name produces an empty slug" }, { status: 400 });
+    }
     const labels: Record<string, { staff: string; service: string; booking: string }> = {
       BARBER: { staff: "Barber", service: "Service", booking: "Appointment" },
       RESTAURANT: { staff: "Server", service: "Experience", booking: "Reservation" },
@@ -75,7 +102,11 @@ export async function POST(request: NextRequest) {
     const trialEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30-day trial
     const shop = await prisma.shop.create({
       data: {
-        name, slug, businessType, email, phone,
+        name: cleanName,
+        slug,
+        businessType: businessType as any,
+        email: email || null,
+        phone: phone || null,
         staffLabel: l.staff, serviceLabel: l.service, bookingLabel: l.booking,
         showStaffPicker: businessType !== "RESTAURANT",
         showPartySize: businessType === "RESTAURANT",

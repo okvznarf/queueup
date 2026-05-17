@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { hashPassword, createToken } from "@/lib/auth";
-import { sanitize, isValidEmail, rateLimit, getClientIp } from "@/lib/security";
+import { sanitize, isValidEmail, rateLimit, getClientIp, parseBody } from "@/lib/security";
 import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
@@ -11,7 +11,16 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = await parseBody(request, 3_000);
+    if (!body) {
+      return NextResponse.json({ error: "Invalid or oversized payload" }, { status: 400 });
+    }
+    if (typeof body.email !== "string" || typeof body.password !== "string" || typeof body.name !== "string") {
+      return NextResponse.json({ error: "Name, email and password are required" }, { status: 400 });
+    }
+    if (body.password.length > 200) {
+      return NextResponse.json({ error: "Password too long" }, { status: 400 });
+    }
     const email = sanitize(body.email, 200).toLowerCase();
     const password = body.password;
     const name = sanitize(body.name, 100);

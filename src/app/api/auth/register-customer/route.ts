@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { hashPassword, createToken } from "@/lib/auth";
-import { sanitize, isValidEmail, isValidPhone, rateLimit, getClientIp } from "@/lib/security";
+import { sanitize, isValidEmail, isValidPhone, rateLimit, getClientIp, parseBody } from "@/lib/security";
 import { sendWelcomeEmail } from "@/lib/email";
 import { logger } from "@/lib/logger";
 
@@ -11,7 +11,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
   }
   try {
-    const body = await request.json();
+    const body = await parseBody(request, 3_000);
+    if (!body) {
+      return NextResponse.json({ error: "Invalid or oversized payload" }, { status: 400 });
+    }
+    if (
+      typeof body.name !== "string" ||
+      typeof body.email !== "string" ||
+      typeof body.phone !== "string" ||
+      typeof body.password !== "string" ||
+      typeof body.shopId !== "string"
+    ) {
+      return NextResponse.json({ error: "All fields are required" }, { status: 400 });
+    }
+    if (body.password.length > 200) {
+      return NextResponse.json({ error: "Password too long" }, { status: 400 });
+    }
     const name = sanitize(body.name, 100);
     const email = sanitize(body.email, 200).toLowerCase();
     const phone = sanitize(body.phone, 30);
@@ -35,15 +50,21 @@ export async function POST(request: NextRequest) {
     if (existing && existing.passwordHash) {
       return NextResponse.json({ error: "Account already exists. Please login." }, { status: 409 });
     }
+    // Passwordless record exists (from a prior walk-in booking). Don't let an
+    // unverified actor attach a password and claim the booking history —
+    // require them to prove email ownership via the reset-password flow.
+    if (existing) {
+      return NextResponse.json(
+        {
+          error: "An account with this email already exists from a prior booking. Please use the \"forgot password\" link to set your password — we'll email you a reset link.",
+          code: "USE_PASSWORD_RESET",
+        },
+        { status: 409 },
+      );
+    }
 
     const passwordHash = await hashPassword(password);
-
-    let customer;
-    if (existing) {
-      customer = await prisma.customer.update({ where: { id: existing.id }, data: { passwordHash, name } });
-    } else {
-      customer = await prisma.customer.create({ data: { name, email, phone, passwordHash, shopId } });
-    }
+    const customer = await prisma.customer.create({ data: { name, email, phone, passwordHash, shopId } });
 
     const shop = await prisma.shop.findUnique({ where: { id: shopId }, select: { name: true, slug: true } });
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";

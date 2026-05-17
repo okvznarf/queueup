@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
-import { rateLimit, sanitize, isValidEmail, isValidPhone, getClientIp } from "@/lib/security";
+import { rateLimit, sanitize, isValidEmail, isValidPhone, getClientIp, parseBody } from "@/lib/security";
 
 function requireSuperadmin(request: NextRequest) {
   const cookieHeader = request.headers.get("cookie") || "";
@@ -43,10 +43,14 @@ export async function POST(request: NextRequest) {
   const user = requireSuperadmin(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await request.json();
+  // Avatar base64 can be up to ~700KB, so allow 1MB body limit here
+  const body = await parseBody(request, 1_000_000);
+  if (!body) return NextResponse.json({ error: "Invalid or oversized payload" }, { status: 400 });
   const { shopId, name, role, email, phone, bio, avatarUrl } = body;
 
-  if (!shopId || !name) return NextResponse.json({ error: "shopId and name required" }, { status: 400 });
+  if (!shopId || typeof shopId !== "string" || !name || typeof name !== "string") {
+    return NextResponse.json({ error: "shopId and name required" }, { status: 400 });
+  }
   if (email && !isValidEmail(email)) return NextResponse.json({ error: "Invalid email" }, { status: 400 });
   if (phone && !isValidPhone(phone)) return NextResponse.json({ error: "Invalid phone" }, { status: 400 });
 
@@ -84,10 +88,11 @@ export async function PATCH(request: NextRequest) {
   const user = requireSuperadmin(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await request.json();
+  const body = await parseBody(request, 1_000_000);
+  if (!body) return NextResponse.json({ error: "Invalid or oversized payload" }, { status: 400 });
   const { id, name, role, email, phone, bio, avatarUrl, isActive } = body;
 
-  if (!id) return NextResponse.json({ error: "Staff id required" }, { status: 400 });
+  if (!id || typeof id !== "string") return NextResponse.json({ error: "Staff id required" }, { status: 400 });
   if (email && !isValidEmail(email)) return NextResponse.json({ error: "Invalid email" }, { status: 400 });
   if (phone && !isValidPhone(phone)) return NextResponse.json({ error: "Invalid phone" }, { status: 400 });
 
@@ -126,8 +131,10 @@ export async function DELETE(request: NextRequest) {
   const user = requireSuperadmin(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id } = await request.json();
-  if (!id) return NextResponse.json({ error: "Staff id required" }, { status: 400 });
+  const body = await parseBody(request, 1_000);
+  if (!body) return NextResponse.json({ error: "Invalid or oversized payload" }, { status: 400 });
+  const { id } = body;
+  if (!id || typeof id !== "string") return NextResponse.json({ error: "Staff id required" }, { status: 400 });
 
   await prisma.staff.delete({ where: { id } });
   return NextResponse.json({ success: true });
