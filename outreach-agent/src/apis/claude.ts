@@ -84,6 +84,8 @@ const CATEGORY_HINTS: Record<BusinessCategory, string> = {
   dentist: "Fokus na propuštene termine. Pacijent ne dođe = 30-60 min prazan stolac. To je 50-150 EUR po no-showu.",
   salon: "Fokus na otkazivanja u zadnji čas. Klijentica otkaže 30 min prije. Taj termin više nitko ne popuni.",
   veterinary: "Fokus na organizaciju hitnih i redovnih posjeta. Vlasnici zaborave na kontrole, kaos u čekaonici.",
+  groomer: "Fokus na no-showove i kasna otkazivanja. Vlasnici pasa zakažu šišanje i ne dođu. Termin od 60-90 min prazan = izgubljena lova.",
+  mechanic: "Fokus na propuštene termine za servis. Klijent zakaže i ne dođe, lift stoji prazan. 1-2 propuštena servisa tjedno = 100-300 EUR izgubljeno.",
   other: "Fokus na izgubljeno vrijeme i novac kad klijenti ne dođu ili otkažu kasno.",
 };
 

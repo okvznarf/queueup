@@ -240,15 +240,21 @@ async function runTest(integration: string) {
       break;
     }
     case "sendgrid": {
-      validateEnv(["SENDGRID_API_KEY", "SENDER_EMAIL"]);
+      validateEnv(["SENDGRID_API_KEY", "SENDER_EMAIL", "ANTHROPIC_API_KEY"]);
       const testEmail = opts.to || process.env.SENDER_EMAIL!;
+      const testCategory = (opts.category as BusinessCategory) || "barber";
+      const testCity = opts.cities?.split(",")[0]?.trim() || "Zagreb";
+      const testName = "Demo Salon";
+      console.log(`Generating real pitch for ${testName} (${testCategory}, ${testCity})...`);
+      const testPitch = await generatePitch(testName, testCategory, testCity);
+      console.log(`\nPitch:\n${testPitch}\n`);
       await sendOutreachEmail({
         to: testEmail,
-        businessName: "Test Salon",
-        category: "barber",
-        message: "Bok,\n\nOvo je testna poruka iz QueueUp outreach agenta.\n\nFran",
+        businessName: testName,
+        category: testCategory,
+        message: testPitch,
       });
-      console.log(`SendGrid OK. Test email sent to ${testEmail}`);
+      console.log(`SendGrid OK. Real pitch sent to ${testEmail}`);
       break;
     }
     case "claude": {

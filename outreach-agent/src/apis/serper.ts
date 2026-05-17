@@ -11,6 +11,8 @@ const CATEGORY_QUERIES: Record<BusinessCategory, string> = {
   dentist: "stomatolog ordinacija",
   salon: "kozmetički salon",
   veterinary: "veterinarska ordinacija",
+  groomer: "šišanje pasa pet grooming",
+  mechanic: "autoservis mehaničar",
   other: "mali biznis",
 };
 

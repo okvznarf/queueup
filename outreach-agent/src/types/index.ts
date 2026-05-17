@@ -1,4 +1,4 @@
-export type BusinessCategory = "barber" | "spa" | "restaurant" | "fitness" | "dentist" | "salon" | "veterinary" | "other";
+export type BusinessCategory = "barber" | "spa" | "restaurant" | "fitness" | "dentist" | "salon" | "veterinary" | "groomer" | "mechanic" | "other";
 
 export type MessageStatus = "Not Sent" | "Sent" | "Opened" | "Replied";
 export type ReplyStatus = "No Reply" | "Auto Reply" | "Manual Reply";

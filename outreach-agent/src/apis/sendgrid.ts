@@ -49,6 +49,7 @@ function buildHtml(message: string, senderEmail: string): string {
     <p style="margin: 0 0 8px; color: #555; font-size: 14px;">Vidi kako izgleda u praksi:</p>
     <img src="cid:qrcode" alt="QR kod za demo" style="width: 180px; height: 180px;" />
     <p style="margin: 8px 0 0; color: #888; font-size: 12px;">Skeniraj ili klikni: <a href="${DEMO_BOOKING_URL}" style="color: #84934A;">${DEMO_BOOKING_URL}</a></p>
+    <p style="margin: 12px 0 0; font-size: 13px;"><a href="https://queueup.me" style="color: #84934A; font-weight: 600;">queueup.me</a> — Saznaj više o QueueUp-u</p>
   </div>
   <div style="border-top: 1px solid #eee; padding-top: 16px; color: #999; font-size: 12px;">
     <p style="margin: 0 0 4px;">${senderEmail}</p>
