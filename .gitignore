@@ -50,7 +50,13 @@ next-env.d.ts
 .vercel
 .env*.local
 
-# outreach agent secrets & logs
+# outreach agent secrets & logs & run artifacts
 outreach-agent/.env
 outreach-agent/logs/
 outreach-agent/leads.csv
+outreach-agent/reports/
+outreach-agent/campaigns.json
+
+# one-off widget test pages
+public/test-widget.html
+public/widget/test.html
