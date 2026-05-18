@@ -65,17 +65,38 @@ export default function BookingClient({ shop }: { shop: Shop }) {
   const service = shop.services.find((s: any) => s.id === selService);
   const staffMember = shop.staff.find((s: any) => s.id === selStaff);
 
+  // Drop-off booking model: pick a DAY only (no specific time slot). Mechanics
+  // routinely keep cars for hours/days, so a slot picker doesn't make sense.
+  // Customer is told to drop off any time within the shop's open hours.
+  const isDropOff = shop.businessType === "MECHANIC";
+
+  function selDateWh(): any | null {
+    if (!selDate) return null;
+    const dayName = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"][selDate.getDay()];
+    return shop.workingHours.find((h: any) => h.day === dayName) || null;
+  }
+
   useEffect(() => {
-    if (selDate && selService) {
-      setSlotsLoading(true);
-      const duration = selDuration || service?.duration || 30;
-      let url = "/api/availability?shopId=" + shop.id + "&date=" + selDate.toISOString().split("T")[0] + "&duration=" + duration;
-      if (selStaff) url += "&staffId=" + selStaff;
-      fetch(url).then(r => r.json()).then(data => {
-        setSlots(data);
-        setSlotsLoading(false);
-      }).catch(() => setSlotsLoading(false));
+    if (!selDate || !selService) return;
+    if (isDropOff) {
+      // Auto-set slot to the day's opening time so the existing POST path works.
+      const wh = selDateWh();
+      if (wh && !wh.isClosed && wh.openTime) {
+        setSlots([]);
+        setSelSlot({ label: `Drop-off (${wh.openTime}–${wh.closeTime})`, startTime: wh.openTime, available: true });
+      } else {
+        setSelSlot(null);
+      }
+      return;
     }
+    setSlotsLoading(true);
+    const duration = selDuration || service?.duration || 30;
+    let url = "/api/availability?shopId=" + shop.id + "&date=" + selDate.toISOString().split("T")[0] + "&duration=" + duration;
+    if (selStaff) url += "&staffId=" + selStaff;
+    fetch(url).then(r => r.json()).then(data => {
+      setSlots(data);
+      setSlotsLoading(false);
+    }).catch(() => setSlotsLoading(false));
   }, [selDate, selStaff, selService]);
 
   const goStep = (n: number) => {
@@ -92,7 +113,7 @@ export default function BookingClient({ shop }: { shop: Shop }) {
   if (shop.showStaffPicker && shop.staff.length > 0) steps.push({ id: "staff", label: shop.staffLabel || "Staff" });
   if (shop.showPartySize) steps.push({ id: "party", label: "Party Size" });
   if (shop.showVehicleInfo) steps.push({ id: "vehicle", label: "Vehicle" });
-  steps.push({ id: "datetime", label: "Date & Time" });
+  steps.push({ id: "datetime", label: isDropOff ? "Drop-off Day" : "Date & Time" });
   steps.push({ id: "details", label: "Details" });
   steps.push({ id: "confirm", label: "Confirm" });
 
@@ -156,7 +177,18 @@ export default function BookingClient({ shop }: { shop: Shop }) {
     const start = new Date(selDate);
     start.setHours(h, m, 0, 0);
     const end = new Date(start);
-    end.setMinutes(end.getMinutes() + (service.duration || 60));
+    if (isDropOff) {
+      // Drop-off spans the whole open window, not a fixed service duration.
+      const wh = selDateWh();
+      if (wh && wh.closeTime) {
+        const [eh, em] = wh.closeTime.split(":").map(Number);
+        end.setHours(eh, em, 0, 0);
+      } else {
+        end.setHours(end.getHours() + 8);
+      }
+    } else {
+      end.setMinutes(end.getMinutes() + (service.duration || 60));
+    }
     const pad = (n: number) => n.toString().padStart(2, "0");
     const fmt = (d: Date) => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
     const title = encodeURIComponent(`${service.name} — ${shop.name}`);
@@ -200,13 +232,14 @@ export default function BookingClient({ shop }: { shop: Shop }) {
             {staffMember && <Row label={shop.staffLabel} value={staffMember.name} s={s} accent={accent} />}
             {shop.showPartySize && <Row label="Party Size" value={partySize + " guests"} s={s} accent={accent} />}
             {shop.showVehicleInfo && <Row label="Vehicle" value={vehicleInfo} s={s} accent={accent} />}
-            <Row label="Date" value={DAYS[selDate!.getDay()] + ", " + MONTHS[selDate!.getMonth()] + " " + selDate!.getDate()} s={s} accent={accent} />
-            <Row label="Time" value={selSlot.label} s={s} accent={accent} />
+            <Row label={isDropOff ? "Drop-off Day" : "Date"} value={DAYS[selDate!.getDay()] + ", " + MONTHS[selDate!.getMonth()] + " " + selDate!.getDate()} s={s} accent={accent} />
+            <Row label={isDropOff ? "Window" : "Time"} value={selSlot.label} s={s} accent={accent} />
             <div style={{ height: 1, background: accent + "22", margin: "6px 0" }} />
             <Row label="Name" value={form.name} s={s} accent={accent} />
             <Row label="Phone" value={form.phone} s={s} accent={accent} />
           </div>
           <p style={{ color: s.dim, fontSize: 13, fontStyle: "italic" }}>Confirmation sent to {form.email}</p>
+          {isDropOff && <p style={{ color: s.muted, fontSize: 13, marginTop: 8 }}>We'll call you when your vehicle is ready for pickup.</p>}
           {createAccount && <p style={{ color: "#22c55e", fontSize: 13, marginTop: 8 }}>Account created! Manage bookings at <a href="/customer/dashboard" style={{ color: accent, fontWeight: 600 }}>My Bookings</a></p>}
           <div className="bk-confirmed-actions" style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 20, flexWrap: "wrap" }}>
             <button onClick={handleAddToCalendar} className="bk-btn" style={{ background: "transparent", color: accent, border: "1.5px solid " + accent + "35", borderRadius: 12, padding: "13px 28px", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>Add to Calendar</button>
@@ -225,7 +258,11 @@ export default function BookingClient({ shop }: { shop: Shop }) {
         <div>
           <div style={{ fontWeight: 700, fontSize: 13, letterSpacing: 3, color: accent, textTransform: "uppercase" as const, opacity: 0.9 }}>{shop.name}</div>
           <h1 style={{ fontSize: 28, fontWeight: 700, margin: "14px 0 0", color: s.text, letterSpacing: "-0.02em" }}>Book Your {shop.bookingLabel}</h1>
-          <p style={{ color: s.muted, fontSize: 14, marginTop: 6, lineHeight: 1.5 }}>Select a {shop.serviceLabel.toLowerCase()} and pick a time.</p>
+          <p style={{ color: s.muted, fontSize: 14, marginTop: 6, lineHeight: 1.5 }}>
+            {isDropOff
+              ? `Select a ${shop.serviceLabel.toLowerCase()} and pick a drop-off day.`
+              : `Select a ${shop.serviceLabel.toLowerCase()} and pick a time.`}
+          </p>
         </div>
         <a href={"/customer/login?shop=" + shop.slug} className="bk-btn" style={{ fontSize: 13, color: accent, textDecoration: "none", border: "1.5px solid " + accent + "35", borderRadius: 10, padding: "8px 16px", fontWeight: 600, display: "inline-block" }}>Sign In</a>
       </header>
@@ -350,7 +387,7 @@ export default function BookingClient({ shop }: { shop: Shop }) {
 
         {currentStep?.id === "datetime" && (
           <div>
-            <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: s.text, letterSpacing: "-0.01em" }}>Pick a Date</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: s.text, letterSpacing: "-0.01em" }}>{isDropOff ? "Pick a Drop-off Day" : "Pick a Date"}</h2>
             <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 8 }}>
               {dates.map((d, i) => {
                 const dayName = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"][d.getDay()];
@@ -372,8 +409,32 @@ export default function BookingClient({ shop }: { shop: Shop }) {
                 );
               })}
             </div>
-            {selDate && slotsLoading && <p style={{ color: s.muted, marginTop: 18, fontSize: 14 }}>Loading available times...</p>}
-            {selDate && !slotsLoading && slots.length > 0 && (
+            {isDropOff && selDate && (() => {
+              const wh = selDateWh();
+              if (!wh || wh.isClosed) {
+                return <p style={{ color: s.dim, fontStyle: "italic", marginTop: 18, fontSize: 14 }}>Closed on this day</p>;
+              }
+              return (
+                <div style={{ animation: "bk-fade-in 0.3s ease", marginTop: 24, background: s.card, border: "1.5px solid " + s.border, borderRadius: 14, padding: 20, boxShadow: s.shadow }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: accent + "20", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                      </svg>
+                    </div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: s.text }}>Drop-off window</div>
+                  </div>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: accent, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "-0.01em", marginBottom: 8 }}>
+                    {wh.openTime} – {wh.closeTime}
+                  </div>
+                  <p style={{ color: s.muted, fontSize: 13, lineHeight: 1.5, margin: 0 }}>
+                    Leave your vehicle any time during these hours. We'll call you on the number you provide once it's ready for pickup — same day or longer depending on the job.
+                  </p>
+                </div>
+              );
+            })()}
+            {!isDropOff && selDate && slotsLoading && <p style={{ color: s.muted, marginTop: 18, fontSize: 14 }}>Loading available times...</p>}
+            {!isDropOff && selDate && !slotsLoading && slots.length > 0 && (
               <div style={{ animation: "bk-fade-in 0.3s ease" }}>
                 <h2 style={{ fontSize: 18, fontWeight: 600, margin: "24px 0 14px", color: s.text, letterSpacing: "-0.01em" }}>Available Times</h2>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -391,7 +452,7 @@ export default function BookingClient({ shop }: { shop: Shop }) {
                 </div>
               </div>
             )}
-            {selDate && !slotsLoading && slots.length === 0 && <p style={{ color: s.dim, fontStyle: "italic", marginTop: 18, fontSize: 14 }}>Closed on this day</p>}
+            {!isDropOff && selDate && !slotsLoading && slots.length === 0 && <p style={{ color: s.dim, fontStyle: "italic", marginTop: 18, fontSize: 14 }}>Closed on this day</p>}
           </div>
         )}
 
@@ -431,8 +492,8 @@ export default function BookingClient({ shop }: { shop: Shop }) {
               {staffMember && <Row label={shop.staffLabel} value={staffMember.name} s={s} accent={accent} />}
               {shop.showPartySize && <Row label="Party Size" value={partySize + " guests"} s={s} accent={accent} />}
               {shop.showVehicleInfo && <Row label="Vehicle" value={vehicleInfo} s={s} accent={accent} />}
-              <Row label="Date" value={DAYS[selDate!.getDay()] + ", " + MONTHS[selDate!.getMonth()] + " " + selDate!.getDate()} s={s} accent={accent} />
-              <Row label="Time" value={selSlot.label} s={s} accent={accent} />
+              <Row label={isDropOff ? "Drop-off Day" : "Date"} value={DAYS[selDate!.getDay()] + ", " + MONTHS[selDate!.getMonth()] + " " + selDate!.getDate()} s={s} accent={accent} />
+              <Row label={isDropOff ? "Window" : "Time"} value={selSlot.label} s={s} accent={accent} />
               <div style={{ height: 1, background: accent + "22", margin: "6px 0" }} />
               <Row label="Name" value={form.name} s={s} accent={accent} />
               <Row label="Phone" value={form.phone} s={s} accent={accent} />
