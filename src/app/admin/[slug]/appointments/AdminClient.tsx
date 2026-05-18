@@ -342,6 +342,7 @@ export default function AdminClient({ shop }: { shop: Shop }) {
 
         {/* Main Content */}
         <div style={{ flex: 1, padding: 24 }}>
+          <TrialBanner shop={shop} accent={accent} onGoToBilling={() => setActiveTab("billing")} />
 
           {/* ── APPOINTMENTS ── */}
           {activeTab === "appointments" && (
@@ -837,6 +838,52 @@ function StatusBadge({ label, color }: { label: string; color: string }) {
     <span style={{ fontSize: 11, fontWeight: 700, color, background: `${color}20`, padding: "3px 10px", borderRadius: 6, letterSpacing: 0.5 }}>
       {label.toUpperCase()}
     </span>
+  );
+}
+
+// Persistent across all tabs. Hidden if subscription is active or trial is
+// over (different surfaces handle the "trial ended" state). Color-graded by
+// urgency so a paying customer sees a calm gold tone and an about-to-expire
+// owner sees an unmistakable red prompt.
+function TrialBanner({ shop, accent, onGoToBilling }: { shop: any; accent: string; onGoToBilling: () => void }) {
+  const hasSub = !!shop.stripeSubscriptionId;
+  if (hasSub) return null;
+  const trialEnd = shop.trialEndsAt ? new Date(shop.trialEndsAt) : null;
+  if (!trialEnd || trialEnd <= new Date()) return null;
+  const daysLeft = Math.max(0, Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+  const urgent = daysLeft <= 2;
+  const warning = daysLeft <= 6;
+  const color = urgent ? "#ef4444" : warning ? "#f59e0b" : accent;
+  const headline = urgent
+    ? `Trial ends in ${daysLeft} day${daysLeft === 1 ? "" : "s"} — your AI receptionist will stop taking calls.`
+    : warning
+    ? `Trial ends in ${daysLeft} days. Add a payment method so service doesn't pause.`
+    : `Free trial: ${daysLeft} days left. Lock in a plan whenever you're ready — no charge until the trial ends.`;
+  return (
+    <div style={{
+      background: color + "12",
+      border: "1px solid " + color + "55",
+      borderRadius: 12,
+      padding: "12px 16px",
+      marginBottom: 18,
+      display: "flex",
+      alignItems: "center",
+      gap: 14,
+    }}>
+      <span style={{
+        fontSize: 10, fontWeight: 800, color, background: color + "20",
+        padding: "3px 8px", borderRadius: 4, letterSpacing: 0.8, whiteSpace: "nowrap",
+      }}>
+        {urgent ? "URGENT" : warning ? "HEADS UP" : "TRIAL"}
+      </span>
+      <span style={{ flex: 1, fontSize: 13, color: "#e8e4dd" }}>{headline}</span>
+      <button onClick={onGoToBilling} style={{
+        background: color, color: "#111", border: "none", borderRadius: 8,
+        padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap",
+      }}>
+        {urgent ? "Add payment now" : "Add payment method"}
+      </button>
+    </div>
   );
 }
 
