@@ -18,8 +18,8 @@ export async function streamTtsToTwilio(
 
   const audioStream = await getClient().textToSpeech.stream(voiceId, {
     text,
-    model_id: 'eleven_flash_v2_5',
-    output_format: 'ulaw_8000',
+    modelId: 'eleven_flash_v2_5',
+    outputFormat: 'ulaw_8000',
   });
 
   for await (const chunk of audioStream) {

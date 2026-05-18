@@ -56,9 +56,12 @@ function mockResponse(data: unknown, status = 200) {
   });
 }
 
-import { BOOKING_TOOLS, dispatchTool } from '../src/handlers/bookingTools.js';
+import { getToolsForPack, dispatchTool } from '../src/handlers/bookingTools.js';
 
-describe('BOOKING_TOOLS definitions', () => {
+// Legacy 5-tool set (returned when a shop has no vertical pack).
+const BOOKING_TOOLS = getToolsForPack(null);
+
+describe('legacy BOOKING_TOOLS definitions', () => {
   it('exports exactly 5 tools', () => {
     expect(BOOKING_TOOLS).toHaveLength(5);
   });

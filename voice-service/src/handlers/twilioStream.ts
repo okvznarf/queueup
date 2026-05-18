@@ -11,7 +11,10 @@ import { writeAuditLog, generateCallSummary, saveCallSummary } from '../lib/audi
 
 export const sessions = new Map<string, Session>();
 
-const deepgramConnections = new Map<string, ReturnType<typeof createDeepgramConnection>>();
+// Deepgram v5 connect() is async; store the Promise so consumers chain off it.
+// Pre-open media chunks are buffered behind the promise chain (negligible window).
+type DeepgramConnectionPromise = ReturnType<typeof createDeepgramConnection>;
+const deepgramConnections = new Map<string, DeepgramConnectionPromise>();
 
 export function handleTwilioMessage(
   event: TwilioMediaEvent,
@@ -52,12 +55,15 @@ export function handleTwilioMessage(
           });
       }
 
-      // Create Deepgram connection for this call
-      const dgConnection = createDeepgramConnection(async (transcript) => {
+      // Create Deepgram connection for this call (async — store Promise).
+      const dgConnectionPromise = createDeepgramConnection(async (transcript) => {
         logger.info('Transcript received', { callSid });
         await handleTranscript(callSid, transcript, ws);
       });
-      deepgramConnections.set(callSid, dgConnection);
+      dgConnectionPromise.catch((err) => {
+        logger.error('Failed to open Deepgram connection', { callSid }, err);
+      });
+      deepgramConnections.set(callSid, dgConnectionPromise);
 
       // Play GDPR consent greeting via ElevenLabs TTS
       playConsentGreeting(CONSENT_SCRIPT, streamSid, ws).catch((err) => {
@@ -70,10 +76,12 @@ export function handleTwilioMessage(
       const callSid = findCallSidForMedia(event);
       if (!callSid) break;
 
-      const dgConnection = deepgramConnections.get(callSid);
-      if (dgConnection && event.media?.payload) {
+      const dgConnectionPromise = deepgramConnections.get(callSid);
+      if (dgConnectionPromise && event.media?.payload) {
         const audioBuffer = Buffer.from(event.media.payload, 'base64');
-        dgConnection.send(audioBuffer);
+        dgConnectionPromise
+          .then((conn) => conn.sendMedia(audioBuffer))
+          .catch(() => {/* connection error already logged at open time */});
       }
       break;
     }
@@ -86,9 +94,9 @@ export function handleTwilioMessage(
         const session = sessions.get(stopCallSid);
 
         // Close Deepgram connection
-        const dgConnection = deepgramConnections.get(stopCallSid);
-        if (dgConnection) {
-          dgConnection.finish();
+        const dgConnectionPromise = deepgramConnections.get(stopCallSid);
+        if (dgConnectionPromise) {
+          dgConnectionPromise.then((conn) => conn.close()).catch(() => {/* already logged */});
           deepgramConnections.delete(stopCallSid);
         }
 
