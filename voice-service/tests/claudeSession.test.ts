@@ -309,11 +309,15 @@ describe('processPatientUtterance — text-only response', () => {
     await processPatientUtterance(session, 'Hello', async () => {});
     const callArgs = mockMessagesCreate.mock.calls[0][0] as {
       tools: unknown[];
-      system: string;
+      system: string | Array<{ type: string; text: string; cache_control?: unknown }>;
     };
     expect(callArgs.tools).toBeDefined();
     expect(Array.isArray(callArgs.tools)).toBe(true);
-    expect(callArgs.system).toContain('Sunrise Dental');
+    // System prompt is sent as cached content blocks (prompt caching).
+    const systemText = Array.isArray(callArgs.system)
+      ? callArgs.system.map((b) => b.text).join('\n')
+      : callArgs.system;
+    expect(systemText).toContain('Sunrise Dental');
   });
 });
 

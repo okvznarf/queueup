@@ -3,11 +3,15 @@ import type { TwilioMediaEvent } from '../src/types/session.js';
 
 // Mock all external dependencies before importing the module under test
 
+// Deepgram SDK v5: createDeepgramConnection is async and returns a Promise
+// of an object with sendMedia()/close() (was send()/finish() in v4).
 vi.mock('../src/handlers/deepgramClient.js', () => ({
-  createDeepgramConnection: vi.fn(() => ({
-    send: vi.fn(),
-    finish: vi.fn(),
-  })),
+  createDeepgramConnection: vi.fn(() =>
+    Promise.resolve({
+      sendMedia: vi.fn(),
+      close: vi.fn(),
+    }),
+  ),
 }));
 
 vi.mock('../src/handlers/elevenLabsTts.js', () => ({
@@ -87,11 +91,12 @@ describe('handleTwilioMessage', () => {
     expect(session!.consentState).toBe('pending');
   });
 
-  it('Test 3: "media" event decodes base64 payload and forwards to Deepgram', () => {
+  it('Test 3: "media" event decodes base64 payload and forwards to Deepgram', async () => {
     const ws = makeMockWs();
     handleTwilioMessage(makeStartEvent(), ws);
 
-    const mockDg = (createDeepgramConnection as any).mock.results[0].value;
+    // createDeepgramConnection now returns a Promise; await it to get the conn.
+    const mockDg = await (createDeepgramConnection as any).mock.results[0].value;
 
     const audioPayload = Buffer.from('test-audio').toString('base64');
     const mediaEvent: TwilioMediaEvent = {
@@ -100,7 +105,11 @@ describe('handleTwilioMessage', () => {
     };
     handleTwilioMessage(mediaEvent, ws);
 
-    expect(mockDg.send).toHaveBeenCalledWith(Buffer.from('test-audio'));
+    // Production code chains conn.sendMedia(...) off the promise — flush the
+    // microtask before asserting.
+    await Promise.resolve();
+
+    expect(mockDg.sendMedia).toHaveBeenCalledWith(Buffer.from('test-audio'));
   });
 
   it('Test 4: "stop" event cleans up session from sessions Map', () => {
