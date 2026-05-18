@@ -1,0 +1,21 @@
+name: Cron — usage alerts
+
+# Hourly: send 80% / 100% AI quota alert emails to shop owners.
+# Hits /api/cron/usage-alerts which is idempotent within a billing period.
+# GitHub-scheduled runs can be delayed up to ~15 min under high load — fine
+# for this workload.
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit /api/cron/usage-alerts
+        run: |
+          curl -fsSL --retry 3 --retry-delay 10 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://www.queueup.me/api/cron/usage-alerts"

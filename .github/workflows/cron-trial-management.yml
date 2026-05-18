@@ -1,0 +1,20 @@
+name: Cron — trial management
+
+# Daily at 06:00 UTC (08:00 Europe/Zagreb): send 7-day / 1-day trial reminders
+# and the final ended-notice that flips Shop.subscriptionActive to false.
+# Idempotent via Shop.trialNoticesLevel progression.
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit /api/cron/trial-management
+        run: |
+          curl -fsSL --retry 3 --retry-delay 10 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://www.queueup.me/api/cron/trial-management"

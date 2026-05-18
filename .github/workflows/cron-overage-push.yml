@@ -1,0 +1,20 @@
+name: Cron — overage push
+
+# Daily at 01:00 UTC: push cumulative billing-period overage call counts to
+# each active subscription's metered Stripe item. Uses action: "set" so
+# re-runs are idempotent and a missed day catches up on the next run.
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit /api/cron/overage-push
+        run: |
+          curl -fsSL --retry 3 --retry-delay 10 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://www.queueup.me/api/cron/overage-push"

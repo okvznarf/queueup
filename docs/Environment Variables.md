@@ -6,10 +6,25 @@
 | `DATABASE_URL` | Vercel env vars | PostgreSQL connection string (Neon) |
 | `NEXTAUTH_SECRET` | Vercel env vars | JWT signing secret |
 | `SENDGRID_API_KEY` | Vercel env vars | Email sending |
-| `CRON_SECRET` | Vercel env vars | Protects cron endpoints from unauthorized calls |
+| `CRON_SECRET` | Vercel env vars **+ GitHub repo secret** | Protects cron endpoints. Must match between Vercel and GH (Settings → Secrets → Actions). |
 | `GOOGLE_CLIENT_ID` | Vercel env vars | Google OAuth |
 | `GOOGLE_CLIENT_SECRET` | Vercel env vars | Google OAuth |
 | `NEXTAUTH_URL` | Vercel env vars | Production URL (https://www.queueup.me) |
+| `STRIPE_SECRET_KEY` | Vercel env vars | Stripe API (live or test) |
+| `STRIPE_WEBHOOK_SECRET` | Vercel env vars | Signature verification for /api/webhooks/stripe |
+
+## Crons
+Two crons run on Vercel (Hobby plan cap):
+- `/api/cron/reminders` — daily 00:00 UTC
+- `/api/cron/jobs` — daily 00:00 UTC
+
+Three crons run via **GitHub Actions** (`.github/workflows/cron-*.yml`) because
+Hobby is limited to 2 daily crons. The workflows curl the endpoints with
+`Authorization: Bearer ${{ secrets.CRON_SECRET }}` — add `CRON_SECRET` to the
+GitHub repo secrets (same value as Vercel):
+- `/api/cron/usage-alerts` — hourly
+- `/api/cron/trial-management` — daily 06:00 UTC
+- `/api/cron/overage-push` — daily 01:00 UTC
 
 ## Outreach Agent (local .env)
 | Variable | Where | Purpose |
