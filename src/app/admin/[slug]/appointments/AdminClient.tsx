@@ -13,6 +13,23 @@ const STATUS_COLORS: Record<string, string> = {
   NO_SHOW: "#a855f7",
 };
 
+// Mechanic-vertical repair workflow colors. Same scale (amber → blue → green).
+const REPAIR_STATUS_COLORS: Record<string, string> = {
+  RECEIVED: "#94a3b8",
+  IN_PROGRESS: "#3b82f6",
+  WAITING_FOR_PARTS: "#f59e0b",
+  READY: "#22c55e",
+  PICKED_UP: "#6b7280",
+};
+const REPAIR_STATUS_LABELS: Record<string, string> = {
+  RECEIVED: "Received",
+  IN_PROGRESS: "In progress",
+  WAITING_FOR_PARTS: "Waiting parts",
+  READY: "Ready",
+  PICKED_UP: "Picked up",
+};
+const REPAIR_STATUS_ORDER = ["RECEIVED", "IN_PROGRESS", "WAITING_FOR_PARTS", "READY", "PICKED_UP"];
+
 const DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
 const DAY_LABELS: Record<string, string> = {
   MONDAY: "Mon", TUESDAY: "Tue", WEDNESDAY: "Wed", THURSDAY: "Thu",
@@ -92,6 +109,18 @@ export default function AdminClient({ shop }: { shop: Shop }) {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
+      });
+      if (res.ok) fetchAppointments();
+    } catch (e) { console.error(e); }
+  };
+
+  // Mechanic-only: update repair workflow state.
+  const updateRepair = async (id: string, fields: { repairStatus?: string; repairStatusNote?: string }) => {
+    try {
+      const res = await fetch("/api/appointments/" + id, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fields),
       });
       if (res.ok) fetchAppointments();
     } catch (e) { console.error(e); }
@@ -352,8 +381,36 @@ export default function AdminClient({ shop }: { shop: Shop }) {
                         </div>
                         <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{apt.customer?.phone}{apt.customer?.email ? " | " + apt.customer.email : ""}</div>
                         {apt.notes && <div style={{ fontSize: 12, color: "#555", marginTop: 4, fontStyle: "italic" }}>Note: {apt.notes}</div>}
-                        {apt.vehicleInfo && <div style={{ fontSize: 12, color: "#555", marginTop: 2 }}>Vehicle: {apt.vehicleInfo}</div>}
+                        {apt.vehicleInfo && <div style={{ fontSize: 12, color: "#555", marginTop: 2 }}>Vehicle: {apt.vehicleInfo}{apt.licensePlate ? " (" + apt.licensePlate + ")" : ""}</div>}
                         {apt.partySize && <div style={{ fontSize: 12, color: "#555", marginTop: 2 }}>Party: {apt.partySize} guests</div>}
+                        {shop.businessType === "MECHANIC" && (
+                          <div style={{ marginTop: 10, padding: "10px 12px", background: "#0e0e0e", borderRadius: 8, border: "1px solid #ffffff08" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                              <span style={{ fontSize: 11, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.8 }}>Repair</span>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: REPAIR_STATUS_COLORS[apt.repairStatus ?? "RECEIVED"], background: REPAIR_STATUS_COLORS[apt.repairStatus ?? "RECEIVED"] + "20", padding: "2px 8px", borderRadius: 4 }}>
+                                {REPAIR_STATUS_LABELS[apt.repairStatus ?? "RECEIVED"]}
+                              </span>
+                              <select value={apt.repairStatus ?? "RECEIVED"} onChange={(e) => updateRepair(apt.id, { repairStatus: e.target.value })} style={{ ...INPUT, padding: "4px 8px", fontSize: 12, width: "auto", marginLeft: "auto" }}>
+                                {REPAIR_STATUS_ORDER.map((s) => (
+                                  <option key={s} value={s}>{REPAIR_STATUS_LABELS[s]}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <input
+                                defaultValue={apt.repairStatusNote ?? ""}
+                                placeholder="Add an update (e.g. waiting on brake pads — Tuesday)"
+                                onBlur={(e) => {
+                                  const v = e.target.value.trim();
+                                  if (v !== (apt.repairStatusNote ?? "")) {
+                                    updateRepair(apt.id, { repairStatusNote: v });
+                                  }
+                                }}
+                                style={{ ...INPUT, padding: "6px 10px", fontSize: 12 }}
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
                         <span style={{ fontSize: 12, fontWeight: 600, color: STATUS_COLORS[apt.status] || "#888", background: (STATUS_COLORS[apt.status] || "#888") + "18", padding: "3px 10px", borderRadius: 6 }}>{apt.status}</span>

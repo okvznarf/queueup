@@ -1393,6 +1393,9 @@ export const AppointmentScalarFieldEnum = {
   vehicleInfo: 'vehicleInfo',
   licensePlate: 'licensePlate',
   notes: 'notes',
+  repairStatus: 'repairStatus',
+  repairStatusNote: 'repairStatusNote',
+  repairStatusUpdatedAt: 'repairStatusUpdatedAt',
   totalPrice: 'totalPrice',
   paidAt: 'paidAt',
   reminderSentAt: 'reminderSentAt',
@@ -1593,6 +1596,20 @@ export type EnumBookingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'BookingStatus[]'
  */
 export type ListEnumBookingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BookingStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'RepairStatus'
+ */
+export type EnumRepairStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RepairStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'RepairStatus[]'
+ */
+export type ListEnumRepairStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RepairStatus[]'>
     
 
 

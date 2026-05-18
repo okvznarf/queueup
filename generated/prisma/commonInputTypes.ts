@@ -253,6 +253,13 @@ export type EnumBookingStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumBookingStatusFilter<$PrismaModel> | $Enums.BookingStatus
 }
 
+export type EnumRepairStatusNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.RepairStatus | Prisma.EnumRepairStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.RepairStatus[] | Prisma.ListEnumRepairStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.RepairStatus[] | Prisma.ListEnumRepairStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumRepairStatusNullableFilter<$PrismaModel> | $Enums.RepairStatus | null
+}
+
 export type FloatNullableFilter<$PrismaModel = never> = {
   equals?: number | Prisma.FloatFieldRefInput<$PrismaModel> | null
   in?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel> | null
@@ -272,6 +279,16 @@ export type EnumBookingStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumBookingStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumBookingStatusFilter<$PrismaModel>
+}
+
+export type EnumRepairStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RepairStatus | Prisma.EnumRepairStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.RepairStatus[] | Prisma.ListEnumRepairStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.RepairStatus[] | Prisma.ListEnumRepairStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumRepairStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.RepairStatus | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRepairStatusNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRepairStatusNullableFilter<$PrismaModel>
 }
 
 export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -548,6 +565,13 @@ export type NestedEnumBookingStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumBookingStatusFilter<$PrismaModel> | $Enums.BookingStatus
 }
 
+export type NestedEnumRepairStatusNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.RepairStatus | Prisma.EnumRepairStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.RepairStatus[] | Prisma.ListEnumRepairStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.RepairStatus[] | Prisma.ListEnumRepairStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumRepairStatusNullableFilter<$PrismaModel> | $Enums.RepairStatus | null
+}
+
 export type NestedEnumBookingStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.BookingStatus | Prisma.EnumBookingStatusFieldRefInput<$PrismaModel>
   in?: $Enums.BookingStatus[] | Prisma.ListEnumBookingStatusFieldRefInput<$PrismaModel>
@@ -556,6 +580,16 @@ export type NestedEnumBookingStatusWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumBookingStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumBookingStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumRepairStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RepairStatus | Prisma.EnumRepairStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.RepairStatus[] | Prisma.ListEnumRepairStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.RepairStatus[] | Prisma.ListEnumRepairStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumRepairStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.RepairStatus | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRepairStatusNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRepairStatusNullableFilter<$PrismaModel>
 }
 
 export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {

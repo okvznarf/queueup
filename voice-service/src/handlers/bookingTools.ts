@@ -405,13 +405,44 @@ export async function dispatchTool(
     }
 
     case 'check_repair_status': {
-      // Backend support not yet implemented — surfaces a clear message Claude can
-      // relay rather than crashing. When repair-status API ships, replace this stub.
-      session.actionsLog.push('stub:check_repair_status');
+      const plate = (input.license_plate as string | undefined)?.trim();
+      if (!plate) {
+        return {
+          error: 'MISSING_PLATE',
+          message:
+            'Ask the customer for their license plate ("registracija") before calling this tool.',
+        };
+      }
+      const params = new URLSearchParams({ shopId, licensePlate: plate });
+      const res = await fetch(apiUrl(`/api/internal/repair-status?${params}`), {
+        headers: authHeaders(shopId),
+      });
+      if (!res.ok) {
+        return { error: 'LOOKUP_FAILED', message: `HTTP ${res.status}` };
+      }
+      const data = (await res.json()) as {
+        found: boolean;
+        appointment?: {
+          id: string;
+          date: string;
+          vehicleInfo: string | null;
+          service: string;
+          repairStatus: string;
+          repairStatusNote: string | null;
+          repairStatusUpdatedAt: string | null;
+        };
+      };
+      if (!data.found || !data.appointment) {
+        return {
+          found: false,
+          message:
+            "No active repair found for that license plate. Confirm the plate, then offer to log a callback if the customer is certain the car is at the shop.",
+        };
+      }
+      session.actionsLog.push(`repair_status_lookup:${data.appointment.id}`);
       return {
-        error: 'NOT_IMPLEMENTED',
-        message:
-          'Repair status lookup is not available yet. Offer to log a callback request so a mechanic can call back with the status.',
+        found: true,
+        ...data.appointment,
       };
     }
 

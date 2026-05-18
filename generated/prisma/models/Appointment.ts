@@ -47,6 +47,9 @@ export type AppointmentMinAggregateOutputType = {
   vehicleInfo: string | null
   licensePlate: string | null
   notes: string | null
+  repairStatus: $Enums.RepairStatus | null
+  repairStatusNote: string | null
+  repairStatusUpdatedAt: Date | null
   totalPrice: number | null
   paidAt: Date | null
   reminderSentAt: Date | null
@@ -69,6 +72,9 @@ export type AppointmentMaxAggregateOutputType = {
   vehicleInfo: string | null
   licensePlate: string | null
   notes: string | null
+  repairStatus: $Enums.RepairStatus | null
+  repairStatusNote: string | null
+  repairStatusUpdatedAt: Date | null
   totalPrice: number | null
   paidAt: Date | null
   reminderSentAt: Date | null
@@ -91,6 +97,9 @@ export type AppointmentCountAggregateOutputType = {
   vehicleInfo: number
   licensePlate: number
   notes: number
+  repairStatus: number
+  repairStatusNote: number
+  repairStatusUpdatedAt: number
   totalPrice: number
   paidAt: number
   reminderSentAt: number
@@ -125,6 +134,9 @@ export type AppointmentMinAggregateInputType = {
   vehicleInfo?: true
   licensePlate?: true
   notes?: true
+  repairStatus?: true
+  repairStatusNote?: true
+  repairStatusUpdatedAt?: true
   totalPrice?: true
   paidAt?: true
   reminderSentAt?: true
@@ -147,6 +159,9 @@ export type AppointmentMaxAggregateInputType = {
   vehicleInfo?: true
   licensePlate?: true
   notes?: true
+  repairStatus?: true
+  repairStatusNote?: true
+  repairStatusUpdatedAt?: true
   totalPrice?: true
   paidAt?: true
   reminderSentAt?: true
@@ -169,6 +184,9 @@ export type AppointmentCountAggregateInputType = {
   vehicleInfo?: true
   licensePlate?: true
   notes?: true
+  repairStatus?: true
+  repairStatusNote?: true
+  repairStatusUpdatedAt?: true
   totalPrice?: true
   paidAt?: true
   reminderSentAt?: true
@@ -278,6 +296,9 @@ export type AppointmentGroupByOutputType = {
   vehicleInfo: string | null
   licensePlate: string | null
   notes: string | null
+  repairStatus: $Enums.RepairStatus | null
+  repairStatusNote: string | null
+  repairStatusUpdatedAt: Date | null
   totalPrice: number | null
   paidAt: Date | null
   reminderSentAt: Date | null
@@ -323,6 +344,9 @@ export type AppointmentWhereInput = {
   vehicleInfo?: Prisma.StringNullableFilter<"Appointment"> | string | null
   licensePlate?: Prisma.StringNullableFilter<"Appointment"> | string | null
   notes?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  repairStatus?: Prisma.EnumRepairStatusNullableFilter<"Appointment"> | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  repairStatusUpdatedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   totalPrice?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   paidAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   reminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
@@ -349,6 +373,9 @@ export type AppointmentOrderByWithRelationInput = {
   vehicleInfo?: Prisma.SortOrderInput | Prisma.SortOrder
   licensePlate?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  repairStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  repairStatusNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  repairStatusUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   totalPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   paidAt?: Prisma.SortOrderInput | Prisma.SortOrder
   reminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -378,6 +405,9 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   vehicleInfo?: Prisma.StringNullableFilter<"Appointment"> | string | null
   licensePlate?: Prisma.StringNullableFilter<"Appointment"> | string | null
   notes?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  repairStatus?: Prisma.EnumRepairStatusNullableFilter<"Appointment"> | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  repairStatusUpdatedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   totalPrice?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   paidAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   reminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
@@ -404,6 +434,9 @@ export type AppointmentOrderByWithAggregationInput = {
   vehicleInfo?: Prisma.SortOrderInput | Prisma.SortOrder
   licensePlate?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  repairStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  repairStatusNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  repairStatusUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   totalPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   paidAt?: Prisma.SortOrderInput | Prisma.SortOrder
   reminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -434,6 +467,9 @@ export type AppointmentScalarWhereWithAggregatesInput = {
   vehicleInfo?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   licensePlate?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   notes?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
+  repairStatus?: Prisma.EnumRepairStatusNullableWithAggregatesFilter<"Appointment"> | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
+  repairStatusUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
   totalPrice?: Prisma.FloatNullableWithAggregatesFilter<"Appointment"> | number | null
   paidAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
   reminderSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
@@ -456,6 +492,9 @@ export type AppointmentCreateInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -478,6 +517,9 @@ export type AppointmentUncheckedCreateInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -500,6 +542,9 @@ export type AppointmentUpdateInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -522,6 +567,9 @@ export type AppointmentUncheckedUpdateInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -544,6 +592,9 @@ export type AppointmentCreateManyInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -566,6 +617,9 @@ export type AppointmentUpdateManyMutationInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -584,6 +638,9 @@ export type AppointmentUncheckedUpdateManyInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -616,6 +673,9 @@ export type AppointmentCountOrderByAggregateInput = {
   vehicleInfo?: Prisma.SortOrder
   licensePlate?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  repairStatus?: Prisma.SortOrder
+  repairStatusNote?: Prisma.SortOrder
+  repairStatusUpdatedAt?: Prisma.SortOrder
   totalPrice?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
   reminderSentAt?: Prisma.SortOrder
@@ -643,6 +703,9 @@ export type AppointmentMaxOrderByAggregateInput = {
   vehicleInfo?: Prisma.SortOrder
   licensePlate?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  repairStatus?: Prisma.SortOrder
+  repairStatusNote?: Prisma.SortOrder
+  repairStatusUpdatedAt?: Prisma.SortOrder
   totalPrice?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
   reminderSentAt?: Prisma.SortOrder
@@ -665,6 +728,9 @@ export type AppointmentMinOrderByAggregateInput = {
   vehicleInfo?: Prisma.SortOrder
   licensePlate?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  repairStatus?: Prisma.SortOrder
+  repairStatusNote?: Prisma.SortOrder
+  repairStatusUpdatedAt?: Prisma.SortOrder
   totalPrice?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
   reminderSentAt?: Prisma.SortOrder
@@ -853,6 +919,10 @@ export type EnumBookingStatusFieldUpdateOperationsInput = {
   set?: $Enums.BookingStatus
 }
 
+export type NullableEnumRepairStatusFieldUpdateOperationsInput = {
+  set?: $Enums.RepairStatus | null
+}
+
 export type NullableFloatFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number
@@ -872,6 +942,9 @@ export type AppointmentCreateWithoutShopInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -893,6 +966,9 @@ export type AppointmentUncheckedCreateWithoutShopInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -943,6 +1019,9 @@ export type AppointmentScalarWhereInput = {
   vehicleInfo?: Prisma.StringNullableFilter<"Appointment"> | string | null
   licensePlate?: Prisma.StringNullableFilter<"Appointment"> | string | null
   notes?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  repairStatus?: Prisma.EnumRepairStatusNullableFilter<"Appointment"> | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  repairStatusUpdatedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   totalPrice?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   paidAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   reminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
@@ -965,6 +1044,9 @@ export type AppointmentCreateWithoutStaffInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -986,6 +1068,9 @@ export type AppointmentUncheckedCreateWithoutStaffInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -1033,6 +1118,9 @@ export type AppointmentCreateWithoutServiceInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -1054,6 +1142,9 @@ export type AppointmentUncheckedCreateWithoutServiceInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -1101,6 +1192,9 @@ export type AppointmentCreateWithoutCustomerInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -1122,6 +1216,9 @@ export type AppointmentUncheckedCreateWithoutCustomerInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -1169,6 +1266,9 @@ export type AppointmentCreateManyShopInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -1190,6 +1290,9 @@ export type AppointmentUpdateWithoutShopInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1211,6 +1314,9 @@ export type AppointmentUncheckedUpdateWithoutShopInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1232,6 +1338,9 @@ export type AppointmentUncheckedUpdateManyWithoutShopInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1253,6 +1362,9 @@ export type AppointmentCreateManyStaffInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -1274,6 +1386,9 @@ export type AppointmentUpdateWithoutStaffInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1295,6 +1410,9 @@ export type AppointmentUncheckedUpdateWithoutStaffInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1316,6 +1434,9 @@ export type AppointmentUncheckedUpdateManyWithoutStaffInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1337,6 +1458,9 @@ export type AppointmentCreateManyServiceInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -1358,6 +1482,9 @@ export type AppointmentUpdateWithoutServiceInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1379,6 +1506,9 @@ export type AppointmentUncheckedUpdateWithoutServiceInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1400,6 +1530,9 @@ export type AppointmentUncheckedUpdateManyWithoutServiceInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1421,6 +1554,9 @@ export type AppointmentCreateManyCustomerInput = {
   vehicleInfo?: string | null
   licensePlate?: string | null
   notes?: string | null
+  repairStatus?: $Enums.RepairStatus | null
+  repairStatusNote?: string | null
+  repairStatusUpdatedAt?: Date | string | null
   totalPrice?: number | null
   paidAt?: Date | string | null
   reminderSentAt?: Date | string | null
@@ -1442,6 +1578,9 @@ export type AppointmentUpdateWithoutCustomerInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1463,6 +1602,9 @@ export type AppointmentUncheckedUpdateWithoutCustomerInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1484,6 +1626,9 @@ export type AppointmentUncheckedUpdateManyWithoutCustomerInput = {
   vehicleInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatus?: Prisma.NullableEnumRepairStatusFieldUpdateOperationsInput | $Enums.RepairStatus | null
+  repairStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repairStatusUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1507,6 +1652,9 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   vehicleInfo?: boolean
   licensePlate?: boolean
   notes?: boolean
+  repairStatus?: boolean
+  repairStatusNote?: boolean
+  repairStatusUpdatedAt?: boolean
   totalPrice?: boolean
   paidAt?: boolean
   reminderSentAt?: boolean
@@ -1533,6 +1681,9 @@ export type AppointmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   vehicleInfo?: boolean
   licensePlate?: boolean
   notes?: boolean
+  repairStatus?: boolean
+  repairStatusNote?: boolean
+  repairStatusUpdatedAt?: boolean
   totalPrice?: boolean
   paidAt?: boolean
   reminderSentAt?: boolean
@@ -1559,6 +1710,9 @@ export type AppointmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   vehicleInfo?: boolean
   licensePlate?: boolean
   notes?: boolean
+  repairStatus?: boolean
+  repairStatusNote?: boolean
+  repairStatusUpdatedAt?: boolean
   totalPrice?: boolean
   paidAt?: boolean
   reminderSentAt?: boolean
@@ -1585,6 +1739,9 @@ export type AppointmentSelectScalar = {
   vehicleInfo?: boolean
   licensePlate?: boolean
   notes?: boolean
+  repairStatus?: boolean
+  repairStatusNote?: boolean
+  repairStatusUpdatedAt?: boolean
   totalPrice?: boolean
   paidAt?: boolean
   reminderSentAt?: boolean
@@ -1596,7 +1753,7 @@ export type AppointmentSelectScalar = {
   customerId?: boolean
 }
 
-export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "startTime" | "endTime" | "status" | "partySize" | "tableNumber" | "vehicleInfo" | "licensePlate" | "notes" | "totalPrice" | "paidAt" | "reminderSentAt" | "createdAt" | "updatedAt" | "shopId" | "serviceId" | "staffId" | "customerId", ExtArgs["result"]["appointment"]>
+export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "startTime" | "endTime" | "status" | "partySize" | "tableNumber" | "vehicleInfo" | "licensePlate" | "notes" | "repairStatus" | "repairStatusNote" | "repairStatusUpdatedAt" | "totalPrice" | "paidAt" | "reminderSentAt" | "createdAt" | "updatedAt" | "shopId" | "serviceId" | "staffId" | "customerId", ExtArgs["result"]["appointment"]>
 export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   shop?: boolean | Prisma.ShopDefaultArgs<ExtArgs>
   service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
@@ -1635,6 +1792,9 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
     vehicleInfo: string | null
     licensePlate: string | null
     notes: string | null
+    repairStatus: $Enums.RepairStatus | null
+    repairStatusNote: string | null
+    repairStatusUpdatedAt: Date | null
     totalPrice: number | null
     paidAt: Date | null
     reminderSentAt: Date | null
@@ -2081,6 +2241,9 @@ export interface AppointmentFieldRefs {
   readonly vehicleInfo: Prisma.FieldRef<"Appointment", 'String'>
   readonly licensePlate: Prisma.FieldRef<"Appointment", 'String'>
   readonly notes: Prisma.FieldRef<"Appointment", 'String'>
+  readonly repairStatus: Prisma.FieldRef<"Appointment", 'RepairStatus'>
+  readonly repairStatusNote: Prisma.FieldRef<"Appointment", 'String'>
+  readonly repairStatusUpdatedAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly totalPrice: Prisma.FieldRef<"Appointment", 'Float'>
   readonly paidAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly reminderSentAt: Prisma.FieldRef<"Appointment", 'DateTime'>

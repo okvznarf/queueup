@@ -28,6 +28,17 @@ enum BookingStatus {
   NO_SHOW
 }
 
+// Mechanic-vertical repair workflow state. Used independently of BookingStatus
+// (which tracks the appointment lifecycle) — repairStatus tracks what's happening
+// to the vehicle. AI receptionist reads this to answer "je li auto gotov?" calls.
+enum RepairStatus {
+  RECEIVED
+  IN_PROGRESS
+  WAITING_FOR_PARTS
+  READY
+  PICKED_UP
+}
+
 enum DayOfWeek {
   MONDAY
   TUESDAY
@@ -183,6 +194,11 @@ model Appointment {
   vehicleInfo String?
   licensePlate String?
   notes       String?
+  // Mechanic-vertical repair workflow. Null for non-mechanic appointments.
+  // Voice receptionist reads these to answer status-check calls.
+  repairStatus          RepairStatus?
+  repairStatusNote      String?       // e.g., "Waiting for brake pads — Tuesday"
+  repairStatusUpdatedAt DateTime?
   totalPrice      Float?
   paidAt          DateTime?
   reminderSentAt  DateTime?
@@ -201,6 +217,7 @@ model Appointment {
   @@index([status])
   @@index([customerId])
   @@index([shopId, status, date])
+  @@index([shopId, licensePlate])
 }
 
 model WorkingHours {

@@ -36,6 +36,17 @@ export const BookingStatus = {
 export type BookingStatus = (typeof BookingStatus)[keyof typeof BookingStatus]
 
 
+export const RepairStatus = {
+  RECEIVED: 'RECEIVED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  WAITING_FOR_PARTS: 'WAITING_FOR_PARTS',
+  READY: 'READY',
+  PICKED_UP: 'PICKED_UP'
+} as const
+
+export type RepairStatus = (typeof RepairStatus)[keyof typeof RepairStatus]
+
+
 export const DayOfWeek = {
   MONDAY: 'MONDAY',
   TUESDAY: 'TUESDAY',
