@@ -298,6 +298,37 @@ export default function AdminClient({ shop }: { shop: Shop }) {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", background: "#0a0a0a", minHeight: "100vh", color: "#e8e4dd" }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        /* Mobile-responsive admin breakpoint at 768px (tablet portrait and below). */
+        @media (max-width: 768px) {
+          .qu-admin-layout { flex-direction: column; }
+          .qu-admin-sidebar {
+            width: 100% !important;
+            min-height: 0 !important;
+            border-right: none !important;
+            border-bottom: 1px solid #ffffff10;
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+            padding: 8px !important;
+            gap: 4px;
+            -webkit-overflow-scrolling: touch;
+          }
+          .qu-admin-sidebar button {
+            border-left: none !important;
+            border-bottom: 3px solid transparent !important;
+            white-space: nowrap;
+            padding: 8px 14px !important;
+            font-size: 13px !important;
+          }
+          .qu-admin-sidebar button[data-active="true"] {
+            border-bottom-color: var(--qu-accent) !important;
+          }
+          .qu-admin-main { padding: 16px !important; }
+          .qu-admin-stats { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+      ` }} />
+
       {/* Toast */}
       {toast && (
         <div style={{
@@ -318,9 +349,9 @@ export default function AdminClient({ shop }: { shop: Shop }) {
         <a href={"/booking/" + shop.slug} target="_blank" style={{ fontSize: 13, color: accent, textDecoration: "none" }}>View Booking Page ↗</a>
       </div>
 
-      <div style={{ display: "flex" }}>
+      <div className="qu-admin-layout" style={{ display: "flex", ["--qu-accent" as any]: accent } as React.CSSProperties}>
         {/* Sidebar */}
-        <div style={{ width: 200, background: "#111", borderRight: "1px solid #ffffff10", minHeight: "calc(100vh - 50px)", padding: "20px 0" }}>
+        <div className="qu-admin-sidebar" style={{ width: 200, background: "#111", borderRight: "1px solid #ffffff10", minHeight: "calc(100vh - 50px)", padding: "20px 0" }}>
           {[
             { id: "appointments", label: "Appointments" },
             { id: "staff", label: shop.staffLabel + "s" },
@@ -330,7 +361,7 @@ export default function AdminClient({ shop }: { shop: Shop }) {
             { id: "billing", label: "Billing" },
             { id: "settings", label: "Settings" },
           ].map((tab) => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
+            <button key={tab.id} data-active={activeTab === tab.id} onClick={() => setActiveTab(tab.id)} style={{
               display: "block", width: "100%", padding: "10px 20px", border: "none",
               background: activeTab === tab.id ? accent + "18" : "transparent",
               color: activeTab === tab.id ? accent : "#888",
@@ -341,13 +372,13 @@ export default function AdminClient({ shop }: { shop: Shop }) {
         </div>
 
         {/* Main Content */}
-        <div style={{ flex: 1, padding: 24 }}>
+        <div className="qu-admin-main" style={{ flex: 1, padding: 24 }}>
           <TrialBanner shop={shop} accent={accent} onGoToBilling={() => setActiveTab("billing")} />
 
           {/* ── APPOINTMENTS ── */}
           {activeTab === "appointments" && (
             <div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
+              <div className="qu-admin-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
                 <StatCard label="Total Today" value={stats.total} color="#3b82f6" />
                 <StatCard label="Confirmed" value={stats.confirmed} color="#22c55e" />
                 <StatCard label="Completed" value={stats.completed} color="#6b7280" />
