@@ -16,12 +16,14 @@ export async function GET(request: NextRequest) {
   const checks: Record<string, unknown> = { status: "ok" };
 
   // Database connectivity
+  let dbError: string | null = null;
   try {
     await prisma.$queryRawUnsafe("SELECT 1");
     checks.db = "connected";
-  } catch {
+  } catch (e) {
     checks.db = "disconnected";
     checks.status = "degraded";
+    dbError = e instanceof Error ? `${e.name}: ${e.message}`.slice(0, 400) : String(e).slice(0, 400);
   }
 
   // Circuit breaker states
@@ -47,6 +49,8 @@ export async function GET(request: NextRequest) {
 
   if (authorized) {
     checks.errorCount = getRecentErrors().length;
+    if (dbError) checks.dbError = dbError;
+    checks.dbUrlHost = (process.env.DATABASE_URL || "").replace(/^postgres(ql)?:\/\/[^@]*@/, "").split("?")[0] || "(unset)";
     if (request.nextUrl.searchParams.get("errors") === "true") {
       checks.recentErrors = getRecentErrors();
     }
