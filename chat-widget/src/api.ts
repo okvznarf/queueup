@@ -5,7 +5,7 @@ export async function sendMessage(
   message: string,
   onChunk: (text: string) => void,
 ): Promise<void> {
-  const response = await fetch(apiUrl + '/chat', {
+  const response = await fetch(apiUrl.replace(/\/+$/, '') + '/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ shopId, sessionId, message, consentGranted: true }),

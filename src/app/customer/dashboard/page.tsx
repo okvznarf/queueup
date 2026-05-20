@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -51,7 +51,7 @@ export default function CustomerDashboard() {
     setDark(saved === "dark");
   }, []);
 
-  const fetchAppointments = async () => {
+  const fetchAppointments = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -61,9 +61,9 @@ export default function CustomerDashboard() {
       else { setError("Failed to load appointments. Please try again."); }
     } catch { setError("Connection error. Check your internet and try again."); }
     setLoading(false);
-  };
+  }, [router]);
 
-  useEffect(() => { fetchAppointments(); }, []);
+  useEffect(() => { fetchAppointments(); }, [fetchAppointments]);
 
   if (dark === null) return null;
 

@@ -6,6 +6,8 @@
 # dependencies
 /node_modules
 outreach-agent/node_modules
+chat-widget/node_modules
+voice-service/node_modules
 /.pnp
 .pnp.*
 .yarn/*

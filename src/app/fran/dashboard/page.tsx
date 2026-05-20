@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 type Shop = {
@@ -69,15 +69,15 @@ export default function SuperadminDashboard() {
   const editFileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  const fetchShops = async () => {
+  const fetchShops = useCallback(async () => {
     const res = await fetch("/api/superadmin/shops");
     if (res.status === 401) { router.push("/fran/login"); return; }
     const data = await res.json();
     setShops(data);
     setLoading(false);
-  };
+  }, [router]);
 
-  useEffect(() => { fetchShops(); }, []);
+  useEffect(() => { fetchShops(); }, [fetchShops]);
 
   const handleToggleActive = async (shop: Shop) => {
     await fetch("/api/superadmin/shops", {

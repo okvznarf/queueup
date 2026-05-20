@@ -8,7 +8,9 @@ type EventHandler = (data: unknown) => void;
 // Usage: useShopEvents(shopId, { "appointment:created": (data) => refetch() })
 export function useShopEvents(shopId: string | null, handlers: Record<string, EventHandler>) {
   const handlersRef = useRef(handlers);
-  handlersRef.current = handlers;
+  useEffect(() => {
+    handlersRef.current = handlers;
+  });
 
   useEffect(() => {
     if (!shopId) return;

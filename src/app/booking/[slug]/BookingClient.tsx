@@ -80,7 +80,8 @@ export default function BookingClient({ shop }: { shop: Shop }) {
     if (!selDate || !selService) return;
     if (isDropOff) {
       // Auto-set slot to the day's opening time so the existing POST path works.
-      const wh = selDateWh();
+      const dayName = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"][selDate.getDay()];
+      const wh = shop.workingHours.find((h: any) => h.day === dayName) || null;
       if (wh && !wh.isClosed && wh.openTime) {
         setSlots([]);
         setSelSlot({ label: `Drop-off (${wh.openTime}–${wh.closeTime})`, startTime: wh.openTime, available: true });
@@ -97,7 +98,7 @@ export default function BookingClient({ shop }: { shop: Shop }) {
       setSlots(data);
       setSlotsLoading(false);
     }).catch(() => setSlotsLoading(false));
-  }, [selDate, selStaff, selService]);
+  }, [selDate, selStaff, selService, selDuration, isDropOff, service?.duration, shop.id, shop.workingHours]);
 
   const goStep = (n: number) => {
     setStep(n);

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { useNow } from "@/hooks/useNow";
 
 type Shop = any;
 type Appointment = any;
@@ -694,11 +695,12 @@ function BillingTab({
   onSubscribe: (cycle: "monthly" | "annual") => void;
   onOpenPortal: () => void;
 }) {
+  const now = useNow();
   const hasSubscription = !!shop.stripeSubscriptionId;
-  const isTrialing = !hasSubscription && shop.trialEndsAt && new Date(shop.trialEndsAt) > new Date();
   const trialEnd = shop.trialEndsAt ? new Date(shop.trialEndsAt) : null;
+  const isTrialing = !hasSubscription && trialEnd && trialEnd.getTime() > now;
   const trialDaysLeft = trialEnd
-    ? Math.max(0, Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    ? Math.max(0, Math.ceil((trialEnd.getTime() - now) / (1000 * 60 * 60 * 24)))
     : 0;
 
   const base = shop.monthlyPrice ?? 0;
@@ -877,11 +879,12 @@ function StatusBadge({ label, color }: { label: string; color: string }) {
 // urgency so a paying customer sees a calm gold tone and an about-to-expire
 // owner sees an unmistakable red prompt.
 function TrialBanner({ shop, accent, onGoToBilling }: { shop: any; accent: string; onGoToBilling: () => void }) {
+  const now = useNow();
   const hasSub = !!shop.stripeSubscriptionId;
   if (hasSub) return null;
   const trialEnd = shop.trialEndsAt ? new Date(shop.trialEndsAt) : null;
-  if (!trialEnd || trialEnd <= new Date()) return null;
-  const daysLeft = Math.max(0, Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+  if (!trialEnd || trialEnd.getTime() <= now) return null;
+  const daysLeft = Math.max(0, Math.ceil((trialEnd.getTime() - now) / (1000 * 60 * 60 * 24)));
   const urgent = daysLeft <= 2;
   const warning = daysLeft <= 6;
   const color = urgent ? "#ef4444" : warning ? "#f59e0b" : accent;
